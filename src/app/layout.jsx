@@ -5,6 +5,7 @@ import PageIntroAnimation from "@/components/layout/PageIntroAnimation/PageIntro
 import ScrollReveal from "@/components/layout/ScrollReveal/ScrollReveal";
 import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
+import BackToTop from "@/components/ui/BackToTop/BackToTop";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -89,6 +90,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         <PageIntroAnimation />
         <ScrollReveal />
+        <BackToTop />
 
         <Header />
         {children}
