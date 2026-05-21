@@ -1,3 +1,4 @@
+import ProjectsHero from "@/components/sections/projects/ProjectsHero/ProjectsHero";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -18,7 +19,7 @@ export const metadata = createPageMetadata({
 export default function ProjectsPage() {
   return (
     <main>
-      <p>Projects Page</p>
+      <ProjectsHero />
     </main>
   );
 }
