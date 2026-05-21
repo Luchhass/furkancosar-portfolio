@@ -1,12 +1,6 @@
 "use client";
 
-export default function GradientActionButton({
-  className = "",
-  href = "",
-  id = "",
-  label = "",
-  onClick,
-}) {
+export default function GradientActionButton({ className = "", href = "", id = "", label = "", onClick }) {
   function updateFillOrigin(event) {
     const button = event.currentTarget;
     const rect = button.getBoundingClientRect();

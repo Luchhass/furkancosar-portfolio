@@ -4,10 +4,8 @@ import { useRef } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import GradientActionButton from "@/components/ui/ContactButton/ContactButton";
-import RevealCounter, {
-  playRevealCounters,
-} from "@/components/ui/RevealCounter/RevealCounter";
+import GradientActionButton from "@/components/ui/GradientActionButton/GradientActionButton";
+import RevealCounter, { playRevealCounters } from "@/components/ui/RevealCounter/RevealCounter";
 
 gsap.registerPlugin(useGSAP);
 
@@ -22,13 +20,7 @@ function normalizeCopyLines(copyLines) {
     .filter(Boolean);
 }
 
-export default function Hero({
-  titleLines,
-  copyLines,
-  stat,
-  action,
-  copyClassName = "",
-}) {
+export default function Hero({ titleLines, copyLines, stat, action, copyClassName = "" }) {
   const heroRef = useRef(null);
   const pathname = usePathname();
   const heroCopyLines = normalizeCopyLines(copyLines);
