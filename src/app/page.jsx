@@ -1,10 +1,10 @@
-import AboutMeAccordion from "@/components/sections/Home/AboutMeAccordion/AboutMeAccordion";
 import HomeHero from "@/components/sections/Home/HomeHero/HomeHero";
+import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
+import ScrollMarqueeText from "@/components/ui/ScrollMarqueeText/ScrollMarqueeText";
+import AboutMeAccordion from "@/components/sections/Home/AboutMeAccordion/AboutMeAccordion";
 import ProjectsHighlights from "@/components/sections/Home/ProjectsHighlights/ProjectsHighlights";
 import CollaborationCTA from "@/components/ui/CollaborationCTA/CollaborationCTA";
 import IdentityBand from "@/components/ui/IdentityBand/IdentityBand";
-import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
-import ScrollMarqueeText from "@/components/ui/ScrollMarqueeText/ScrollMarqueeText";
 import { createPageMetadata, siteConfig } from "@/lib/seo";
 
 export const metadata = createPageMetadata({

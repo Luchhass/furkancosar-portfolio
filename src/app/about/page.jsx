@@ -1,10 +1,10 @@
 import AboutHero from "@/components/sections/about/AboutHero/AboutHero";
+import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
+import ScrollMarqueeText from "@/components/ui/ScrollMarqueeText/ScrollMarqueeText";
 import AboutMeIntro from "@/components/sections/about/AboutMeIntro/AboutMeIntro";
 import GitHubStats from "@/components/sections/about/GitHubStats/GitHubStats";
 import TechStackAccordion from "@/components/sections/about/TechStackAccordion/TechStackAccordion";
 import CollaborationCTA from "@/components/ui/CollaborationCTA/CollaborationCTA";
-import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
-import ScrollMarqueeText from "@/components/ui/ScrollMarqueeText/ScrollMarqueeText";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
