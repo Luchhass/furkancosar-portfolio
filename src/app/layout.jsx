@@ -1,9 +1,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import { baseKeywords, siteConfig } from "@/lib/seo";
+import "./globals.css";
+import PageIntroAnimation from "@/components/layout/PageIntroAnimation/PageIntroAnimation";
+import ScrollReveal from "@/components/layout/ScrollReveal/ScrollReveal";
 import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
-import { baseKeywords, siteConfig } from "@/lib/seo";
-import PageIntroAnimation from "@/components/layout/PageIntroAnimation/PageIntroAnimation";
-import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -86,10 +87,12 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <PageIntroAnimation />
+        <ScrollReveal />
+
         <Header />
         {children}
         <Footer />
-        <PageIntroAnimation />
       </body>
     </html>
   );
