@@ -1,3 +1,4 @@
+import ContactHero from "@/components/sections/contact/ContactHero/ContactHero";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -17,7 +18,7 @@ export const metadata = createPageMetadata({
 export default function ContactPage() {
   return (
     <main>
-      <p>Contact Page</p>
+      <ContactHero />
     </main>
   );
 }
