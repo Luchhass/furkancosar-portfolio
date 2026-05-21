@@ -7,7 +7,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { contactItems, navigationItems, socialItems } from "@/data/site";
-import SocialMediaButtons from "@/components/SocialMediaButtons/SocialMediaButtons";
+import SocialMediaButtons from "@/components/ui/SocialMediaButtons/SocialMediaButtons";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 

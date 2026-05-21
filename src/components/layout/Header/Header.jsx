@@ -6,7 +6,7 @@ import { useGSAP } from "@gsap/react";
 import { contactItems, navigationItems, siteConfig, socialItems } from "@/data/site";
 import gsap from "gsap";
 import Link from "next/link";
-import SocialMediaButtons from "../SocialMediaButtons/SocialMediaButtons";
+import SocialMediaButtons from "../../ui/SocialMediaButtons/SocialMediaButtons";
 
 gsap.registerPlugin(useGSAP);
 

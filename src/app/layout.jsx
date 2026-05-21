@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import Header from "@/components/Header/Header";
-import Footer from "@/components/Footer/Footer";
+import Header from "@/components/layout/Header/Header";
+import Footer from "@/components/layout/Footer/Footer";
 import { baseKeywords, siteConfig } from "@/lib/seo";
-import PageIntroAnimation from "@/components/PageIntroAnimation/PageIntroAnimation";
+import PageIntroAnimation from "@/components/layout/PageIntroAnimation/PageIntroAnimation";
 import "./globals.css";
 
 const geistSans = Geist({
