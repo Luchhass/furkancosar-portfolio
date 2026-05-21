@@ -1,3 +1,4 @@
+import AboutMeAccordion from "@/components/sections/Home/AboutMeAccordion/AboutMeAccordion";
 import HomeHero from "@/components/sections/Home/HomeHero/HomeHero";
 import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
 import ScrollMarqueeText from "@/components/ui/ScrollMarqueeText/ScrollMarqueeText";
@@ -22,6 +23,7 @@ export default function Home() {
       <HomeHero />
       <MarqueeText text="Welcome" duration="50s" />
       <ScrollMarqueeText text="to my page" />
+      <AboutMeAccordion />
     </main>
   );
 }
