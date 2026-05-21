@@ -1,5 +1,6 @@
 import AboutHero from "@/components/sections/about/AboutHero/AboutHero";
 import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
+import ScrollMarqueeText from "@/components/ui/ScrollMarqueeText/ScrollMarqueeText";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -20,6 +21,7 @@ export default function AboutPage() {
     <main>
       <AboutHero />
       <MarqueeText text="FURKAN COSAR" duration="50s" />
+      <ScrollMarqueeText text="FRONTEND DEV" />
     </main>
   );
 }
