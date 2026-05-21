@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import { baseKeywords, siteConfig } from "@/lib/seo";
+import PageIntroAnimation from "@/components/PageIntroAnimation/PageIntroAnimation";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -88,6 +89,7 @@ export default function RootLayout({ children }) {
         <Header />
         {children}
         <Footer />
+        <PageIntroAnimation />
       </body>
     </html>
   );
