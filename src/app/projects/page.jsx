@@ -1,4 +1,5 @@
 import ProjectsHero from "@/components/sections/projects/ProjectsHero/ProjectsHero";
+import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -20,6 +21,7 @@ export default function ProjectsPage() {
   return (
     <main>
       <ProjectsHero />
+      <MarqueeText text="MY PROJECTS" duration="50s" />
     </main>
   );
 }
