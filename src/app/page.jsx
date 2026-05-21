@@ -1,3 +1,4 @@
+import HomeHero from "@/components/sections/Home/HomeHero/HomeHero";
 import { createPageMetadata, siteConfig } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -16,7 +17,7 @@ export const metadata = createPageMetadata({
 export default function Home() {
   return (
     <main>
-      <p>Home Page</p>
+      <HomeHero />
     </main>
   );
 }
