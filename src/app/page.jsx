@@ -1,4 +1,5 @@
 import HomeHero from "@/components/sections/Home/HomeHero/HomeHero";
+import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
 import { createPageMetadata, siteConfig } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -18,6 +19,7 @@ export default function Home() {
   return (
     <main>
       <HomeHero />
+      <MarqueeText text="Welcome" duration="50s" />
     </main>
   );
 }
