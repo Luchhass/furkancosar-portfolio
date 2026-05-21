@@ -1,6 +1,7 @@
 import AboutMeAccordion from "@/components/sections/Home/AboutMeAccordion/AboutMeAccordion";
 import HomeHero from "@/components/sections/Home/HomeHero/HomeHero";
 import ProjectsHighlights from "@/components/sections/Home/ProjectsHighlights/ProjectsHighlights";
+import CollaborationCTA from "@/components/ui/CollaborationCTA/CollaborationCTA";
 import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
 import ScrollMarqueeText from "@/components/ui/ScrollMarqueeText/ScrollMarqueeText";
 import { createPageMetadata, siteConfig } from "@/lib/seo";
@@ -26,6 +27,7 @@ export default function Home() {
       <ScrollMarqueeText text="to my page" />
       <AboutMeAccordion />
       <ProjectsHighlights />
+      <CollaborationCTA />
     </main>
   );
 }
