@@ -1,7 +1,8 @@
 "use client";
 
-import RevealTextLine from "@/components/layout/ScrollReveal/RevealTextLine";
 import { useState } from "react";
+import RevealTextLine from "@/components/layout/ScrollReveal/RevealTextLine";
+import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
 
 const projectTypes = ["Website", "Interface", "Ecommerce", "Dashboard"];
 
@@ -87,11 +88,16 @@ export default function ContactForm() {
     <section
       data-header-theme="light"
       data-scroll-reveal="sequence"
-      className="min-h-dvh overflow-hidden bg-white px-8 py-20 text-black md:px-10 md:py-24 lg:px-16 lg:py-32"
+      className="relative isolate min-h-dvh overflow-hidden bg-white px-8 py-20 text-black md:px-10 md:py-24 lg:px-16 lg:py-32"
       aria-labelledby="contact-form-title"
     >
-      <div className="grid w-full grid-cols-[40px_minmax(0,1fr)] gap-x-4 md:grid-cols-[120px_minmax(0,1fr)] md:gap-x-5 lg:grid-cols-[160px_minmax(0,1fr)_160px] lg:items-start lg:gap-x-5">
-        <p data-reveal-part="kicker" className="m-0 flex items-center gap-2 self-start text-[13px] leading-none font-black tracking-[0.08em] text-black/55 uppercase md:text-sm">
+      <OutlineCirclesBackground />
+
+      <div className="relative z-10 grid w-full grid-cols-[40px_minmax(0,1fr)] gap-x-4 md:grid-cols-[120px_minmax(0,1fr)] md:gap-x-5 lg:grid-cols-[160px_minmax(0,1fr)_160px] lg:items-start lg:gap-x-5">
+        <p
+          data-reveal-part="kicker"
+          className="m-0 flex items-center gap-2 self-start text-[13px] leading-none font-black tracking-[0.08em] text-black/55 uppercase md:text-sm"
+        >
           <span data-reveal-inner className="inline-flex items-center gap-2">
             <span
               className="gradient-action-dot h-2 w-2 rounded-full"
@@ -115,21 +121,26 @@ export default function ContactForm() {
             <div>
               <p className="m-0 mt-5 max-w-md text-[13px] leading-tight font-medium text-black/60 md:mt-7 md:text-sm">
                 <RevealTextLine>
-                  Tell me what you want to build, where the project is right now,
+                  Tell me what you want to build, where the project is right
+                  now,
                 </RevealTextLine>
                 <RevealTextLine>
                   and what kind of feeling the interface should carry. We can
                   talk
                 </RevealTextLine>
                 <RevealTextLine>
-                  through the screens, motion details, responsive flow and launch
+                  through the screens, motion details, responsive flow and
+                  launch
                 </RevealTextLine>
                 <RevealTextLine>
                   priorities before shaping the cleanest frontend path.
                 </RevealTextLine>
               </p>
 
-              <div data-reveal-part="content" className="mt-7 grid max-w-xl grid-cols-2 gap-x-6 gap-y-4 border-t border-black/10 pt-5 md:mt-9 md:grid-cols-4">
+              <div
+                data-reveal-part="content"
+                className="mt-7 grid max-w-xl grid-cols-2 gap-x-6 gap-y-4 border-t border-black/10 pt-5 md:mt-9 md:grid-cols-4"
+              >
                 {contactNotes.map(([number, label]) => (
                   <div key={label}>
                     <span className="gradient-text-flow block text-[28px] leading-[0.82] font-black md:text-[30px] lg:text-[32px]">

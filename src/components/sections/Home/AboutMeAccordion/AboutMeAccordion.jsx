@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Code2, Sparkles, Workflow } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
 
 gsap.registerPlugin(useGSAP);
 
@@ -143,6 +144,8 @@ export default function AboutMeAccordion() {
       data-scroll-reveal="sequence"
       className="relative isolate min-h-dvh overflow-hidden bg-white px-8 py-20 text-black md:px-10 md:py-24 lg:px-16 lg:py-32"
     >
+      <OutlineCirclesBackground />
+      
       <svg className="absolute h-0 w-0" aria-hidden="true">
         <defs>
           <linearGradient

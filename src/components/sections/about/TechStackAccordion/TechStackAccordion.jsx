@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { Code2, Sparkles, Workflow } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
 
 gsap.registerPlugin(useGSAP);
 
@@ -230,8 +231,10 @@ export default function TechStackAccordion() {
       ref={accordionRef}
       data-header-theme="light"
       data-scroll-reveal="sequence"
-      className="min-h-dvh bg-white px-8 py-20 text-black md:px-10 md:py-24 lg:px-16 lg:py-32"
+      className="relative isolate min-h-dvh overflow-hidden bg-white px-8 py-20 text-black md:px-10 md:py-24 lg:px-16 lg:py-32"
     >
+      <OutlineCirclesBackground />
+
       <svg className="absolute h-0 w-0" aria-hidden="true">
         <defs>
           <linearGradient
@@ -257,7 +260,7 @@ export default function TechStackAccordion() {
         </defs>
       </svg>
 
-      <div className="grid w-full max-w-205 grid-cols-[40px_minmax(0,1fr)] gap-x-4 md:grid-cols-[120px_minmax(0,1fr)] md:gap-x-5 lg:grid-cols-[160px_minmax(0,1fr)]">
+      <div className="relative z-10 grid w-full max-w-205 grid-cols-[40px_minmax(0,1fr)] gap-x-4 md:grid-cols-[120px_minmax(0,1fr)] md:gap-x-5 lg:grid-cols-[160px_minmax(0,1fr)]">
         <h2
           data-reveal-part="title"
           className="col-start-2 m-0 flex flex-col text-[44px] leading-[0.9] font-black tracking-[-0.04em] uppercase md:text-[80px] lg:text-[120px]"

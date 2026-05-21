@@ -1,4 +1,5 @@
 import RevealTextLine from "@/components/layout/ScrollReveal/RevealTextLine";
+import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
 import RevealCounter from "@/components/ui/RevealCounter/RevealCounter";
 import { projectCount } from "@/data/projects";
 
@@ -9,10 +10,12 @@ export default function ProjectsIntro() {
     <section
       data-header-theme="light"
       data-scroll-reveal="sequence"
-      className="min-h-dvh overflow-hidden bg-white px-8 py-20 text-black md:px-10 md:py-24 lg:px-16 lg:py-32"
+      className="relative isolate min-h-dvh overflow-hidden bg-white px-8 py-20 text-black md:px-10 md:py-24 lg:px-16 lg:py-32"
       aria-labelledby="projects-intro-title"
     >
-      <div className="grid w-full max-w-205 grid-cols-1 gap-y-5 md:grid-cols-[120px_minmax(0,1fr)] md:gap-x-5 md:gap-y-0 lg:grid-cols-[160px_minmax(0,1fr)]">
+      <OutlineCirclesBackground />
+
+      <div className="relative z-10 grid w-full max-w-205 grid-cols-1 gap-y-5 md:grid-cols-[120px_minmax(0,1fr)] md:gap-x-5 md:gap-y-0 lg:grid-cols-[160px_minmax(0,1fr)]">
         <p
           data-reveal-part="kicker"
           className="m-0 inline-flex items-center gap-2 self-start text-[13px] leading-none font-black tracking-[0.08em] text-black/55 uppercase md:pt-3 md:text-sm"

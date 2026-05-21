@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import GradientActionButton from "@/components/ui/GradientActionButton/GradientActionButton";
 import RevealCounter, { playRevealCounters } from "@/components/ui/RevealCounter/RevealCounter";
+import { GeometricPentagonBackground } from "../Backgrounds/GeometricPentagonBackground";
 
 gsap.registerPlugin(useGSAP);
 
@@ -313,6 +314,8 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       data-scroll-reveal="off"
       className="relative isolate grid h-dvh grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] overflow-hidden bg-black px-8 py-6 md:px-10 md:py-8 lg:px-16 lg:py-12"
     >
+      <GeometricPentagonBackground />
+      
       <div className="relative z-10 row-start-2 flex items-center justify-center">
         <h1 className="m-0 flex flex-col items-center text-center text-[44px] leading-[0.9] font-black tracking-[-0.04em] text-white uppercase md:text-[80px] lg:text-[120px]">
           {titleLines.map((line) => (
