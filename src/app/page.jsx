@@ -1,5 +1,6 @@
 import AboutMeAccordion from "@/components/sections/Home/AboutMeAccordion/AboutMeAccordion";
 import HomeHero from "@/components/sections/Home/HomeHero/HomeHero";
+import ProjectsHighlights from "@/components/sections/Home/ProjectsHighlights/ProjectsHighlights";
 import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
 import ScrollMarqueeText from "@/components/ui/ScrollMarqueeText/ScrollMarqueeText";
 import { createPageMetadata, siteConfig } from "@/lib/seo";
@@ -24,6 +25,7 @@ export default function Home() {
       <MarqueeText text="Welcome" duration="50s" />
       <ScrollMarqueeText text="to my page" />
       <AboutMeAccordion />
+      <ProjectsHighlights />
     </main>
   );
 }

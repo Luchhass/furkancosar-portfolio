@@ -400,6 +400,8 @@ export const latestProjects = [...projects].sort(
   (a, b) => new Date(b.date) - new Date(a.date),
 );
 
+export const homeProjects = latestProjects.slice(0, 6);
+
 export const featuredProjects = latestProjects.filter(
   (project) => project.featured,
 );
@@ -407,6 +409,7 @@ export const featuredProjects = latestProjects.filter(
 export const projectStats = createProjectStats(projects);
 
 export const projectCount = projectStats.total;
+export const homeProjectCount = homeProjects.length;
 export const featuredProjectCount = projectStats.featured;
 export const completedProjectCount = projectStats.completed;
 
