@@ -1,5 +1,6 @@
 import AboutHero from "@/components/sections/about/AboutHero/AboutHero";
 import AboutMeIntro from "@/components/sections/about/AboutMeIntro/AboutMeIntro";
+import GitHubStats from "@/components/sections/about/GitHubStats/GitHubStats";
 import MarqueeText from "@/components/ui/MarqueeText/MarqueeText";
 import ScrollMarqueeText from "@/components/ui/ScrollMarqueeText/ScrollMarqueeText";
 import { createPageMetadata } from "@/lib/seo";
@@ -24,6 +25,7 @@ export default function AboutPage() {
       <MarqueeText text="FURKAN COSAR" duration="50s" />
       <ScrollMarqueeText text="FRONTEND DEV" />
       <AboutMeIntro />
+      <GitHubStats />
     </main>
   );
 }
