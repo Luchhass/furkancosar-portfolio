@@ -28,6 +28,7 @@ export default function Home() {
       <AboutMeAccordion />
       <ProjectsHighlights />
       <CollaborationCTA />
+
     </main>
   );
 }
