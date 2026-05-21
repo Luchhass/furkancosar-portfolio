@@ -1,6 +1,6 @@
 "use client";
 
-function SocialMediaGlyph({ icon }) {
+function SocialIcon({ icon }) {
   if (icon === "instagram") {
     return (
       <svg
@@ -40,7 +40,7 @@ function SocialMediaGlyph({ icon }) {
   );
 }
 
-export default function SocialMediaButtons({ item, animated = false }) {
+export default function SocialMediaButtons({ item, animationAttribute }) {
   function updateActionFillOrigin(event) {
     const link = event.currentTarget;
     const rect = link.getBoundingClientRect();
@@ -58,10 +58,10 @@ export default function SocialMediaButtons({ item, animated = false }) {
   return (
     <a
       href={item.href}
+      aria-label={item.name || item.label}
       target="_blank"
       rel="noreferrer"
-      aria-label={item.name}
-      data-menu-social-item={animated ? "" : undefined}
+      {...(animationAttribute ? { [animationAttribute]: "" } : {})}
       onPointerEnter={updateActionFillOrigin}
       onPointerLeave={updateActionFillOrigin}
       className="gradient-action-button group/social relative isolate inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full text-white no-underline"
@@ -81,7 +81,7 @@ export default function SocialMediaButtons({ item, animated = false }) {
         className="relative z-10 h-4.5 w-4.5 [&_svg]:h-full [&_svg]:w-full"
         aria-hidden="true"
       >
-        <SocialMediaGlyph icon={item.icon} />
+        <SocialIcon icon={item.icon} />
       </span>
     </a>
   );

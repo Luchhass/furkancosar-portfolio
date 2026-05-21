@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Furkan Cosar",
   brand: "FURKANCOSAR",
-  email: "furkancosar2005@gmail.com",
+  email: "furkancasar2005@gmail.com",
   phoneHref: "tel:+905061393220",
   phoneLabel: "+90 506 139 32 20",
 };
@@ -29,20 +29,24 @@ export const socialItems = [
     href: "https://instagram.com",
     icon: "instagram",
     name: "Instagram",
+    label: "Instagram",
   },
   {
     href: "https://linkedin.com",
     icon: "linkedin",
     name: "LinkedIn",
+    label: "LinkedIn",
   },
   {
     href: "https://github.com",
     icon: "github",
     name: "GitHub",
+    label: "GitHub",
   },
   {
     href: "https://x.com",
     icon: "x",
     name: "X",
+    label: "X",
   },
 ];

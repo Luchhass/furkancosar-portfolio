@@ -384,7 +384,10 @@ export default function Header() {
             >
               {socialItems.map((item) => (
                 <li key={item.name} className="overflow-hidden rounded-full">
-                  <SocialMediaButtons item={item} animated />
+                  <SocialMediaButtons
+                    item={item}
+                    animationAttribute="data-menu-social-item"
+                  />
                 </li>
               ))}
             </ul>
