@@ -20,16 +20,16 @@ const Y_STEP_RATIO = 0.758;
 const DEFAULT_SCALE = 0.982;
 const HOVER_RADIUS = 92;
 
-const MAX_DPR = 1.35;
+const MAX_DPR = 1.15;
 const MOBILE_MAX_DPR = 1;
 
-const TRAIL_LIFETIME = 1500;
+const TRAIL_LIFETIME = 1100;
 const MOBILE_TRAIL_LIFETIME = 950;
 
-const TRAIL_MAX_POINTS = 36;
+const TRAIL_MAX_POINTS = 22;
 const MOBILE_TRAIL_MAX_POINTS = 18;
 
-const TRAIL_SPACING = 20;
+const TRAIL_SPACING = 30;
 const MOBILE_TRAIL_SPACING = 30;
 
 const DESKTOP_FRAME_GAP = 0;
@@ -318,6 +318,7 @@ export function GeometricPentagonBackground() {
     let lastTrailPoint = null;
     let trail = [];
     let lastDrawAt = 0;
+    let isPageIntroActive = Boolean(window.__pageIntroActivePath);
 
     const pointer = {
       intensity: 0,
@@ -521,7 +522,7 @@ export function GeometricPentagonBackground() {
     function drawFrame(now = performance.now()) {
       frameId = 0;
 
-      if (!scene || !isVisible || !shouldUseInteraction) {
+      if (!scene || !isVisible || !shouldUseInteraction || isPageIntroActive) {
         return;
       }
 
@@ -670,6 +671,8 @@ export function GeometricPentagonBackground() {
     }
 
     function scheduleRootRectUpdate() {
+      if (!isVisible) return;
+
       if (rectFrameId) return;
 
       rectFrameId = requestAnimationFrame(() => {
@@ -686,7 +689,7 @@ export function GeometricPentagonBackground() {
     }
 
     function updateInteraction(clientX, clientY) {
-      if (!scene || !shouldUseInteraction) return;
+      if (!scene || !shouldUseInteraction || isPageIntroActive) return;
 
       if (rootRect.width <= 0 || rootRect.height <= 0) {
         deactivatePointer();
@@ -777,6 +780,16 @@ export function GeometricPentagonBackground() {
       scheduleRootRectUpdate();
     }
 
+    function handlePageIntroStart() {
+      isPageIntroActive = true;
+      deactivatePointer();
+    }
+
+    function handlePageIntroComplete() {
+      isPageIntroActive = false;
+      scheduleRootRectUpdate();
+    }
+
     function handleVisibilityChange() {
       if (document.hidden) {
         deactivatePointer();
@@ -825,6 +838,8 @@ export function GeometricPentagonBackground() {
     });
     window.addEventListener("pageshow", handlePageShow);
     window.addEventListener("blur", deactivatePointer);
+    window.addEventListener("page-intro:start", handlePageIntroStart);
+    window.addEventListener("page-intro:complete", handlePageIntroComplete);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     resize();
@@ -845,6 +860,11 @@ export function GeometricPentagonBackground() {
       window.removeEventListener("scroll", scheduleRootRectUpdate);
       window.removeEventListener("pageshow", handlePageShow);
       window.removeEventListener("blur", deactivatePointer);
+      window.removeEventListener("page-intro:start", handlePageIntroStart);
+      window.removeEventListener(
+        "page-intro:complete",
+        handlePageIntroComplete,
+      );
       document.removeEventListener("visibilitychange", handleVisibilityChange);
 
       if (frameId) cancelAnimationFrame(frameId);

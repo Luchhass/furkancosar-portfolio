@@ -255,10 +255,25 @@ body::-webkit-scrollbar,
     --lift-x: 0px;
     --lift-y: 0px;
 
+    backface-visibility: hidden;
     transform: perspective(660px) rotateX(var(--card-tilt-y))
       rotateY(var(--card-tilt-x));
     transform-style: preserve-3d;
     transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .project-card-motion:hover,
+  .project-card-motion:focus-within {
+    transition-duration: 0.18s;
+  }
+
+  .project-card-motion .gradient-action-border {
+    animation-play-state: paused;
+  }
+
+  .project-card-motion:hover .gradient-action-border,
+  .project-card-motion:focus-within .gradient-action-border {
+    animation-play-state: running;
   }
 
   .project-card-lift {
@@ -311,5 +326,23 @@ body::-webkit-scrollbar,
       rgba(0, 0, 0, 0.05),
       transparent
     );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gradient-text-flow,
+    .gradient-bg-flow,
+    .gradient-action-fill,
+    .gradient-action-border,
+    .gradient-action-dot,
+    .gradient-icon-flow {
+      animation: none;
+    }
+
+    .project-card-motion,
+    .project-card-lift,
+    .gradient-action-fill,
+    .gradient-title-fill {
+      transition-duration: 0.01ms;
+    }
   }
 }

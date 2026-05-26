@@ -25,8 +25,11 @@ export default function ProjectsHighlights() {
   const sliderRef = useRef(null);
   const cursorRef = useRef(null);
   const cursorPillRef = useRef(null);
+  const cursorQuickToRef = useRef(null);
   const cardTiltFrameRef = useRef(null);
   const pendingCardTiltRef = useRef(null);
+  const dragFrameRef = useRef(null);
+  const pendingDragClientXRef = useRef(null);
   const programmaticScrollFrameRef = useRef(null);
 
   const scrollMotionRef = useRef({
@@ -64,6 +67,28 @@ export default function ProjectsHighlights() {
         scale: 0.84,
         transformOrigin: "50% 50%",
       });
+
+      const quickX = gsap.quickTo(cursor, "x", {
+        duration: 0.46,
+        ease: "power3.out",
+      });
+
+      const quickY = gsap.quickTo(cursor, "y", {
+        duration: 0.46,
+        ease: "power3.out",
+      });
+
+      cursorQuickToRef.current = {
+        x: quickX,
+        y: quickY,
+      };
+
+      return () => {
+        quickX.tween?.kill();
+        quickY.tween?.kill();
+        cursorQuickToRef.current = null;
+        gsap.killTweensOf([cursor, pill]);
+      };
     },
     { scope: sectionRef },
   );
@@ -97,6 +122,8 @@ export default function ProjectsHighlights() {
       }
 
       function setViewportScrollLeft(nextScrollLeft) {
+        if (Math.abs(viewport.scrollLeft - nextScrollLeft) < 0.5) return;
+
         scrollMotion.isProgrammaticScroll = true;
         viewport.scrollLeft = nextScrollLeft;
 
@@ -150,9 +177,17 @@ export default function ProjectsHighlights() {
         },
       });
 
+      let resizeRefreshFrame = null;
+
       const resizeObserver = new ResizeObserver(() => {
         measure();
-        tween.scrollTrigger?.refresh();
+
+        if (resizeRefreshFrame !== null) return;
+
+        resizeRefreshFrame = window.requestAnimationFrame(() => {
+          resizeRefreshFrame = null;
+          tween.scrollTrigger?.refresh();
+        });
       });
 
       resizeObserver.observe(viewport);
@@ -164,6 +199,11 @@ export default function ProjectsHighlights() {
       return () => {
         tween.kill();
         resizeObserver.disconnect();
+
+        if (resizeRefreshFrame !== null) {
+          window.cancelAnimationFrame(resizeRefreshFrame);
+          resizeRefreshFrame = null;
+        }
 
         if (programmaticScrollFrameRef.current !== null) {
           window.cancelAnimationFrame(programmaticScrollFrameRef.current);
@@ -180,6 +220,10 @@ export default function ProjectsHighlights() {
     return () => {
       if (cardTiltFrameRef.current !== null) {
         window.cancelAnimationFrame(cardTiltFrameRef.current);
+      }
+
+      if (dragFrameRef.current !== null) {
+        window.cancelAnimationFrame(dragFrameRef.current);
       }
     };
   }, []);
@@ -205,6 +249,21 @@ export default function ProjectsHighlights() {
     card.style.setProperty("--card-tilt-y", "0deg");
     card.style.setProperty("--lift-x", "0px");
     card.style.setProperty("--lift-y", "0px");
+  }
+
+  function applyPendingDragScroll() {
+    const viewport = sliderRef.current;
+    const dragState = dragRef.current;
+    const clientX = pendingDragClientXRef.current;
+
+    dragFrameRef.current = null;
+
+    if (!viewport || !dragState.isDragging || clientX === null) return;
+
+    viewport.scrollLeft =
+      dragState.startScrollLeft - (clientX - dragState.startX);
+
+    syncUserScrollOffset(viewport);
   }
 
   function resetVisibleCards() {
@@ -275,15 +334,23 @@ export default function ProjectsHighlights() {
 
     if (!viewport || !dragState.isDragging) return;
 
-    viewport.scrollLeft =
-      dragState.startScrollLeft - (event.clientX - dragState.startX);
+    pendingDragClientXRef.current = event.clientX;
 
-    syncUserScrollOffset(viewport);
+    if (dragFrameRef.current !== null) return;
+
+    dragFrameRef.current = window.requestAnimationFrame(
+      applyPendingDragScroll,
+    );
   }
 
   function finishDrag() {
     const viewport = sliderRef.current;
     const dragState = dragRef.current;
+
+    if (dragFrameRef.current !== null) {
+      window.cancelAnimationFrame(dragFrameRef.current);
+      applyPendingDragScroll();
+    }
 
     if (viewport && dragState.pointerId !== null) {
       viewport.releasePointerCapture?.(dragState.pointerId);
@@ -301,6 +368,7 @@ export default function ProjectsHighlights() {
     }
 
     setIsDragging(false);
+    pendingDragClientXRef.current = null;
   }
 
   function handleSliderScroll() {
@@ -317,12 +385,17 @@ export default function ProjectsHighlights() {
 
     if (!cursor || event.pointerType === "touch") return;
 
-    gsap.to(cursor, {
+    const quickTo = cursorQuickToRef.current;
+
+    if (quickTo) {
+      quickTo.x(event.clientX - 52);
+      quickTo.y(event.clientY - 52);
+      return;
+    }
+
+    gsap.set(cursor, {
       x: event.clientX - 52,
       y: event.clientY - 52,
-      duration: 0.46,
-      ease: "power3.out",
-      overwrite: "auto",
     });
   }
 

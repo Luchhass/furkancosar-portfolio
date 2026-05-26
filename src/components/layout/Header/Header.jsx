@@ -20,6 +20,7 @@ export default function Header() {
   const menuAddressRef = useRef(null);
   const menuSocialsRef = useRef(null);
   const menuTimelineRef = useRef(null);
+  const headerThemeRef = useRef("dark");
 
   useEffect(() => {
     let frame = null;
@@ -38,7 +39,11 @@ export default function Header() {
 
         const nextTheme = section?.getAttribute("data-header-theme") || "dark";
 
-        setHeaderTheme(nextTheme);
+        if (headerThemeRef.current !== nextTheme) {
+          headerThemeRef.current = nextTheme;
+          setHeaderTheme(nextTheme);
+        }
+
         frame = null;
       });
     };

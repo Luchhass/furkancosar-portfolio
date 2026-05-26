@@ -1,14 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const isVisibleRef = useRef(false);
 
   useEffect(() => {
     function updateVisibility() {
-      setIsVisible(window.scrollY > 240);
+      const nextIsVisible = window.scrollY > 240;
+
+      if (isVisibleRef.current === nextIsVisible) return;
+
+      isVisibleRef.current = nextIsVisible;
+      setIsVisible(nextIsVisible);
     }
 
     updateVisibility();
