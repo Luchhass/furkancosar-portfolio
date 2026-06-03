@@ -8,6 +8,7 @@ import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
 import BackToTop from "@/components/ui/BackToTop/BackToTop";
 import SeoStructuredData from "@/components/layout/SeoStructuredData/SeoStructuredData";
+import GoogleAnalytics from "@/components/layout/GoogleAnalytics/GoogleAnalytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -92,6 +93,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col">
         <SeoStructuredData />
+        <GoogleAnalytics />
         <PageIntroPrepaintMask />
         <PageIntroAnimation />
         <ScrollReveal />
