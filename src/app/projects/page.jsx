@@ -8,10 +8,12 @@ import { createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
   title: "Furkan Cosar | Projects",
   description:
-    "Browse Furkan Cosar's frontend projects, including responsive websites, dashboards, ecommerce interfaces, landing pages and polished UI builds.",
+    "Browse Furkan Cosar's FURKANCOSAR frontend projects, including responsive websites, dashboards, ecommerce interfaces, landing pages and polished UI builds.",
   path: "/projects",
   keywords: [
     "Furkan Cosar projects",
+    "Furkan Coşar projects",
+    "FURKANCOSAR projects",
     "frontend projects",
     "React projects",
     "Next.js projects",

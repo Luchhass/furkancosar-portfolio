@@ -1,19 +1,39 @@
 export const siteConfig = {
   name: "Furkan Cosar",
+  displayName: "Furkan Coşar",
+  brand: "FURKANCOSAR",
   url:
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://furkancosar-portfolio.vercel.app",
-  title: "Furkan Cosar | Frontend Developer",
+    "https://www.furkancosar.com",
+  title: "Furkan Cosar | FURKANCOSAR Frontend Developer",
   description:
-    "Frontend developer portfolio of Furkan Cosar, focused on responsive websites, modern interfaces, GSAP motion, React, Next.js and polished digital experiences.",
-  email: "furkancasar2005@gmail.com",
+    "Frontend developer portfolio of Furkan Cosar, also styled Furkan Coşar and FURKANCOSAR, focused on responsive websites, React, Next.js, GSAP motion and polished interfaces.",
+  email: "furkancosar2005@gmail.com",
   creator: "Furkan Cosar",
-  ogImage: "/project-screenshots/My-Portfolio-Next.png",
+  ogImage: "/opengraph-image",
+  githubProfile: "https://github.com/Luchhass",
 };
 
-export const baseKeywords = [
+export const nameVariants = [
+  "Furkan",
   "Furkan Cosar",
+  "Furkan Coşar",
+  "Furkan cosar",
+  "Furkan coşar",
+  "furkancosar",
+  "furkancoşar",
+  "FURKANCOSAR",
+  "FurkanCosar",
+  "FurkanCoşar",
+];
+
+export const baseKeywords = [
+  ...nameVariants,
+  "Furkancosar",
+  "Furkan Cosar official website",
+  "Furkan Coşar official website",
   "Furkan Cosar portfolio",
+  "Furkan Coşar portfolio",
   "frontend developer",
   "frontend portfolio",
   "React developer",
@@ -27,6 +47,33 @@ export const baseKeywords = [
   "portfolio website",
   "Istanbul frontend developer",
 ];
+
+export const siteRoutes = [
+  {
+    path: "/",
+    priority: 1,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/about",
+    priority: 0.9,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/projects",
+    priority: 0.9,
+    changeFrequency: "weekly",
+  },
+  {
+    path: "/contact",
+    priority: 0.7,
+    changeFrequency: "yearly",
+  },
+];
+
+export function absoluteUrl(path = "/") {
+  return new URL(path, siteConfig.url).toString();
+}
 
 export function createPageMetadata({
   title,

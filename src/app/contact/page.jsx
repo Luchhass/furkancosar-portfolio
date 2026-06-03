@@ -6,10 +6,12 @@ import { createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
   title: "Furkan Cosar | Contact",
   description:
-    "Contact Furkan Cosar for frontend development, responsive websites, animated interfaces, React, Next.js, GSAP projects and polished web experiences.",
+    "Contact Furkan Cosar, also searchable as Furkan Coşar and FURKANCOSAR, for frontend development, responsive websites, React, Next.js and GSAP projects.",
   path: "/contact",
   keywords: [
     "contact Furkan Cosar",
+    "contact Furkan Coşar",
+    "contact FURKANCOSAR",
     "hire frontend developer",
     "frontend project inquiry",
     "React developer contact",

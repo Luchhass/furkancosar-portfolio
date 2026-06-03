@@ -7,6 +7,7 @@ import ScrollReveal from "@/components/layout/ScrollReveal/ScrollReveal";
 import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
 import BackToTop from "@/components/ui/BackToTop/BackToTop";
+import SeoStructuredData from "@/components/layout/SeoStructuredData/SeoStructuredData";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -76,9 +77,10 @@ export const metadata = {
   },
   other: {
     "profile:first_name": "Furkan",
-    "profile:last_name": "Cosar",
+    "profile:last_name": "Coşar",
     "portfolio:role": "Frontend Developer",
     "portfolio:stack": "React, Next.js, GSAP, JavaScript, Tailwind CSS",
+    "portfolio:brand": siteConfig.brand,
   },
 };
 
@@ -89,6 +91,7 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <SeoStructuredData />
         <PageIntroPrepaintMask />
         <PageIntroAnimation />
         <ScrollReveal />
