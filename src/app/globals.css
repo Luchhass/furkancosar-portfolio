@@ -6,6 +6,35 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+body[data-site-menu-open="true"] [data-back-to-top],
+body[data-hero-fullscreen="true"] [data-back-to-top] {
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transform: translateY(4rem) scale(1) !important;
+}
+
+body[data-site-menu-open="true"] [data-hero-fullscreen-toggle] {
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+body[data-hero-fullscreen="true"] [data-hero-intro="brand"],
+body[data-hero-fullscreen="true"] [data-hero-intro="menu-button"],
+body[data-hero-fullscreen="true"] [data-hero-intro="projects-link"] {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.hero-fullscreen-icon :where(path, line, polyline, polygon, rect, circle) {
+  transition: stroke 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-hero-fullscreen-toggle]:hover
+  .hero-fullscreen-icon
+  :where(path, line, polyline, polygon, rect, circle) {
+  stroke: var(--hero-fullscreen-icon-gradient);
+}
+
 html,
 body {
   scrollbar-width: none;

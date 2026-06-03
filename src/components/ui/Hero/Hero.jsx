@@ -49,6 +49,9 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       const headerProjectsLink = document.querySelector(
         "[data-hero-intro='projects-link']",
       );
+      const headerFullscreenButton = document.querySelector(
+        "[data-hero-intro='fullscreen-button']",
+      );
       const headerBrand = document.querySelector("[data-hero-intro='brand']");
       const headerMenuButton = document.querySelector(
         "[data-hero-intro='menu-button']",
@@ -56,7 +59,10 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
 
       const headerBrandIntroTarget = isHome ? null : headerBrand;
 
-      const headerLeftItems = [headerProjectsLink].filter(isVisibleElement);
+      const headerLeftItems = [
+        headerProjectsLink,
+        headerFullscreenButton,
+      ].filter(isVisibleElement);
       const headerCenterItems = [headerBrandIntroTarget].filter(
         isVisibleElement,
       );
@@ -310,12 +316,13 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
   return (
     <section
       ref={heroRef}
+      data-hero-fullscreen-surface
       data-header-theme="dark"
       data-scroll-reveal="off"
-      className="relative isolate grid h-dvh grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] overflow-hidden bg-black px-8 py-6 md:px-10 md:py-8 lg:px-16 lg:py-12"
+      className="relative isolate grid h-dvh grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] overflow-x-clip bg-black px-8 py-6 md:px-10 md:py-8 lg:px-16 lg:py-12"
     >
       <GeometricPentagonBackground />
-      
+
       <div className="relative z-10 row-start-2 flex items-center justify-center">
         <h1 className="m-0 flex flex-col items-center text-center text-[44px] leading-[0.9] font-black tracking-[-0.04em] text-white uppercase md:text-[80px] lg:text-[120px]">
           {titleLines.map((line) => (
@@ -383,6 +390,8 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
                 href={action.href}
                 id={action.id}
                 label={action.label}
+                rel={action.rel}
+                target={action.target}
               />
             </div>
           </div>

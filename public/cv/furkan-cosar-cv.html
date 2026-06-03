@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Furkan Cosar CV</title>
+    <style>
+      :root {
+        --black: #09090a;
+        --ink: #111113;
+        --muted: rgba(17, 17, 19, 0.58);
+        --soft: rgba(17, 17, 19, 0.1);
+        --white-muted: rgba(255, 255, 255, 0.68);
+        --white-soft: rgba(255, 255, 255, 0.14);
+        --page-pad-y: 12mm;
+        --sidebar-pad-x: 8.8mm;
+        --sidebar-section-gap: 8.1mm;
+        --sidebar-title-gap: 3.6mm;
+        --sidebar-list-gap: 2.8mm;
+        --sidebar-identity-offset: calc(var(--sidebar-section-gap) * 1.15);
+        --main-section-gap: 8.2mm;
+        --main-title-gap: 3mm;
+        --rule-gap: 3.8mm;
+        --gradient: linear-gradient(
+          120deg,
+          #6768ff,
+          #884cff,
+          #a53cdd,
+          #cf3d9f,
+          #ee4b67,
+          #884cff
+        );
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #151517;
+        color: var(--ink);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        position: relative;
+        isolation: isolate;
+        display: grid;
+        grid-template-columns: 70mm 1fr;
+        width: 210mm;
+        min-height: 297mm;
+        overflow: hidden;
+        background: #ffffff;
+      }
+
+      .page::before,
+      .page::after {
+        content: "";
+        position: absolute;
+        z-index: 0;
+        border: 0.35mm solid rgba(17, 17, 19, 0.07);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .page::before {
+        width: 128mm;
+        height: 128mm;
+        top: -35mm;
+        right: -52mm;
+      }
+
+      .page::after {
+        width: 96mm;
+        height: 96mm;
+        right: 26mm;
+        bottom: -54mm;
+      }
+
+      .sidebar {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        min-height: 297mm;
+        flex-direction: column;
+        gap: var(--sidebar-section-gap);
+        overflow: hidden;
+        background: var(--black);
+        padding: var(--page-pad-y) var(--sidebar-pad-x) 10mm;
+        color: #ffffff;
+      }
+
+      .brand-kicker {
+        position: relative;
+        z-index: 1;
+        max-width: 38mm;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.58);
+        font-size: 7pt;
+        font-weight: 900;
+        letter-spacing: 0.11em;
+        line-height: 1.25;
+        text-transform: uppercase;
+      }
+
+      .name-block {
+        position: relative;
+        z-index: 1;
+        margin-top: var(--sidebar-identity-offset);
+      }
+
+      .name {
+        margin: 0;
+        font-size: 27pt;
+        font-weight: 900;
+        letter-spacing: -0.045em;
+        line-height: 0.82;
+        text-transform: uppercase;
+      }
+
+      .role {
+        display: block;
+        width: max-content;
+        max-width: 100%;
+        margin-top: 3.4mm;
+        background: var(--gradient);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        font-size: 8.4pt;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .side-section {
+        position: relative;
+        z-index: 1;
+      }
+
+      .side-title,
+      .main-title {
+        display: flex;
+        align-items: center;
+        gap: var(--sidebar-list-gap);
+        margin: 0 0 var(--sidebar-title-gap);
+        font-size: 8.2pt;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .side-title::before,
+      .main-title::before {
+        content: "";
+        width: 2.2mm;
+        height: 2.2mm;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        background: var(--gradient);
+        box-shadow: 0 0 7mm rgba(207, 61, 159, 0.34);
+      }
+
+      .side-rule,
+      .main-rule {
+        height: 0.32mm;
+        margin-bottom: var(--rule-gap);
+        background: var(--gradient);
+      }
+
+      .contact-list,
+      .focus-list {
+        display: grid;
+        gap: var(--sidebar-list-gap);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .contact-list li,
+      .skill-list li,
+      .focus-list li {
+        display: grid;
+        grid-template-columns: 12mm 1fr;
+        gap: var(--sidebar-list-gap);
+        align-items: baseline;
+        color: var(--white-muted);
+        font-size: 7pt;
+        font-weight: 700;
+        line-height: 1.32;
+      }
+
+      .contact-list span,
+      .skill-list span,
+      .focus-list span {
+        color: rgba(255, 255, 255, 0.36);
+        font-size: 6.35pt;
+        font-weight: 900;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .skill-meter-list {
+        display: grid;
+        gap: 3.7mm;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .skill-meter {
+        display: grid;
+        gap: 0;
+      }
+
+      .skill-meter-name {
+        position: relative;
+        z-index: 1;
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 6.5pt;
+        font-weight: 900;
+        letter-spacing: 0.03em;
+        line-height: 1;
+        text-shadow: 0 0.35mm 1mm rgba(0, 0, 0, 0.35);
+      }
+
+      .skill-meter-value {
+        position: relative;
+        z-index: 1;
+        color: rgba(255, 255, 255, 0.74);
+        font-size: 5.8pt;
+        font-weight: 900;
+        letter-spacing: 0.11em;
+        line-height: 1;
+        text-shadow: 0 0.35mm 1mm rgba(0, 0, 0, 0.35);
+      }
+
+      .skill-meter-track {
+        position: relative;
+        display: flex;
+        height: 4.2mm;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        overflow: hidden;
+        padding: 0 1.6mm;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .skill-meter-track::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: var(--level);
+        background: var(--gradient);
+        box-shadow: 0 0 5mm rgba(207, 61, 159, 0.24);
+      }
+
+      .about-copy {
+        margin: 0;
+        color: var(--white-muted);
+        font-size: 7.1pt;
+        font-weight: 600;
+        line-height: 1.55;
+      }
+
+      .main {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        align-content: start;
+        gap: var(--main-section-gap);
+        padding: var(--page-pad-y) 12.5mm 10mm 11mm;
+      }
+
+      .topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8mm;
+        border-bottom: 0.32mm solid var(--soft);
+        padding-bottom: 4.4mm;
+      }
+
+      .topline p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 7pt;
+        font-weight: 900;
+        letter-spacing: 0.13em;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .topline strong {
+        color: var(--ink);
+      }
+
+      .availability {
+        width: max-content;
+        max-width: 54mm;
+        border: 0.32mm solid var(--soft);
+        padding: 2.5mm 3.2mm;
+        font-size: 6.8pt;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .availability span {
+        display: inline-block;
+        width: 1.8mm;
+        height: 1.8mm;
+        margin-right: 1.8mm;
+        border-radius: 50%;
+        background: var(--gradient);
+      }
+
+      .main-section {
+        min-width: 0;
+      }
+
+      .main-title {
+        margin-bottom: var(--main-title-gap);
+        color: var(--ink);
+        font-size: 10.5pt;
+        letter-spacing: 0.07em;
+      }
+
+      .main-rule {
+        margin-bottom: 4.6mm;
+      }
+
+      .timeline {
+        display: grid;
+        gap: 5.2mm;
+      }
+
+      .entry {
+        display: grid;
+        grid-template-columns: 18.5mm 1fr;
+        gap: 4.6mm;
+        min-width: 0;
+      }
+
+      .date {
+        margin: 0;
+        color: rgba(17, 17, 19, 0.42);
+        font-size: 6.4pt;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+        line-height: 1.25;
+        text-align: right;
+        text-transform: uppercase;
+      }
+
+      .entry-body {
+        position: relative;
+        min-width: 0;
+        padding-left: 4.4mm;
+      }
+
+      .entry-body::before {
+        content: "";
+        position: absolute;
+        top: 1mm;
+        bottom: -5.3mm;
+        left: 0;
+        width: 0.32mm;
+        background: rgba(17, 17, 19, 0.12);
+      }
+
+      .entry-body::after {
+        content: "";
+        position: absolute;
+        top: 0.9mm;
+        left: -0.9mm;
+        width: 2.1mm;
+        height: 2.1mm;
+        border-radius: 50%;
+        background: var(--gradient);
+      }
+
+      .timeline .entry:last-child .entry-body::before {
+        bottom: 0;
+      }
+
+      .entry h3 {
+        margin: 0;
+        color: var(--ink);
+        font-size: 9.2pt;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        line-height: 1.04;
+        text-transform: uppercase;
+      }
+
+      .entry .company {
+        display: block;
+        margin-top: 1.25mm;
+        color: rgba(17, 17, 19, 0.56);
+        font-size: 7.2pt;
+        font-style: italic;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .entry p {
+        margin: 2.2mm 0 0;
+        color: rgba(17, 17, 19, 0.58);
+        font-size: 7.05pt;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+
+      .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7.2mm;
+      }
+
+      .two-column .main-title {
+        font-size: 9.7pt;
+        white-space: nowrap;
+      }
+
+      .compact-list {
+        display: grid;
+        gap: 3.6mm;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .compact-list li {
+        border-top: 0.32mm solid rgba(17, 17, 19, 0.09);
+        padding-top: 2.8mm;
+      }
+
+      .compact-list strong {
+        display: block;
+        margin-bottom: 1mm;
+        color: var(--ink);
+        font-size: 7.8pt;
+        font-weight: 900;
+        letter-spacing: 0.03em;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .compact-list span {
+        color: rgba(17, 17, 19, 0.56);
+        font-size: 6.95pt;
+        font-weight: 600;
+        line-height: 1.42;
+      }
+
+      .reference-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7.2mm;
+      }
+
+      .reference {
+        border-top: 0.32mm solid rgba(17, 17, 19, 0.1);
+        padding-top: 3.2mm;
+      }
+
+      .reference h3 {
+        margin: 0;
+        color: var(--ink);
+        font-size: 8.5pt;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .reference p {
+        margin: 1.4mm 0 0;
+        color: rgba(17, 17, 19, 0.58);
+        font-size: 6.85pt;
+        font-weight: 600;
+        line-height: 1.42;
+      }
+
+      .reference small {
+        display: block;
+        margin-top: 1.8mm;
+        color: rgba(17, 17, 19, 0.52);
+        font-size: 6.05pt;
+        font-weight: 800;
+        line-height: 1.4;
+      }
+
+      @media print {
+        html,
+        body {
+          width: 210mm;
+          height: 297mm;
+          background: #ffffff;
+        }
+
+        body {
+          display: block;
+        }
+
+        .page {
+          width: 210mm;
+          min-height: 297mm;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page" aria-label="Furkan Cosar CV">
+      <aside class="sidebar">
+        <p class="brand-kicker">Frontend detail.<br />Visual motion.</p>
+
+        <section class="name-block" aria-label="Identity">
+          <h1 class="name">Furkan<br />Cosar</h1>
+          <span class="role">Frontend Developer</span>
+        </section>
+
+        <section class="side-section" aria-labelledby="contact-title">
+          <h2 class="side-title" id="contact-title">Contact</h2>
+          <div class="side-rule"></div>
+          <ul class="contact-list">
+            <li><span>Phone</span><a href="tel:+905061393220">+90 506 139 32 20</a></li>
+            <li><span>Email</span><a href="mailto:furkancosar2005@gmail.com">furkancosar2005@gmail.com</a></li>
+            <li><span>City</span><span>Atasehir / Istanbul</span></li>
+            <li><span>Web</span><a href="https://www.furkancosar.com">www.furkancosar.com</a></li>
+          </ul>
+        </section>
+
+        <section class="side-section" aria-labelledby="about-title">
+          <h2 class="side-title" id="about-title">About Me</h2>
+          <div class="side-rule"></div>
+          <p class="about-copy">
+            Front-End Developer focused on clean, responsive and user-friendly
+            interfaces with HTML, CSS, JavaScript, React and Next.js. Completed
+            Acunmedya Academy's Front-End program and currently studying Web
+            Design and Programming at Istanbul University.
+          </p>
+        </section>
+
+        <section class="side-section" aria-labelledby="skills-title">
+          <h2 class="side-title" id="skills-title">Tech Skills</h2>
+          <div class="side-rule"></div>
+          <ul class="skill-meter-list">
+            <li class="skill-meter" style="--level: 100%" aria-label="HTML 100 percent">
+              <div class="skill-meter-track" aria-hidden="true">
+                <span class="skill-meter-name">HTML</span>
+                <span class="skill-meter-value">100</span>
+              </div>
+            </li>
+            <li class="skill-meter" style="--level: 100%" aria-label="CSS 100 percent">
+              <div class="skill-meter-track" aria-hidden="true">
+                <span class="skill-meter-name">CSS</span>
+                <span class="skill-meter-value">100</span>
+              </div>
+            </li>
+            <li class="skill-meter" style="--level: 82%" aria-label="JavaScript 82 percent">
+              <div class="skill-meter-track" aria-hidden="true">
+                <span class="skill-meter-name">JavaScript</span>
+                <span class="skill-meter-value">82</span>
+              </div>
+            </li>
+            <li class="skill-meter" style="--level: 70%" aria-label="React 70 percent">
+              <div class="skill-meter-track" aria-hidden="true">
+                <span class="skill-meter-name">React</span>
+                <span class="skill-meter-value">70</span>
+              </div>
+            </li>
+            <li class="skill-meter" style="--level: 90%" aria-label="Next.js 90 percent">
+              <div class="skill-meter-track" aria-hidden="true">
+                <span class="skill-meter-name">Next.js</span>
+                <span class="skill-meter-value">90</span>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <section class="side-section" aria-labelledby="focus-title">
+          <h2 class="side-title" id="focus-title">Focus</h2>
+          <div class="side-rule"></div>
+          <ul class="focus-list">
+            <li><span>UI</span>Responsive interfaces</li>
+            <li><span>Motion</span>GSAP interaction details</li>
+            <li><span>Build</span>Clean frontend delivery</li>
+          </ul>
+        </section>
+      </aside>
+
+      <section class="main">
+        <div class="topline">
+          <p><strong>Furkancosar</strong> / Portfolio CV</p>
+          <div class="availability"><span></span>Open for frontend work</div>
+        </div>
+
+        <section class="main-section" aria-labelledby="experience-title">
+          <h2 class="main-title" id="experience-title">Experience</h2>
+          <div class="main-rule"></div>
+
+          <div class="timeline">
+            <article class="entry">
+              <p class="date">2025 - Present</p>
+              <div class="entry-body">
+                <h3>Co-Founder &amp; Part-Time Frontend Developer</h3>
+                <span class="company">Appivar A.S.</span>
+                <p>
+                  Co-founder working part-time on product interfaces,
+                  responsive flows and frontend implementation for modern web
+                  and app experiences.
+                </p>
+              </div>
+            </article>
+
+            <article class="entry">
+              <p class="date">2024 - Present</p>
+              <div class="entry-body">
+                <h3>Freelance Frontend Developer</h3>
+                <span class="company">Independent Projects</span>
+                <p>
+                  Deliver freelance websites and interfaces with responsive
+                  layouts, React components, motion details and launch-ready
+                  frontend polish.
+                </p>
+              </div>
+            </article>
+
+            <article class="entry">
+              <p class="date">2016 - 2020</p>
+              <div class="entry-body">
+                <h3>Intern</h3>
+                <span class="company">Mavinesil Interaktif Hizmetler</span>
+                <p>
+                  Supported social media content, company cargo and paperwork,
+                  plus Excel-to-dashboard data transfer for company list
+                  management.
+                </p>
+              </div>
+            </article>
+
+            <article class="entry">
+              <p class="date">2019 - 2020</p>
+              <div class="entry-body">
+                <h3>Intern</h3>
+                <span class="company">BiClick Digital Agency</span>
+                <p>
+                  Created social media posts, handled cargo and paperwork, and
+                  transferred Excel data into a dashboard for company list
+                  management.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="main-section" aria-labelledby="education-title">
+          <h2 class="main-title" id="education-title">Education</h2>
+          <div class="main-rule"></div>
+
+          <div class="timeline">
+            <article class="entry">
+              <p class="date">2023 - Present</p>
+              <div class="entry-body">
+                <h3>Web Design and Programming</h3>
+                <span class="company">Istanbul University</span>
+                <p>
+                  Pursuing Web Design and Coding while building a foundation in
+                  design principles, programming and responsive web
+                  applications.
+                </p>
+              </div>
+            </article>
+
+            <article class="entry">
+              <p class="date">2024 - 2024</p>
+              <div class="entry-body">
+                <h3>Extended Frontend Specialization</h3>
+                <span class="company">Nisantasi University</span>
+                <p>
+                  Completed practical frontend training focused on responsive
+                  interfaces, JavaScript frameworks and industry-level frontend
+                  practices.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="main-section two-column" aria-label="Frontend details">
+          <div>
+            <h2 class="main-title">Frontend Value</h2>
+            <div class="main-rule"></div>
+            <ul class="compact-list">
+              <li>
+                <strong>Interface Craft</strong>
+                <span>Clean typography, layout rhythm and responsive UI details.</span>
+              </li>
+              <li>
+                <strong>Motion Direction</strong>
+                <span>GSAP reveals, transitions and interaction feedback.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="main-title">References</h2>
+            <div class="main-rule"></div>
+            <div class="reference-grid">
+              <article class="reference">
+                <h3>Recai Cosar</h3>
+                <p>Full Stack Developer,<br />Software Architect</p>
+                <small>+90 542 215 41 81<br />recai@mavinesil.com</small>
+              </article>
+
+              <article class="reference">
+                <h3>Orhan Ekici</h3>
+                <p>Full Stack Developer,<br />Managing Director</p>
+                <small>+90 541 304 50 74<br />hello@reallygreatsite.com</small>
+              </article>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

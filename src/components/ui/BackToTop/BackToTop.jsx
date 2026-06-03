@@ -35,6 +35,7 @@ export default function BackToTop() {
   return (
     <button
       type="button"
+      data-back-to-top
       aria-label="Back to top"
       onClick={scrollToTop}
       className={`gradient-bg-flow group fixed right-5 bottom-5 z-70 flex h-13 w-13 cursor-pointer items-center justify-center overflow-hidden rounded-full text-white shadow-[0_18px_45px_rgba(0,0,0,.24)] transition-[width,opacity,transform,filter,border-radius] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:w-36 hover:brightness-110 focus-visible:w-36 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#cf3d9f] md:right-auto md:bottom-8 md:left-8 md:h-14 md:w-14 md:hover:w-38 md:focus-visible:w-38 ${

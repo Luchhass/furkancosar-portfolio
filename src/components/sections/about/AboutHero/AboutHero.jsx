@@ -21,9 +21,11 @@ export default function AboutHero() {
         "performance and interaction details work together.",
       ]}
       action={{
-        href: "/contact",
+        href: "/cv/furkan-cosar-cv.pdf",
         id: "about-hero-cv",
         label: "CHECK MY CV",
+        rel: "noreferrer",
+        target: "_blank",
       }}
     />
   );
