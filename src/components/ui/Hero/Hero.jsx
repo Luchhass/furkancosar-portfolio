@@ -313,6 +313,72 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
     { dependencies: [pathname], scope: heroRef, revertOnUpdate: true },
   );
 
+  useGSAP(
+    () => {
+      const hero = heroRef.current;
+
+      if (!hero) return undefined;
+
+      const hideTargets = gsap.utils.toArray(
+        hero.querySelectorAll("[data-hero-fullscreen-hide]"),
+      );
+
+      if (!hideTargets.length) return undefined;
+
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      let hasSyncedFullscreenState = false;
+
+      function syncFullscreenState() {
+        const isFullscreen = document.body.dataset.heroFullscreen === "true";
+
+        if (!hasSyncedFullscreenState && !isFullscreen) {
+          hasSyncedFullscreenState = true;
+          return;
+        }
+
+        hasSyncedFullscreenState = true;
+        gsap.killTweensOf(hideTargets);
+
+        if (prefersReducedMotion) {
+          gsap.set(hideTargets, {
+            autoAlpha: isFullscreen ? 0 : 1,
+            pointerEvents: isFullscreen ? "none" : "auto",
+          });
+
+          return;
+        }
+
+        gsap.to(hideTargets, {
+          autoAlpha: isFullscreen ? 0 : 1,
+          duration: isFullscreen ? 0.36 : 0.44,
+          ease: isFullscreen ? "power2.out" : "power3.out",
+          overwrite: true,
+          pointerEvents: isFullscreen ? "none" : "auto",
+        });
+      }
+
+      syncFullscreenState();
+
+      const observer = new MutationObserver(syncFullscreenState);
+
+      observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["data-hero-fullscreen"],
+      });
+
+      return () => {
+        observer.disconnect();
+        gsap.killTweensOf(hideTargets);
+        gsap.set(hideTargets, {
+          clearProps: "opacity,visibility,transform,pointerEvents",
+        });
+      };
+    },
+    { dependencies: [pathname], scope: heroRef },
+  );
+
   return (
     <section
       ref={heroRef}
@@ -338,7 +404,10 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         </h1>
       </div>
 
-      <div className="relative z-10 row-start-3 grid w-full grid-cols-2 items-end gap-x-4 gap-y-5 self-end md:flex md:items-end md:justify-between md:gap-6">
+      <div
+        data-hero-fullscreen-hide
+        className="relative z-10 row-start-3 grid w-full grid-cols-2 items-end gap-x-4 gap-y-5 self-end md:flex md:items-end md:justify-between md:gap-6"
+      >
         {stat ? (
           <div
             className="pointer-events-auto col-start-1 row-start-2 min-w-0 overflow-hidden pr-3 md:pr-0"

@@ -319,6 +319,9 @@ export function GeometricPentagonBackground() {
     let trail = [];
     let lastDrawAt = 0;
     let isPageIntroActive = Boolean(window.__pageIntroActivePath);
+    let lastCanvasWidth = 0;
+    let lastCanvasHeight = 0;
+    let lastCanvasDpr = 0;
 
     const pointer = {
       intensity: 0,
@@ -643,11 +646,25 @@ export function GeometricPentagonBackground() {
       const width = Math.max(1, rootRect.width);
       const height = Math.max(1, rootRect.height);
       const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+
+      if (
+        scene &&
+        Math.abs(width - lastCanvasWidth) < 0.5 &&
+        Math.abs(height - lastCanvasHeight) < 0.5 &&
+        dpr === lastCanvasDpr
+      ) {
+        return;
+      }
+
       const built = buildCells(width, height);
 
       resizeCanvas(gradientCanvas, width, height, dpr);
       resizeCanvas(cellCanvas, width, height, dpr);
       resizeCanvas(staticCanvas, width, height, dpr);
+
+      lastCanvasWidth = width;
+      lastCanvasHeight = height;
+      lastCanvasDpr = dpr;
 
       scene = {
         ...built,
@@ -659,6 +676,17 @@ export function GeometricPentagonBackground() {
       drawStaticLayer();
       drawBaseLayer();
       requestFrame();
+    }
+
+    function isInsideRootRect(clientX, clientY) {
+      return (
+        rootRect.width > 0 &&
+        rootRect.height > 0 &&
+        clientX >= rootRect.left &&
+        clientX <= rootRect.right &&
+        clientY >= rootRect.top &&
+        clientY <= rootRect.bottom
+      );
     }
 
     function scheduleResize() {
@@ -696,13 +724,7 @@ export function GeometricPentagonBackground() {
         return;
       }
 
-      const isInsideHero =
-        clientX >= rootRect.left &&
-        clientX <= rootRect.right &&
-        clientY >= rootRect.top &&
-        clientY <= rootRect.bottom;
-
-      if (!isInsideHero) {
+      if (!isInsideRootRect(clientX, clientY)) {
         deactivatePointer();
         return;
       }
@@ -768,6 +790,23 @@ export function GeometricPentagonBackground() {
     }
 
     function handlePointerMove(event) {
+      if (
+        !isVisible ||
+        !scene ||
+        !shouldUseInteraction ||
+        isPageIntroActive
+      ) {
+        return;
+      }
+
+      if (!isInsideRootRect(event.clientX, event.clientY)) {
+        if (pointer.targetIntensity > 0 || pointer.intensity > 0.002) {
+          deactivatePointer();
+        }
+
+        return;
+      }
+
       scheduleInteraction(event.clientX, event.clientY);
     }
 

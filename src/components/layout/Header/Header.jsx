@@ -26,7 +26,9 @@ export default function Header() {
   const menuTimelineRef = useRef(null);
   const headerThemeRef = useRef("dark");
   const heroFullscreenRef = useRef(false);
+  const heroFullscreenHeaderSyncStartedRef = useRef(false);
   const heroFullscreenScrollFrameRef = useRef(null);
+  const showHeroFullscreenControlRef = useRef(false);
   const heroFullscreenLockYRef = useRef(0);
   const heroFullscreenBodyStylesRef = useRef(null);
   const heroFullscreenHtmlOverflowRef = useRef("");
@@ -101,9 +103,10 @@ export default function Header() {
           }
         }
 
-        setShowHeroFullscreenControl((current) =>
-          current === nextIsVisible ? current : nextIsVisible,
-        );
+        if (showHeroFullscreenControlRef.current !== nextIsVisible) {
+          showHeroFullscreenControlRef.current = nextIsVisible;
+          setShowHeroFullscreenControl(nextIsVisible);
+        }
 
         frame = null;
       });
@@ -193,6 +196,48 @@ export default function Header() {
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isHeroFullscreen]);
+
+  useEffect(() => {
+    if (!heroFullscreenHeaderSyncStartedRef.current) {
+      heroFullscreenHeaderSyncStartedRef.current = true;
+      return undefined;
+    }
+
+    const targets = [
+      document.querySelector("[data-hero-intro='brand']"),
+      document.querySelector("[data-hero-intro='menu-button']"),
+      document.querySelector("[data-hero-intro='projects-link']"),
+    ].filter(Boolean);
+
+    if (!targets.length) return undefined;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    gsap.killTweensOf(targets);
+
+    if (prefersReducedMotion) {
+      gsap.set(targets, {
+        autoAlpha: isHeroFullscreen ? 0 : 1,
+        pointerEvents: isHeroFullscreen ? "none" : "auto",
+      });
+
+      return undefined;
+    }
+
+    gsap.to(targets, {
+      autoAlpha: isHeroFullscreen ? 0 : 1,
+      duration: isHeroFullscreen ? 0.34 : 0.42,
+      ease: isHeroFullscreen ? "power2.out" : "power3.out",
+      overwrite: true,
+      pointerEvents: isHeroFullscreen ? "none" : "auto",
+    });
+
+    return () => {
+      gsap.killTweensOf(targets);
     };
   }, [isHeroFullscreen]);
 
