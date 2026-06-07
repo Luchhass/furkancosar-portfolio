@@ -10,7 +10,7 @@ export const siteConfig = {
     "Frontend developer portfolio of Furkan Cosar, also styled Furkan Coşar and FURKANCOSAR, focused on responsive websites, React, Next.js, GSAP motion and polished interfaces.",
   email: "furkancosar2005@gmail.com",
   creator: "Furkan Cosar",
-  ogImage: "/og/furkancosar-portfolio-preview-2026-v2.png",
+  ogImage: "/og/furkancosar-portfolio-preview-2026-v3.png",
   githubProfile: "https://github.com/Luchhass",
 };
 
