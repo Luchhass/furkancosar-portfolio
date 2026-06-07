@@ -11,69 +11,62 @@ export const contentType = "image/png";
 const heroWords = ["Creative", "Frontend"];
 const stackItems = ["React", "Next.js", "GSAP", "Tailwind"];
 const panelItems = [
-  ["Focus", "Animated responsive interfaces"],
+  ["Focus", "Responsive animated interfaces"],
   ["Role", "Frontend developer"],
-  ["Build", "Modern UI systems"],
+  ["Build", "React, Next.js and GSAP"],
 ];
 const bandWords = Array.from({ length: 6 }, (_, index) => index);
+const heavyOffsets = [
+  [0, 0],
+  [-0.9, 0],
+  [0.9, 0],
+  [0, -0.9],
+  [0, 0.9],
+];
 
-function HexPattern() {
-  const cells = [];
-  const width = 76;
-  const height = 66;
-  const xStep = 74;
-  const yStep = 55;
-
-  for (let row = -1; row < 10; row += 1) {
-    for (let column = -1; column < 14; column += 1) {
-      const x = column * xStep + (row % 2 ? xStep / 2 : 0);
-      const y = row * yStep;
-      const shade = 14 + ((row * 7 + column * 11) % 22);
-
-      cells.push(
-        <polygon
-          key={`${row}-${column}`}
-          points={`${x + width / 2},${y} ${x + width},${y + height * 0.25} ${x + width},${y + height * 0.75} ${x + width / 2},${y + height} ${x},${y + height * 0.75} ${x},${y + height * 0.25}`}
-          fill={`rgb(${shade},${shade},${shade + 2})`}
-          stroke="rgba(255,255,255,.045)"
-          strokeWidth="1"
-        />,
-      );
-    }
-  }
+function HeavyText({ children, gradient, style }) {
+  const layerStyle = gradient ? {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    background: gradient,
+    backgroundClip: "text",
+    color: "transparent",
+  } : {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    color: style.color || "#ffffff",
+  };
 
   return (
-    <svg
-      width="860"
-      height="526"
-      viewBox="0 0 860 526"
+    <div
       style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        opacity: 0.94,
+        position: "relative",
+        display: "flex",
+        ...style,
       }}
     >
-      <rect width="860" height="526" fill="#070707" />
-      {cells}
-      <rect
-        width="860"
-        height="526"
-        fill="url(#heroShade)"
-        opacity=".92"
-      />
-      <defs>
-        <radialGradient id="heroShade" cx="50%" cy="48%" r="70%">
-          <stop offset="0%" stopColor="rgba(0,0,0,0)" />
-          <stop offset="62%" stopColor="rgba(0,0,0,.16)" />
-          <stop offset="100%" stopColor="rgba(0,0,0,.76)" />
-        </radialGradient>
-      </defs>
-    </svg>
+      <span style={{ display: "flex", opacity: 0 }}>{children}</span>
+
+      {heavyOffsets.map(([x, y], index) => (
+        <span
+          key={index}
+          style={{
+            ...layerStyle,
+            transform: `translate(${x}px, ${y}px)`,
+          }}
+        >
+          {children}
+        </span>
+      ))}
+    </div>
   );
 }
 
 export default function Image() {
+  const hostname = new URL(siteConfig.url).hostname;
+
   return new ImageResponse(
     (
       <div
@@ -85,23 +78,20 @@ export default function Image() {
           overflow: "hidden",
           background: "#050505",
           color: "#ffffff",
-          fontFamily: "Arial, Helvetica, sans-serif",
+          fontFamily: "Impact, Arial Black, Arial, Helvetica, sans-serif",
         }}
       >
         <div
           style={{
             position: "absolute",
-            display: "flex",
             top: 0,
             left: 0,
             width: 860,
             height: 526,
-            overflow: "hidden",
+            display: "flex",
             background: "#050505",
           }}
-        >
-          <HexPattern />
-        </div>
+        />
 
         <div
           style={{
@@ -110,6 +100,7 @@ export default function Image() {
             right: 0,
             width: 340,
             height: 526,
+            display: "flex",
             background: "#f6f5f1",
             color: "#080808",
           }}
@@ -132,26 +123,25 @@ export default function Image() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 54,
-              marginLeft: -46,
+              gap: 44,
+              marginLeft: -44,
               whiteSpace: "nowrap",
             }}
           >
             {bandWords.map((index) => (
-              <span
+              <HeavyText
                 key={index}
                 style={{
-                  display: "flex",
                   color: "#ffffff",
-                  fontSize: 78,
+                  fontSize: 82,
                   fontWeight: 900,
-                  letterSpacing: "-.055em",
+                  letterSpacing: "-.024em",
                   lineHeight: 1,
                   textTransform: "uppercase",
                 }}
               >
                 {siteConfig.brand}
-              </span>
+              </HeavyText>
             ))}
           </div>
         </div>
@@ -159,35 +149,10 @@ export default function Image() {
         <div
           style={{
             position: "absolute",
-            top: 54,
-            left: 64,
-            display: "flex",
-            alignItems: "center",
-            gap: 14,
-            fontSize: 21,
-            fontWeight: 900,
-            letterSpacing: ".14em",
-            textTransform: "uppercase",
-          }}
-        >
-          <span
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: 999,
-              background: "linear-gradient(135deg,#6768ff,#a53cdd,#ee4b67)",
-            }}
-          />
-          {siteConfig.brand}
-        </div>
-
-        <div
-          style={{
-            position: "absolute",
-            top: 96,
-            left: 54,
-            width: 752,
-            height: 352,
+            top: 74,
+            left: 50,
+            width: 760,
+            height: 388,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -196,47 +161,44 @@ export default function Image() {
           }}
         >
           {heroWords.map((word) => (
-            <div
+            <HeavyText
               key={word}
               style={{
-                display: "flex",
-                color: "#ffffff",
-                fontSize: 104,
-                fontWeight: 900,
-                letterSpacing: "-.07em",
-                lineHeight: 0.84,
-                textTransform: "uppercase",
-              }}
+                  color: "#ffffff",
+                  fontSize: 116,
+                  fontWeight: 900,
+                  letterSpacing: "-.038em",
+                  lineHeight: 0.82,
+                  textTransform: "uppercase",
+                }}
             >
               {word}
-            </div>
+            </HeavyText>
           ))}
 
-          <div
+          <HeavyText
+            gradient="linear-gradient(90deg,#745cff,#a83ee1,#e04b88)"
             style={{
-              display: "flex",
-              marginTop: 7,
-              background: "linear-gradient(90deg,#7657ff,#a63ddd,#e24b85)",
-              backgroundClip: "text",
+              marginTop: 12,
               color: "transparent",
-              fontSize: 106,
+              fontSize: 118,
               fontWeight: 900,
-              letterSpacing: "-.07em",
-              lineHeight: 0.9,
+              letterSpacing: "-.038em",
+              lineHeight: 0.88,
               textTransform: "uppercase",
             }}
           >
             Developer
-          </div>
+          </HeavyText>
         </div>
 
         <div
           style={{
             position: "absolute",
-            right: 38,
-            top: 40,
-            width: 264,
-            height: 428,
+            right: 40,
+            top: 44,
+            width: 260,
+            height: 404,
             display: "flex",
             flexDirection: "column",
             color: "#050505",
@@ -248,7 +210,7 @@ export default function Image() {
               alignItems: "flex-start",
               justifyContent: "space-between",
               paddingBottom: 24,
-              borderBottom: "1px solid rgba(0,0,0,.16)",
+              borderBottom: "1px solid rgba(0,0,0,.15)",
             }}
           >
             <div
@@ -259,21 +221,24 @@ export default function Image() {
             >
               <span
                 style={{
+                  display: "flex",
+                  fontFamily: "Arial, Helvetica, sans-serif",
                   fontSize: 12,
-                  fontWeight: 900,
-                  letterSpacing: ".18em",
-                  color: "rgba(0,0,0,.42)",
+                  fontWeight: 800,
+                  letterSpacing: ".16em",
+                  color: "rgba(0,0,0,.45)",
                   textTransform: "uppercase",
                 }}
               >
-                Portfolio
+                {hostname}
               </span>
               <span
                 style={{
+                  display: "flex",
                   marginTop: 8,
-                  fontSize: 36,
+                  fontSize: 38,
                   fontWeight: 900,
-                  letterSpacing: "-.05em",
+                  letterSpacing: "-.06em",
                   lineHeight: 1,
                 }}
               >
@@ -286,8 +251,8 @@ export default function Image() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 62,
-                height: 62,
+                width: 58,
+                height: 58,
                 borderRadius: 999,
                 background: "#050505",
                 color: "#ffffff",
@@ -303,7 +268,7 @@ export default function Image() {
             style={{
               display: "flex",
               flexDirection: "column",
-              paddingTop: 24,
+              paddingTop: 26,
             }}
           >
             {panelItems.map(([label, value]) => (
@@ -320,8 +285,9 @@ export default function Image() {
                 <span
                   style={{
                     display: "flex",
+                    fontFamily: "Arial, Helvetica, sans-serif",
                     fontSize: 10,
-                    fontWeight: 900,
+                    fontWeight: 800,
                     letterSpacing: ".18em",
                     color: "rgba(0,0,0,.42)",
                     textTransform: "uppercase",
@@ -335,8 +301,8 @@ export default function Image() {
                     marginTop: 8,
                     fontSize: 17,
                     fontWeight: 900,
-                    letterSpacing: "-.01em",
-                    lineHeight: 1.1,
+                    letterSpacing: "-.015em",
+                    lineHeight: 1.08,
                     textTransform: "uppercase",
                   }}
                 >
@@ -349,59 +315,27 @@ export default function Image() {
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              marginTop: "auto",
-              gap: 12,
+              gap: 8,
+              flexWrap: "wrap",
+              marginTop: 4,
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                flexWrap: "wrap",
-              }}
-            >
-              {stackItems.map((item) => (
-                <span
-                  key={item}
-                  style={{
-                    display: "flex",
-                    border: "1px solid rgba(0,0,0,.14)",
-                    padding: "8px 10px",
-                    fontSize: 11,
-                    fontWeight: 900,
-                    letterSpacing: ".09em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                paddingTop: 10,
-                borderTop: "1px solid rgba(0,0,0,.16)",
-                fontSize: 13,
-                fontWeight: 900,
-                letterSpacing: ".08em",
-                textTransform: "uppercase",
-              }}
-            >
+            {stackItems.map((item) => (
               <span
+                key={item}
                 style={{
-                  width: 9,
-                  height: 9,
-                  borderRadius: 999,
-                  background: "linear-gradient(135deg,#6768ff,#a53cdd,#ee4b67)",
+                  display: "flex",
+                  border: "1px solid rgba(0,0,0,.14)",
+                  padding: "9px 11px",
+                  fontSize: 11,
+                  fontWeight: 900,
+                  letterSpacing: ".09em",
+                  textTransform: "uppercase",
                 }}
-              />
-              {new URL(siteConfig.url).hostname}
-            </div>
+              >
+                {item}
+              </span>
+            ))}
           </div>
         </div>
       </div>
