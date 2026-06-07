@@ -49,6 +49,7 @@ export const metadata = {
         url: siteConfig.ogImage,
         width: 1200,
         height: 630,
+        type: "image/png",
         alt: "Furkan Cosar frontend developer portfolio preview",
       },
     ],

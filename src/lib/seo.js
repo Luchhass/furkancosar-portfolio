@@ -10,7 +10,7 @@ export const siteConfig = {
     "Frontend developer portfolio of Furkan Cosar, also styled Furkan Coşar and FURKANCOSAR, focused on responsive websites, React, Next.js, GSAP motion and polished interfaces.",
   email: "furkancosar2005@gmail.com",
   creator: "Furkan Cosar",
-  ogImage: "/opengraph-image",
+  ogImage: "/og/furkancosar-portfolio-2026.png",
   githubProfile: "https://github.com/Luchhass",
 };
 
@@ -102,6 +102,7 @@ export function createPageMetadata({
           url: siteConfig.ogImage,
           width: 1200,
           height: 630,
+          type: "image/png",
           alt: `${siteConfig.name} frontend developer portfolio preview`,
         },
       ],
