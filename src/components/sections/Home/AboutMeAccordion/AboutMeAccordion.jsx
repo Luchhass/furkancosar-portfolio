@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Code2, Sparkles, Workflow } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
+import ResponsiveTextLines from "@/components/ui/ResponsiveTextLines/ResponsiveTextLines";
 
 gsap.registerPlugin(useGSAP);
 
@@ -12,49 +13,35 @@ const accordionItems = [
   {
     id: "build",
     title: "What I Build",
-    descriptionLines: [
-      "I create responsive web interfaces that look clean, feel modern and",
-      "work smoothly across different screens. My focus is on building pages",
-      "that are easy to understand, visually balanced and comfortable to use.",
-    ],
+    description:
+      "I create responsive web interfaces that look clean, feel modern and work smoothly across different screens. My focus is on building pages that are easy to understand, visually balanced and comfortable to use.",
     Icon: Code2,
   },
   {
     id: "details",
     title: "What I Care About",
-    descriptionLines: [
-      "I pay attention to layout, spacing, motion and small interface details",
-      "that make a website feel more polished. I like when every section has",
-      "a clear purpose, a strong visual rhythm and a smooth interaction flow.",
-    ],
+    description:
+      "I pay attention to layout, spacing, motion and small interface details that make a website feel more polished. I like when every section has a clear purpose, a strong visual rhythm and a smooth interaction flow.",
     Icon: Sparkles,
   },
   {
     id: "workflow",
     title: "How I Work",
-    descriptionLines: [
-      "I like building step by step, keeping components organized and making",
-      "each section feel clear and intentional. I usually start from the structure,",
-      "refine the visual details and improve the experience without making it complicated.",
-    ],
+    description:
+      "I like building step by step, keeping components organized and making each section feel clear and intentional. I usually start from the structure, refine the visual details and improve the experience without making it complicated.",
     Icon: Workflow,
   },
 ];
 
-function AccordionTextLine({ children }) {
-  return (
-    <span className="block overflow-hidden">
-      <span data-accordion-line className="block">
-        {children}
-      </span>
-    </span>
-  );
-}
-
 export default function AboutMeAccordion() {
   const [openId, setOpenId] = useState(accordionItems[0].id);
+  const [lineLayoutKey, setLineLayoutKey] = useState(0);
   const accordionRef = useRef(null);
   const animationFrameRef = useRef(null);
+
+  const handleLinesChange = useCallback(() => {
+    setLineLayoutKey((currentKey) => currentKey + 1);
+  }, []);
 
   useGSAP(
     () => {
@@ -122,7 +109,7 @@ export default function AboutMeAccordion() {
         gsap.killTweensOf(allLines);
       };
     },
-    { scope: accordionRef, dependencies: [openId] },
+    { scope: accordionRef, dependencies: [openId, lineLayoutKey] },
   );
 
   function updateTitleFillOrigin(event) {
@@ -233,12 +220,12 @@ export default function AboutMeAccordion() {
                     }`}
                   >
                     <div className="min-h-0">
-                      <p className="m-0 max-w-2xl pt-2 text-[13px] leading-tight font-medium text-black/75 md:text-sm">
-                        {item.descriptionLines.map((line) => (
-                          <AccordionTextLine key={line}>
-                            {line}
-                          </AccordionTextLine>
-                        ))}
+                      <p className="relative m-0 max-w-2xl pt-2 text-[13px] leading-tight font-medium text-black/75 md:text-sm">
+                        <ResponsiveTextLines
+                          text={item.description}
+                          lineAttribute="data-accordion-line"
+                          onLinesChange={handleLinesChange}
+                        />
                       </p>
                     </div>
                   </div>

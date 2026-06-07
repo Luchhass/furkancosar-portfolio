@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Code2, Sparkles, Workflow } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
+import ResponsiveTextLines from "@/components/ui/ResponsiveTextLines/ResponsiveTextLines";
 
 gsap.registerPlugin(useGSAP);
 
@@ -13,10 +14,8 @@ const techGroups = [
   {
     id: "core",
     title: "Core Frontend",
-    descriptionLines: [
-      "The base I use for structure, styling, behavior,",
-      "typing and scalable CSS details.",
-    ],
+    description:
+      "The base I use for structure, styling, behavior, typing and scalable CSS details.",
     Icon: Code2,
     items: [
       { name: "HTML5", logo: "/tech-logos/html5.svg" },
@@ -29,10 +28,8 @@ const techGroups = [
   {
     id: "interface",
     title: "Interface Stack",
-    descriptionLines: [
-      "The stack I use to build responsive interfaces,",
-      "reusable components and polished layouts.",
-    ],
+    description:
+      "The stack I use to build responsive interfaces, reusable components and polished layouts.",
     Icon: Sparkles,
     items: [
       { name: "React", logo: "/tech-logos/react.svg" },
@@ -45,10 +42,8 @@ const techGroups = [
   {
     id: "workflow",
     title: "Development Workflow",
-    descriptionLines: [
-      "The tools that help me version, format, ship",
-      "and keep the development process organized.",
-    ],
+    description:
+      "The tools that help me version, format, ship and keep the development process organized.",
     Icon: Workflow,
     items: [
       { name: "Git", logo: "/tech-logos/git.svg" },
@@ -66,10 +61,8 @@ const techGroups = [
   {
     id: "product",
     title: "Product Collaboration",
-    descriptionLines: [
-      "The apps I use while planning screens,",
-      "discussing details and tracking real product work.",
-    ],
+    description:
+      "The apps I use while planning screens, discussing details and tracking real product work.",
     Icon: Sparkles,
     items: [
       { name: "Figma", logo: "/tech-logos/figma.svg" },
@@ -79,21 +72,15 @@ const techGroups = [
   },
 ];
 
-function TechTextLine({ children }) {
-  return (
-    <span className="block overflow-hidden">
-      <span data-tech-line className="block">
-        {children}
-      </span>
-    </span>
-  );
-}
-
 export default function TechStackAccordion() {
   const [openId, setOpenId] = useState(techGroups[0].id);
   const [animationKey, setAnimationKey] = useState(0);
   const accordionRef = useRef(null);
   const animationFrameRef = useRef(null);
+
+  const handleLinesChange = useCallback(() => {
+    setAnimationKey((currentKey) => currentKey + 1);
+  }, []);
 
   useGSAP(
     () => {
@@ -322,10 +309,12 @@ export default function TechStackAccordion() {
                     }`}
                   >
                     <div className="min-h-0">
-                      <p className="m-0 max-w-md pt-2 text-[13px] leading-tight font-medium text-black/70 md:text-sm">
-                        {item.descriptionLines.map((line) => (
-                          <TechTextLine key={line}>{line}</TechTextLine>
-                        ))}
+                      <p className="relative m-0 max-w-md pt-2 text-[13px] leading-tight font-medium text-black/70 md:text-sm">
+                        <ResponsiveTextLines
+                          text={item.description}
+                          lineAttribute="data-tech-line"
+                          onLinesChange={handleLinesChange}
+                        />
                       </p>
 
                       <ul className="m-0 flex max-w-xl list-none flex-wrap gap-x-5 gap-y-4 p-0 pt-4 md:gap-x-6">
