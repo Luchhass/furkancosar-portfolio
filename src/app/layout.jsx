@@ -77,13 +77,44 @@ export const metadata = {
     address: false,
     telephone: false,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "16x16 32x32 48x48" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/manifest.webmanifest",
   other: {
+    "mobile-web-app-capable": "yes",
+    "msapplication-TileColor": "#000000",
+    "msapplication-TileImage": "/icon-512.png",
     "profile:first_name": "Furkan",
     "profile:last_name": "Coşar",
     "portfolio:role": "Frontend Developer",
     "portfolio:stack": "React, Next.js, GSAP, JavaScript, Tailwind CSS",
     "portfolio:brand": siteConfig.brand,
   },
+  appleWebApp: {
+    capable: true,
+    title: siteConfig.brand,
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#050505" },
+  ],
 };
 
 export default function RootLayout({ children }) {
