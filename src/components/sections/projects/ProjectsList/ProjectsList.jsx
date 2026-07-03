@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { latestProjects } from "@/data/projects";
+import ProjectDetailsModal from "@/components/ui/ProjectDetailsModal/ProjectDetailsModal";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -30,6 +30,7 @@ export default function ProjectsList({ projects = latestProjects }) {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [selectedProjectDetails, setSelectedProjectDetails] = useState(null);
 
   const projectCards = projects;
 
@@ -249,6 +250,17 @@ export default function ProjectsList({ projects = latestProjects }) {
         });
       }
 
+      function getVisibleMasks() {
+        return masks.filter((mask) => {
+          const rect = mask.getBoundingClientRect();
+
+          return (
+            rect.top < window.innerHeight * 0.82 &&
+            rect.bottom > window.innerHeight * 0.18
+          );
+        });
+      }
+
       cardPairs.forEach(setHidden);
 
       const triggers = ScrollTrigger.batch(masks, {
@@ -262,7 +274,18 @@ export default function ProjectsList({ projects = latestProjects }) {
         onLeaveBack: playHide,
       });
 
+      const initialRevealFrame = window.requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+
+        const visibleMasks = getVisibleMasks();
+
+        if (visibleMasks.length) {
+          playReveal(visibleMasks);
+        }
+      });
+
       return () => {
+        window.cancelAnimationFrame(initialRevealFrame);
         triggers.forEach((trigger) => trigger.kill());
         activeTimelines.forEach((timeline) => timeline.kill());
 
@@ -497,6 +520,20 @@ export default function ProjectsList({ projects = latestProjects }) {
     });
   }
 
+  function openProjectDetails(project, projectNumber) {
+    setSelectedProjectDetails({
+      project,
+      projectNumber,
+    });
+  }
+
+  function handleProjectCardKeyDown(event, project, projectNumber) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    openProjectDetails(project, projectNumber);
+  }
+
   return (
     <section
       ref={sectionRef}
@@ -641,8 +678,6 @@ export default function ProjectsList({ projects = latestProjects }) {
                   2,
                   "0",
                 );
-                const hasProjectLink = Boolean(project.liveUrl);
-                const isExternalLink = project.liveUrl?.startsWith("http");
                 const hasImage = Boolean(project.screenshot);
                 const technologies = project.technologies?.slice(0, 4) || [];
 
@@ -651,12 +686,20 @@ export default function ProjectsList({ projects = latestProjects }) {
                     key={project.id || project.slug || project.name}
                     data-project-result-motion
                     data-project-card-reveal
-                    data-reveal-mask-active="true"
+                    data-reveal-mask-active="false"
                     className="min-w-0 overflow-visible data-[reveal-mask-active=true]:overflow-hidden data-[reveal-mask-active=true]:contain-[paint]"
                   >
                     <div data-project-card-reveal-inner className="h-full">
                       <article
-                        className="project-card-motion group/project relative isolate h-full min-w-0 overflow-visible"
+                        role="button"
+                        tabIndex={0}
+                        aria-haspopup="dialog"
+                        aria-label={`Open details for ${project.name}`}
+                        className="project-card-motion group/project relative isolate h-full min-w-0 cursor-pointer overflow-visible focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/45"
+                        onClick={() => openProjectDetails(project, itemNumber)}
+                        onKeyDown={(event) =>
+                          handleProjectCardKeyDown(event, project, itemNumber)
+                        }
                         onPointerMove={handleCardPointerMove}
                         onPointerLeave={(event) =>
                           resetCardTilt(event.currentTarget)
@@ -727,28 +770,13 @@ export default function ProjectsList({ projects = latestProjects }) {
                               ) : null}
                             </div>
 
-                            {hasProjectLink ? (
-                              <Link
-                                href={project.liveUrl}
-                                target={isExternalLink ? "_blank" : undefined}
-                                rel={isExternalLink ? "noreferrer" : undefined}
-                                className="project-card-lift mt-auto inline-flex w-fit items-center gap-2 pt-1 text-sm leading-none font-black tracking-[0.02em] uppercase no-underline"
-                              >
-                                <span
-                                  className="gradient-action-dot h-2 w-2 rounded-full"
-                                  aria-hidden="true"
-                                />
-                                View Project
-                              </Link>
-                            ) : (
-                              <span className="project-card-lift mt-auto inline-flex w-fit items-center gap-2 pt-1 text-sm leading-none font-black tracking-[0.02em] text-white/35 uppercase">
-                                <span
-                                  className="h-2 w-2 rounded-full bg-white/20"
-                                  aria-hidden="true"
-                                />
-                                No Live Link
-                              </span>
-                            )}
+                            <span className="project-card-lift mt-auto inline-flex w-fit items-center gap-2 pt-1 text-sm leading-none font-black tracking-[0.02em] uppercase">
+                              <span
+                                className="gradient-action-dot h-2 w-2 rounded-full"
+                                aria-hidden="true"
+                              />
+                              View Details
+                            </span>
                           </div>
                         </div>
                       </article>
@@ -789,6 +817,12 @@ export default function ProjectsList({ projects = latestProjects }) {
           )}
         </div>
       </div>
+
+      <ProjectDetailsModal
+        project={selectedProjectDetails?.project}
+        projectNumber={selectedProjectDetails?.projectNumber}
+        onClose={() => setSelectedProjectDetails(null)}
+      />
     </section>
   );
 }

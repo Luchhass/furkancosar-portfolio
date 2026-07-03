@@ -304,10 +304,15 @@ export default function Footer() {
 
               {index === 0 && (
                 <span
-                  className="text-white/60 md:hidden lg:inline"
+                  className="inline-block overflow-hidden md:hidden lg:inline-block"
                   aria-hidden="true"
                 >
-                  |
+                  <span
+                    data-footer-address-item
+                    className="inline-block text-white/60"
+                  >
+                    |
+                  </span>
                 </span>
               )}
             </span>

@@ -69,8 +69,24 @@ function getAllMovers(groups) {
   ];
 }
 
+function hasTargets(targets) {
+  return Array.isArray(targets) ? targets.length > 0 : Boolean(targets);
+}
+
+function setIfTargets(targets, vars) {
+  if (!hasTargets(targets)) return;
+
+  gsap.set(targets, vars);
+}
+
+function killIfTargets(targets) {
+  if (!hasTargets(targets)) return;
+
+  gsap.killTweensOf(targets);
+}
+
 function killSequenceTweens(groups) {
-  gsap.killTweensOf([...getAllMovers(groups), ...getAllMasks(groups)]);
+  killIfTargets([...getAllMovers(groups), ...getAllMasks(groups)]);
 }
 
 function getHiddenState(part) {
@@ -134,21 +150,21 @@ function getContentHiddenState(direction = "up") {
 }
 
 function setSequenceHidden(groups) {
-  gsap.set(groups.kicker.masks, {
+  setIfTargets(groups.kicker.masks, {
     clipPath: getMaskClipPath("kicker", "down"),
   });
 
-  gsap.set(groups.title.masks, {
+  setIfTargets(groups.title.masks, {
     clipPath: getMaskClipPath("title", "down"),
   });
 
-  gsap.set(groups.content.masks, {
+  setIfTargets(groups.content.masks, {
     clipPath: getMaskClipPath("content", "up"),
   });
 
-  gsap.set(groups.kicker.movers, getHiddenState("kicker"));
-  gsap.set(groups.title.movers, getHiddenState("title"));
-  gsap.set(groups.content.movers, getContentHiddenState("up"));
+  setIfTargets(groups.kicker.movers, getHiddenState("kicker"));
+  setIfTargets(groups.title.movers, getHiddenState("title"));
+  setIfTargets(groups.content.movers, getContentHiddenState("up"));
 }
 
 function revealSequence(groups) {
@@ -166,7 +182,7 @@ function revealSequence(groups) {
       clearProps: "transform,opacity,visibility,willChange,transformOrigin",
     },
     onComplete: () => {
-      gsap.set(masks, { clearProps: "clipPath" });
+      setIfTargets(masks, { clearProps: "clipPath" });
     },
   });
 
@@ -176,7 +192,7 @@ function revealSequence(groups) {
       duration: 0.8,
       stagger: 0.04,
       onComplete: () => {
-        gsap.set(groups.kicker.masks, { clearProps: "clipPath" });
+        setIfTargets(groups.kicker.masks, { clearProps: "clipPath" });
       },
     });
   }
@@ -188,7 +204,7 @@ function revealSequence(groups) {
         duration: 1.08,
         stagger: 0.14,
         onComplete: () => {
-          gsap.set(groups.title.masks, { clearProps: "clipPath" });
+          setIfTargets(groups.title.masks, { clearProps: "clipPath" });
         },
       },
       "-=0.5",
@@ -202,7 +218,7 @@ function revealSequence(groups) {
         duration: 0.86,
         stagger: 0.07,
         onComplete: () => {
-          gsap.set(groups.content.masks, { clearProps: "clipPath" });
+          setIfTargets(groups.content.masks, { clearProps: "clipPath" });
         },
       },
       "-=0.46",
@@ -213,15 +229,15 @@ function revealSequence(groups) {
 }
 
 function hideSequence(groups) {
-  gsap.set(groups.kicker.masks, {
+  setIfTargets(groups.kicker.masks, {
     clipPath: getMaskClipPath("kicker", "down"),
   });
 
-  gsap.set(groups.title.masks, {
+  setIfTargets(groups.title.masks, {
     clipPath: getMaskClipPath("title", "down"),
   });
 
-  gsap.set(groups.content.masks, {
+  setIfTargets(groups.content.masks, {
     clipPath: getMaskClipPath("content", "up"),
   });
 
@@ -232,40 +248,46 @@ function hideSequence(groups) {
     },
   });
 
-  timeline.to(
-    groups.content.movers,
-    {
-      ...getContentHiddenState("up"),
-      duration: 0.4,
-      stagger: {
-        each: 0.03,
-        from: "end",
+  if (groups.content.movers.length) {
+    timeline.to(
+      groups.content.movers,
+      {
+        ...getContentHiddenState("up"),
+        duration: 0.4,
+        stagger: {
+          each: 0.03,
+          from: "end",
+        },
       },
-    },
-    0,
-  );
+      0,
+    );
+  }
 
-  timeline.to(
-    groups.title.movers,
-    {
-      autoAlpha: 1,
-      xPercent: -112,
-      duration: 0.42,
-    },
-    0,
-  );
+  if (groups.title.movers.length) {
+    timeline.to(
+      groups.title.movers,
+      {
+        autoAlpha: 1,
+        xPercent: -112,
+        duration: 0.42,
+      },
+      0,
+    );
+  }
 
-  timeline.to(
-    groups.kicker.movers,
-    {
-      autoAlpha: 1,
-      yPercent: 185,
-      rotateX: -8,
-      transformOrigin: "50% 100%",
-      duration: 0.36,
-    },
-    0,
-  );
+  if (groups.kicker.movers.length) {
+    timeline.to(
+      groups.kicker.movers,
+      {
+        autoAlpha: 1,
+        yPercent: 185,
+        rotateX: -8,
+        transformOrigin: "50% 100%",
+        duration: 0.36,
+      },
+      0,
+    );
+  }
 
   return timeline;
 }
@@ -297,7 +319,7 @@ export default function ScrollReveal() {
 
         if (!targets.length) return;
 
-        gsap.killTweensOf(targets);
+        killIfTargets(targets);
         setSequenceHidden(groups);
 
         function stopCurrentTimeline() {
@@ -343,14 +365,14 @@ export default function ScrollReveal() {
         triggers.forEach(({ trigger, targets, masks, controller }) => {
           trigger.kill();
           controller.timeline?.kill();
-          gsap.killTweensOf(targets);
+          killIfTargets(targets);
 
-          gsap.set(targets, {
+          setIfTargets(targets, {
             clearProps:
               "transform,opacity,visibility,willChange,transformOrigin",
           });
 
-          gsap.set(masks, { clearProps: "clipPath" });
+          setIfTargets(masks, { clearProps: "clipPath" });
         });
       };
     },

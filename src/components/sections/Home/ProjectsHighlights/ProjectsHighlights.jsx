@@ -1,16 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { homeProjects } from "@/data/projects";
+import ProjectDetailsModal from "@/components/ui/ProjectDetailsModal/ProjectDetailsModal";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-const AUTO_SCROLL_VIEWPORT_RATIO = 1.75;
+const AUTO_SCROLL_DISTANCE_RATIO = 0.78;
+const AUTO_SCROLL_VIEWPORT_LIMIT = 1.18;
+const CARD_REVEAL_DURATION = 0.72;
+const CARD_REVEAL_STAGGER = 0.105;
 
 function getMaxScrollLeft(viewport) {
   return Math.max(0, viewport.scrollWidth - viewport.clientWidth);
@@ -31,8 +34,11 @@ export default function ProjectsHighlights() {
   const dragFrameRef = useRef(null);
   const pendingDragClientXRef = useRef(null);
   const programmaticScrollFrameRef = useRef(null);
+  const suppressCardOpenRef = useRef(false);
+  const suppressCardOpenTimerRef = useRef(null);
 
   const scrollMotionRef = useRef({
+    autoScrollDistance: 0,
     baseScrollLeft: 0,
     scrollProgress: 0,
     userOffset: 0,
@@ -41,6 +47,7 @@ export default function ProjectsHighlights() {
   });
 
   const dragRef = useRef({
+    hasMoved: false,
     isDragging: false,
     pointerId: null,
     startX: 0,
@@ -48,6 +55,7 @@ export default function ProjectsHighlights() {
   });
 
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedProjectDetails, setSelectedProjectDetails] = useState(null);
   const projectCards = homeProjects;
 
   useGSAP(
@@ -110,15 +118,21 @@ export default function ProjectsHighlights() {
 
       function measure() {
         scrollMotion.maxScrollLeft = getMaxScrollLeft(viewport);
+        scrollMotion.autoScrollDistance = Math.min(
+          scrollMotion.maxScrollLeft * AUTO_SCROLL_DISTANCE_RATIO,
+          viewport.clientWidth * AUTO_SCROLL_VIEWPORT_LIMIT,
+        );
       }
 
       function getBaseScrollLeft(progress) {
-        const autoDistance = Math.min(
-          scrollMotion.maxScrollLeft,
-          viewport.clientWidth * AUTO_SCROLL_VIEWPORT_RATIO,
-        );
+        return scrollMotion.autoScrollDistance * progress;
+      }
 
-        return autoDistance * progress;
+      function clampUserOffset(baseScrollLeft) {
+        scrollMotion.userOffset = Math.min(
+          Math.max(scrollMotion.userOffset, -baseScrollLeft),
+          scrollMotion.maxScrollLeft - baseScrollLeft,
+        );
       }
 
       function setViewportScrollLeft(nextScrollLeft) {
@@ -150,6 +164,8 @@ export default function ProjectsHighlights() {
           return;
         }
 
+        clampUserOffset(scrollMotion.baseScrollLeft);
+
         const nextScrollLeft = clampScrollLeft(
           scrollMotion.baseScrollLeft + scrollMotion.userOffset,
           scrollMotion.maxScrollLeft,
@@ -166,9 +182,9 @@ export default function ProjectsHighlights() {
         onUpdate: updateSliderScroll,
         scrollTrigger: {
           trigger: section,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 2,
+          start: "top 82%",
+          end: "bottom 18%",
+          scrub: 1.4,
           invalidateOnRefresh: true,
           onRefresh: () => {
             measure();
@@ -217,6 +233,128 @@ export default function ProjectsHighlights() {
   );
 
   useEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) return undefined;
+
+    const cards = gsap.utils
+      .toArray(section.querySelectorAll("[data-project-highlight-card]"))
+      .map((mask, index) => ({
+        index,
+        mask,
+        inner: mask.querySelector("[data-project-card-reveal-inner]"),
+      }))
+      .filter(({ inner }) => inner);
+
+    if (!cards.length) return undefined;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+
+    if (prefersReducedMotion.matches) {
+      cards.forEach(({ mask }) => {
+        mask.dataset.revealMaskActive = "false";
+        mask.dataset.revealReady = "true";
+      });
+
+      return undefined;
+    }
+
+    function setCardsHidden() {
+      cards.forEach(({ mask, inner }) => {
+        gsap.killTweensOf(inner);
+        mask.dataset.revealMaskActive = "true";
+        mask.dataset.revealReady = "true";
+
+        gsap.set(inner, {
+          autoAlpha: 1,
+          xPercent: -112,
+          transformOrigin: "0% 50%",
+          willChange: "transform",
+        });
+      });
+    }
+
+    function revealCards() {
+      const timeline = gsap.timeline({
+        defaults: {
+          duration: CARD_REVEAL_DURATION,
+          ease: "expo.out",
+          force3D: true,
+          overwrite: true,
+          clearProps: "willChange,transformOrigin",
+        },
+      });
+
+      cards.forEach(({ mask, inner }, index) => {
+        gsap.killTweensOf(inner);
+        mask.dataset.revealMaskActive = "true";
+        mask.dataset.revealReady = "true";
+
+        timeline.fromTo(
+          inner,
+          {
+            autoAlpha: 1,
+            xPercent: -112,
+            transformOrigin: "0% 50%",
+            willChange: "transform",
+          },
+          {
+            xPercent: 0,
+            onComplete: () => {
+              mask.dataset.revealMaskActive = "false";
+            },
+          },
+          index * CARD_REVEAL_STAGGER,
+        );
+      });
+    }
+
+    setCardsHidden();
+
+    const trigger = ScrollTrigger.create({
+      trigger: sliderRef.current || section,
+      start: "top 84%",
+      end: "bottom 16%",
+      onEnter: revealCards,
+      onEnterBack: revealCards,
+      onLeaveBack: setCardsHidden,
+    });
+
+    const initialRevealFrame = window.requestAnimationFrame(() => {
+      const target = sliderRef.current || section;
+      const rect = target.getBoundingClientRect();
+
+      ScrollTrigger.refresh();
+
+      if (
+        rect.top < window.innerHeight * 0.84 &&
+        rect.bottom > window.innerHeight * 0.16
+      ) {
+        revealCards();
+      }
+    });
+
+    return () => {
+      window.cancelAnimationFrame(initialRevealFrame);
+      trigger.kill();
+      cards.forEach(({ mask, inner }) => {
+        gsap.killTweensOf(inner);
+        mask.dataset.revealMaskActive = "false";
+        delete mask.dataset.revealReady;
+      });
+
+      gsap.set(
+        cards.map(({ inner }) => inner),
+        {
+          clearProps: "transform,opacity,visibility,willChange,transformOrigin",
+        },
+      );
+    };
+  }, [projectCards.length]);
+
+  useEffect(() => {
     return () => {
       if (cardTiltFrameRef.current !== null) {
         window.cancelAnimationFrame(cardTiltFrameRef.current);
@@ -224,6 +362,10 @@ export default function ProjectsHighlights() {
 
       if (dragFrameRef.current !== null) {
         window.cancelAnimationFrame(dragFrameRef.current);
+      }
+
+      if (suppressCardOpenTimerRef.current !== null) {
+        window.clearTimeout(suppressCardOpenTimerRef.current);
       }
     };
   }, []);
@@ -312,10 +454,17 @@ export default function ProjectsHighlights() {
 
     if (!viewport) return;
 
+    if (suppressCardOpenTimerRef.current !== null) {
+      window.clearTimeout(suppressCardOpenTimerRef.current);
+      suppressCardOpenTimerRef.current = null;
+    }
+
+    suppressCardOpenRef.current = false;
     resetVisibleCards();
     syncUserScrollOffset(viewport);
 
     dragRef.current = {
+      hasMoved: false,
       isDragging: true,
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -334,6 +483,11 @@ export default function ProjectsHighlights() {
 
     if (!viewport || !dragState.isDragging) return;
 
+    if (Math.abs(event.clientX - dragState.startX) > 6) {
+      dragState.hasMoved = true;
+      suppressCardOpenRef.current = true;
+    }
+
     pendingDragClientXRef.current = event.clientX;
 
     if (dragFrameRef.current !== null) return;
@@ -346,6 +500,7 @@ export default function ProjectsHighlights() {
   function finishDrag() {
     const viewport = sliderRef.current;
     const dragState = dragRef.current;
+    const shouldSuppressCardOpen = dragState.hasMoved;
 
     if (dragFrameRef.current !== null) {
       window.cancelAnimationFrame(dragFrameRef.current);
@@ -357,6 +512,7 @@ export default function ProjectsHighlights() {
     }
 
     dragRef.current = {
+      hasMoved: false,
       isDragging: false,
       pointerId: null,
       startX: 0,
@@ -369,6 +525,15 @@ export default function ProjectsHighlights() {
 
     setIsDragging(false);
     pendingDragClientXRef.current = null;
+
+    if (shouldSuppressCardOpen) {
+      suppressCardOpenTimerRef.current = window.setTimeout(() => {
+        suppressCardOpenRef.current = false;
+        suppressCardOpenTimerRef.current = null;
+      }, 180);
+    } else {
+      suppressCardOpenRef.current = false;
+    }
   }
 
   function handleSliderScroll() {
@@ -429,6 +594,26 @@ export default function ProjectsHighlights() {
     });
   }
 
+  function openProjectDetails(project, projectNumber) {
+    if (suppressCardOpenRef.current) {
+      suppressCardOpenRef.current = false;
+      return;
+    }
+
+    hideProjectCursor();
+    setSelectedProjectDetails({
+      project,
+      projectNumber,
+    });
+  }
+
+  function handleProjectCardKeyDown(event, project, projectNumber) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    openProjectDetails(project, projectNumber);
+  }
+
   return (
     <section
       ref={sectionRef}
@@ -439,7 +624,9 @@ export default function ProjectsHighlights() {
       <div
         ref={cursorRef}
         aria-hidden="true"
-        className="pointer-events-none fixed top-0 left-0 z-2147483647 will-change-transform"
+        className={`pointer-events-none fixed top-0 left-0 z-2147483647 will-change-transform ${
+          selectedProjectDetails ? "hidden" : ""
+        }`}
         style={{ transform: "translate3d(-140px, -140px, 0)" }}
       >
         <div
@@ -492,110 +679,110 @@ export default function ProjectsHighlights() {
               <div className="flex w-max gap-4">
                 {projectCards.map((project, index) => {
                   const itemNumber = String(index + 1).padStart(2, "0");
-                  const hasProjectLink = Boolean(project.liveUrl);
-                  const isExternalLink = project.liveUrl?.startsWith("http");
                   const hasImage = Boolean(project.screenshot);
                   const technologies = project.technologies?.slice(0, 3) || [];
 
                   return (
-                    <article
+                    <div
                       key={project.id}
-                      className="project-card-motion group/project relative isolate w-[min(72vw,300px)] shrink-0 overflow-visible md:w-[min(40vw,320px)] lg:w-[clamp(300px,23vw,340px)]"
-                      onPointerMove={handleCardPointerMove}
-                      onPointerLeave={(event) =>
-                        resetCardTilt(event.currentTarget)
-                      }
+                      data-project-highlight-card
+                      data-project-card-reveal
+                      data-reveal-mask-active="false"
+                      className="w-[min(72vw,300px)] shrink-0 overflow-visible data-[reveal-mask-active=true]:overflow-hidden data-[reveal-mask-active=true]:contain-[paint] md:w-[min(40vw,320px)] lg:w-[clamp(300px,23vw,340px)]"
                     >
-                      <div className="relative flex h-full flex-col overflow-hidden border border-white/10 bg-[#181818] transition-colors duration-300 group-hover/project:border-white/20 group-focus-within/project:border-white/20">
-                        <span
-                          className="gradient-action-border pointer-events-none z-30 opacity-0 transition-opacity duration-300 group-hover/project:opacity-100 group-focus-within/project:opacity-100"
-                          aria-hidden="true"
-                        />
-
-                        <div className="relative overflow-hidden bg-black">
-                          <div
-                            className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.48))]"
-                            aria-hidden="true"
-                          />
-
-                          {hasImage ? (
-                            <Image
-                              className="pointer-events-none block aspect-16/10 w-full object-cover object-center"
-                              src={project.screenshot}
-                              alt={`${project.name} preview.`}
-                              width={900}
-                              height={563}
-                              loading="lazy"
-                              sizes="(min-width:1024px) 340px, (min-width:768px) 320px, 300px"
-                              draggable={false}
-                            />
-                          ) : (
-                            <div
-                              className="gradient-bg-flow aspect-16/10 w-full opacity-80"
+                      <div data-project-card-reveal-inner className="h-full">
+                        <article
+                          role="button"
+                          tabIndex={0}
+                          aria-haspopup="dialog"
+                          aria-label={`Open details for ${project.name}`}
+                          className="project-card-motion group/project relative isolate h-full cursor-pointer overflow-visible focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/45"
+                          onClick={() => openProjectDetails(project, itemNumber)}
+                          onKeyDown={(event) =>
+                            handleProjectCardKeyDown(event, project, itemNumber)
+                          }
+                          onPointerMove={handleCardPointerMove}
+                          onPointerLeave={(event) =>
+                            resetCardTilt(event.currentTarget)
+                          }
+                        >
+                          <div className="relative flex h-full flex-col overflow-hidden border border-white/10 bg-[#181818] transition-colors duration-300 group-hover/project:border-white/20 group-focus-within/project:border-white/20">
+                            <span
+                              className="gradient-action-border pointer-events-none z-30 opacity-0 transition-opacity duration-300 group-hover/project:opacity-100 group-focus-within/project:opacity-100"
                               aria-hidden="true"
                             />
-                          )}
 
-                          <span className="project-card-lift project-card-number gradient-text-flow absolute bottom-3 left-4 z-20 text-[64px] leading-[0.88] font-black md:text-[76px] lg:text-[88px]">
-                            {itemNumber}
-                          </span>
-                        </div>
+                            <div className="relative overflow-hidden bg-black">
+                              <div
+                                className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.48))]"
+                                aria-hidden="true"
+                              />
 
-                        <div className="flex flex-1 flex-col gap-3 bg-[#202020] px-5 py-5 md:px-6">
-                          <div className="flex flex-col gap-3">
-                            {project.category ? (
-                              <p className="project-card-lift m-0 text-[10px] leading-none font-black tracking-[0.14em] text-white/35 uppercase">
-                                {project.category}
-                              </p>
-                            ) : null}
+                              {hasImage ? (
+                                <Image
+                                  className="pointer-events-none block aspect-16/10 w-full object-cover object-center"
+                                  src={project.screenshot}
+                                  alt={`${project.name} preview.`}
+                                  width={900}
+                                  height={563}
+                                  loading="lazy"
+                                  sizes="(min-width:1024px) 340px, (min-width:768px) 320px, 300px"
+                                  draggable={false}
+                                />
+                              ) : (
+                                <div
+                                  className="gradient-bg-flow aspect-16/10 w-full opacity-80"
+                                  aria-hidden="true"
+                                />
+                              )}
 
-                            <h3 className="project-card-lift m-0 max-w-[10ch] text-[28px] leading-[0.82] font-black tracking-[-0.03em] uppercase md:text-[30px] lg:text-[32px]">
-                              {project.name}
-                            </h3>
+                              <span className="project-card-lift project-card-number gradient-text-flow absolute bottom-3 left-4 z-20 text-[64px] leading-[0.88] font-black md:text-[76px] lg:text-[88px]">
+                                {itemNumber}
+                              </span>
+                            </div>
 
-                            <p className="project-card-lift m-0 max-w-[28ch] text-[13px] leading-tight font-medium text-white/50 md:text-sm">
-                              {project.description}
-                            </p>
+                            <div className="flex flex-1 flex-col gap-3 bg-[#202020] px-5 py-5 md:px-6">
+                              <div className="flex flex-col gap-3">
+                                {project.category ? (
+                                  <p className="project-card-lift m-0 text-[10px] leading-none font-black tracking-[0.14em] text-white/35 uppercase">
+                                    {project.category}
+                                  </p>
+                                ) : null}
 
-                            {technologies.length ? (
-                              <div className="project-card-lift flex flex-wrap gap-1.5 pt-1">
-                                {technologies.map((technology) => (
-                                  <span
-                                    key={technology}
-                                    className="border border-white/10 px-2 py-1 text-[9px] leading-none font-black tracking-[0.08em] text-white/42 uppercase"
-                                  >
-                                    {technology}
-                                  </span>
-                                ))}
+                                <h3 className="project-card-lift m-0 max-w-[10ch] text-[28px] leading-[0.82] font-black tracking-[-0.03em] uppercase md:text-[30px] lg:text-[32px]">
+                                  {project.name}
+                                </h3>
+
+                                <p className="project-card-lift m-0 max-w-[28ch] text-[13px] leading-tight font-medium text-white/50 md:text-sm">
+                                  {project.description}
+                                </p>
+
+                                {technologies.length ? (
+                                  <div className="project-card-lift flex flex-wrap gap-1.5 pt-1">
+                                    {technologies.map((technology) => (
+                                      <span
+                                        key={technology}
+                                        className="border border-white/10 px-2 py-1 text-[9px] leading-none font-black tracking-[0.08em] text-white/42 uppercase"
+                                      >
+                                        {technology}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : null}
                               </div>
-                            ) : null}
-                          </div>
 
-                          {hasProjectLink ? (
-                            <Link
-                              href={project.liveUrl}
-                              target={isExternalLink ? "_blank" : undefined}
-                              rel={isExternalLink ? "noreferrer" : undefined}
-                              className="project-card-lift mt-auto inline-flex w-fit items-center gap-2 pt-1 text-sm leading-none font-black tracking-[0.02em] uppercase no-underline"
-                            >
-                              <span
-                                className="gradient-action-dot h-2 w-2 rounded-full"
-                                aria-hidden="true"
-                              />
-                              View Project
-                            </Link>
-                          ) : (
-                            <span className="project-card-lift mt-auto inline-flex w-fit items-center gap-2 pt-1 text-sm leading-none font-black tracking-[0.02em] text-white/35 uppercase">
-                              <span
-                                className="h-2 w-2 rounded-full bg-white/20"
-                                aria-hidden="true"
-                              />
-                              No Live Link
-                            </span>
-                          )}
-                        </div>
+                              <span className="project-card-lift mt-auto inline-flex w-fit items-center gap-2 pt-1 text-sm leading-none font-black tracking-[0.02em] uppercase">
+                                <span
+                                  className="gradient-action-dot h-2 w-2 rounded-full"
+                                  aria-hidden="true"
+                                />
+                                View Details
+                              </span>
+                            </div>
+                          </div>
+                        </article>
                       </div>
-                    </article>
+                    </div>
                   );
                 })}
               </div>
@@ -603,6 +790,12 @@ export default function ProjectsHighlights() {
           </div>
         </div>
       </div>
+
+      <ProjectDetailsModal
+        project={selectedProjectDetails?.project}
+        projectNumber={selectedProjectDetails?.projectNumber}
+        onClose={() => setSelectedProjectDetails(null)}
+      />
     </section>
   );
 }

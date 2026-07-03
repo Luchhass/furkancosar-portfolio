@@ -249,7 +249,7 @@ export default function Header() {
     };
   }, []);
 
-  const activeHeaderTheme = isMenuOpen ? "dark" : headerTheme;
+  const activeHeaderTheme = isMenuOpen ? "light" : headerTheme;
   const headerColorClass = activeHeaderTheme === "light" ? "text-black" : "text-white";
 
   useEffect(() => {
@@ -632,7 +632,7 @@ export default function Header() {
         <div
           ref={menuRef}
           id="site-menu"
-          className="fixed inset-0 z-40 flex h-dvh flex-col justify-between overflow-hidden bg-black px-8 py-6 text-white md:px-10 md:py-8 lg:px-16 lg:py-12"
+          className="fixed inset-0 z-40 flex h-dvh flex-col justify-between overflow-hidden bg-white px-8 py-6 text-black md:px-10 md:py-8 lg:px-16 lg:py-12"
           style={{ clipPath: "inset(0% 0% 100% 0%)" }}
           role="dialog"
           aria-modal="true"
@@ -658,7 +658,7 @@ export default function Header() {
                       onClick={closeMenuImmediately}
                       onPointerEnter={updateTitleFillOrigin}
                       onPointerLeave={updateTitleFillOrigin}
-                      className="gradient-title-button inline-flex w-fit max-w-full text-[44px] leading-[0.9] font-black tracking-[-0.04em] text-white uppercase no-underline md:text-[80px] lg:text-[120px]"
+                      className="gradient-title-button inline-flex w-fit max-w-full text-[44px] leading-[0.9] font-black tracking-[-0.04em] text-black uppercase no-underline md:text-[80px] lg:text-[120px]"
                     >
                       <span className="gradient-title-text">
                         <span>{item.label}</span>
@@ -682,14 +682,14 @@ export default function Header() {
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <address
               ref={menuAddressRef}
-              className="m-0 flex flex-wrap items-center gap-x-2 gap-y-3 text-[13px] leading-tight font-medium tracking-[0.08em] text-white not-italic md:flex-col md:items-start md:gap-3 md:text-sm"
+              className="m-0 flex flex-wrap items-center gap-x-2 gap-y-3 text-[13px] leading-tight font-medium tracking-[0.08em] text-black not-italic md:flex-col md:items-start md:gap-3 md:text-sm"
             >
               {contactItems.map((item, index) => (
                 <span key={item.href} className="inline-block overflow-hidden">
                   <a
                     href={item.href}
                     data-menu-address-item
-                    className="group relative inline-block w-fit text-white no-underline"
+                    className="group relative inline-block w-fit text-black no-underline"
                   >
                     <span className="relative after:absolute after:bottom-[-0.35rem] after:left-0 after:h-0.5 after:w-full after:bg-current after:[clip-path:inset(0_100%_0_0)] after:opacity-90 after:transition-[clip-path] after:duration-500 after:ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:after:[clip-path:inset(0_0_0_0)] group-focus-visible:after:[clip-path:inset(0_0_0_0)]">
                       {item.label}
@@ -698,7 +698,7 @@ export default function Header() {
 
                   {index === 0 && (
                     <span
-                      className="text-white/60 md:hidden"
+                      className="text-black/60 md:hidden"
                       aria-hidden="true"
                     >
                       |
@@ -718,6 +718,7 @@ export default function Header() {
                   <SocialMediaButtons
                     item={item}
                     animationAttribute="data-menu-social-item"
+                    className="text-black"
                   />
                 </li>
               ))}

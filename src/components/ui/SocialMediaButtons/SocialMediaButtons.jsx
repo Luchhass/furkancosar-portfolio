@@ -40,7 +40,13 @@ function SocialIcon({ icon }) {
   );
 }
 
-export default function SocialMediaButtons({ item, animationAttribute }) {
+export default function SocialMediaButtons({
+  animationAttribute,
+  className = "",
+  item,
+}) {
+  const colorClassName = className || "text-white";
+
   function updateActionFillOrigin(event) {
     const link = event.currentTarget;
     const rect = link.getBoundingClientRect();
@@ -64,7 +70,7 @@ export default function SocialMediaButtons({ item, animationAttribute }) {
       {...(animationAttribute ? { [animationAttribute]: "" } : {})}
       onPointerEnter={updateActionFillOrigin}
       onPointerLeave={updateActionFillOrigin}
-      className="gradient-action-button group/social relative isolate inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full text-white no-underline"
+      className={`gradient-action-button group/social relative isolate inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full no-underline ${colorClassName}`}
     >
       <span
         className="gradient-action-fill pointer-events-none z-0 rounded-full"

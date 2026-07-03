@@ -31,6 +31,7 @@ const MOBILE_TRAIL_MAX_POINTS = 18;
 
 const TRAIL_SPACING = 30;
 const MOBILE_TRAIL_SPACING = 30;
+const TRAIL_HEAD_DEDUP_DISTANCE = 18;
 
 const DESKTOP_FRAME_GAP = 0;
 const MOBILE_FRAME_GAP = 28;
@@ -536,12 +537,10 @@ export function GeometricPentagonBackground() {
 
       lastDrawAt = now;
 
-      const deltaX = pointer.targetX - pointer.x;
-      const deltaY = pointer.targetY - pointer.y;
       const deltaIntensity = pointer.targetIntensity - pointer.intensity;
 
-      pointer.x += deltaX * 0.16;
-      pointer.y += deltaY * 0.16;
+      pointer.x = pointer.targetX;
+      pointer.y = pointer.targetY;
       pointer.intensity += deltaIntensity * 0.14;
 
       trail = trail.filter((point) => now - point.createdAt < trailLifetime);
@@ -559,6 +558,18 @@ export function GeometricPentagonBackground() {
       }
 
       trail.forEach((point) => {
+        const distanceFromHead = Math.hypot(
+          (point.x - pointer.x) * scene.width,
+          (point.y - pointer.y) * scene.height,
+        );
+
+        if (
+          pointer.intensity > 0.01 &&
+          distanceFromHead < TRAIL_HEAD_DEDUP_DISTANCE
+        ) {
+          return;
+        }
+
         const age = now - point.createdAt;
         const life = clamp(1 - age / trailLifetime, 0, 1);
         const trailStrength = Math.pow(smoothStep(life), 0.72);
@@ -626,8 +637,7 @@ export function GeometricPentagonBackground() {
         pointer.intensity > 0.002 ||
         pointer.targetIntensity > 0 ||
         trail.length > 0 ||
-        Math.abs(deltaX) > 0.0008 ||
-        Math.abs(deltaY) > 0.0008;
+        Math.abs(deltaIntensity) > 0.0008;
 
       if (shouldContinue) {
         frameId = requestAnimationFrame(drawFrame);
@@ -732,9 +742,6 @@ export function GeometricPentagonBackground() {
       const nextX = clamp((clientX - rootRect.left) / rootRect.width, 0, 1);
       const nextY = clamp((clientY - rootRect.top) / rootRect.height, 0, 1);
 
-      const shouldSnap =
-        pointer.targetIntensity === 0 && pointer.intensity < 0.03;
-
       const now = performance.now();
 
       const trailDistance = lastTrailPoint
@@ -747,8 +754,8 @@ export function GeometricPentagonBackground() {
       pointer.targetIntensity = 1;
       pointer.targetX = nextX;
       pointer.targetY = nextY;
-      pointer.x = shouldSnap ? nextX : pointer.x;
-      pointer.y = shouldSnap ? nextY : pointer.y;
+      pointer.x = nextX;
+      pointer.y = nextY;
 
       if (
         trailDistance >= trailSpacing ||
