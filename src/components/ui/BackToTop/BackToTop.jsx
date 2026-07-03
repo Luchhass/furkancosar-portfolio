@@ -8,8 +8,18 @@ export default function BackToTop() {
   const isVisibleRef = useRef(false);
 
   useEffect(() => {
+    function isAtPageBottom() {
+      const scrollingElement = document.scrollingElement || document.documentElement;
+      const maxScrollY = Math.max(
+        0,
+        scrollingElement.scrollHeight - window.innerHeight,
+      );
+
+      return window.scrollY >= maxScrollY - 2;
+    }
+
     function updateVisibility() {
-      const nextIsVisible = window.scrollY > 240;
+      const nextIsVisible = window.scrollY > 240 && !isAtPageBottom();
 
       if (isVisibleRef.current === nextIsVisible) return;
 
@@ -19,9 +29,11 @@ export default function BackToTop() {
 
     updateVisibility();
     window.addEventListener("scroll", updateVisibility, { passive: true });
+    window.addEventListener("resize", updateVisibility);
 
     return () => {
       window.removeEventListener("scroll", updateVisibility);
+      window.removeEventListener("resize", updateVisibility);
     };
   }, []);
 

@@ -160,17 +160,29 @@ export default function ProjectsList({ projects = latestProjects }) {
 
       const pairByMask = new Map(cardPairs.map((pair) => [pair.mask, pair]));
       const activeTimelines = new Set();
+      const waitsForSectionReveal = section.matches(
+        "[data-scroll-reveal='sequence']",
+      );
+      let isSectionRevealComplete =
+        !waitsForSectionReveal ||
+        section.dataset.scrollRevealState === "complete";
 
       if (!cardPairs.length) return undefined;
 
       function setHidden({ mask, inner }) {
-        gsap.killTweensOf(inner);
-        gsap.set(inner, {
-          autoAlpha: 1,
-          xPercent: -112,
+        gsap.killTweensOf([mask, inner]);
+        mask.dataset.revealMaskActive = "true";
+        mask.dataset.revealReady = "true";
+
+        gsap.set(mask, {
+          clipPath: "inset(0% 100% 0% 0%)",
           transformOrigin: "0% 50%",
         });
-        mask.dataset.revealReady = "true";
+
+        gsap.set(inner, {
+          autoAlpha: 1,
+          clearProps: "transform,willChange,transformOrigin",
+        });
       }
 
       function getBatchPairs(batch, shouldReverse = false) {
@@ -192,28 +204,30 @@ export default function ProjectsList({ projects = latestProjects }) {
       }
 
       function playReveal(batch) {
+        if (!isSectionRevealComplete) return;
+
         const pairs = getBatchPairs(batch);
         const timeline = createTimeline();
 
         pairs.forEach(({ mask, inner }, index) => {
-          gsap.killTweensOf(inner);
+          gsap.killTweensOf([mask, inner]);
           mask.dataset.revealMaskActive = "true";
+          mask.dataset.revealReady = "true";
 
           timeline.fromTo(
-            inner,
+            mask,
             {
-              autoAlpha: 1,
-              xPercent: -112,
+              clipPath: "inset(0% 100% 0% 0%)",
               transformOrigin: "0% 50%",
-              willChange: "transform",
+              willChange: "clip-path",
             },
             {
-              xPercent: 0,
+              clipPath: "inset(0% 0% 0% 0%)",
               duration: CARD_REVEAL_DURATION,
               ease: "expo.out",
               force3D: true,
               overwrite: true,
-              clearProps: "willChange,transformOrigin",
+              clearProps: "clipPath,willChange,transformOrigin",
               onComplete: () => {
                 mask.dataset.revealMaskActive = "false";
               },
@@ -228,19 +242,19 @@ export default function ProjectsList({ projects = latestProjects }) {
         const timeline = createTimeline();
 
         pairs.forEach(({ mask, inner }, index) => {
-          gsap.killTweensOf(inner);
+          gsap.killTweensOf([mask, inner]);
           mask.dataset.revealMaskActive = "true";
 
           timeline.to(
-            inner,
+            mask,
             {
-              xPercent: -112,
+              clipPath: "inset(0% 100% 0% 0%)",
               duration: CARD_HIDE_DURATION,
               ease: "power2.inOut",
               force3D: true,
               overwrite: true,
               transformOrigin: "0% 50%",
-              willChange: "transform",
+              willChange: "clip-path",
               onComplete: () => {
                 mask.dataset.revealMaskActive = "true";
               },
@@ -274,7 +288,7 @@ export default function ProjectsList({ projects = latestProjects }) {
         onLeaveBack: playHide,
       });
 
-      const initialRevealFrame = window.requestAnimationFrame(() => {
+      function revealVisibleCards() {
         ScrollTrigger.refresh();
 
         const visibleMasks = getVisibleMasks();
@@ -282,20 +296,58 @@ export default function ProjectsList({ projects = latestProjects }) {
         if (visibleMasks.length) {
           playReveal(visibleMasks);
         }
+      }
+
+      function handleSectionRevealComplete() {
+        isSectionRevealComplete = true;
+        revealVisibleCards();
+      }
+
+      function handleSectionRevealHide() {
+        isSectionRevealComplete = !waitsForSectionReveal;
+        activeTimelines.forEach((timeline) => timeline.kill());
+        activeTimelines.clear();
+        cardPairs.forEach(setHidden);
+      }
+
+      section.addEventListener(
+        "scroll-reveal:complete",
+        handleSectionRevealComplete,
+      );
+      section.addEventListener("scroll-reveal:hide", handleSectionRevealHide);
+
+      const initialRevealFrame = window.requestAnimationFrame(() => {
+        if (isSectionRevealComplete) {
+          revealVisibleCards();
+        }
       });
 
       return () => {
         window.cancelAnimationFrame(initialRevealFrame);
+        section.removeEventListener(
+          "scroll-reveal:complete",
+          handleSectionRevealComplete,
+        );
+        section.removeEventListener(
+          "scroll-reveal:hide",
+          handleSectionRevealHide,
+        );
         triggers.forEach((trigger) => trigger.kill());
         activeTimelines.forEach((timeline) => timeline.kill());
 
         const inners = cardPairs.map(({ inner }) => inner);
+        const masksToClear = cardPairs.map(({ mask }) => mask);
 
         gsap.killTweensOf(inners);
+        gsap.killTweensOf(masksToClear);
 
         masks.forEach((mask) => {
           mask.dataset.revealMaskActive = "false";
           delete mask.dataset.revealReady;
+        });
+
+        gsap.set(masksToClear, {
+          clearProps: "clipPath,willChange,transformOrigin",
         });
 
         gsap.set(inners, {
@@ -304,62 +356,6 @@ export default function ProjectsList({ projects = latestProjects }) {
       };
     },
     { scope: sectionRef, dependencies: [cardRenderKey] },
-  );
-
-  useGSAP(
-    () => {
-      const section = sectionRef.current;
-
-      if (!section) return undefined;
-
-      const controlItems = gsap.utils.toArray(
-        section.querySelectorAll("[data-project-control-item]"),
-      );
-
-      if (!controlItems.length) return undefined;
-
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      );
-
-      if (prefersReducedMotion.matches) {
-        gsap.set(controlItems, {
-          clearProps: "opacity,visibility,transform",
-        });
-
-        return undefined;
-      }
-
-      gsap.set(controlItems, {
-        autoAlpha: 0,
-        y: 18,
-      });
-
-      const trigger = ScrollTrigger.create({
-        trigger: controlItems[0],
-        start: "top 90%",
-        once: true,
-        onEnter: () => {
-          gsap.to(controlItems, {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.72,
-            stagger: 0.08,
-            ease: "expo.out",
-            clearProps: "opacity,visibility,transform",
-          });
-        },
-      });
-
-      return () => {
-        trigger.kill();
-        gsap.killTweensOf(controlItems);
-        gsap.set(controlItems, {
-          clearProps: "opacity,visibility,transform",
-        });
-      };
-    },
-    { scope: sectionRef },
   );
 
   useGSAP(
@@ -562,12 +558,16 @@ export default function ProjectsList({ projects = latestProjects }) {
             <span className="block">Work</span>
           </h2>
 
-          <div data-project-controls className="mt-8 md:mt-10 lg:mt-12">
-            <div className="grid gap-6 md:grid-cols-[minmax(0,620px)_auto] md:items-end md:justify-between md:gap-10">
-              <label
-                data-project-control-item
-                className="relative block min-w-0"
-              >
+          <div
+            data-project-controls
+            data-reveal-part="content"
+            className="mt-8 md:mt-10 lg:mt-12"
+          >
+            <div
+              data-reveal-inner
+              className="grid gap-6 md:grid-cols-[minmax(0,620px)_auto] md:items-end md:justify-between md:gap-10"
+            >
+              <label className="relative block min-w-0">
                 <span className="mb-4 block text-[10px] leading-none font-black tracking-[0.16em] text-white/42 uppercase">
                   Search Projects
                 </span>
@@ -611,7 +611,6 @@ export default function ProjectsList({ projects = latestProjects }) {
               </label>
 
               <div
-                data-project-control-item
                 className="shrink-0 md:min-w-27.5 md:pb-0.5 md:text-right"
                 aria-live="polite"
               >
@@ -627,7 +626,7 @@ export default function ProjectsList({ projects = latestProjects }) {
 
             {categoryOptions.length > 1 ? (
               <div
-                data-project-control-item
+                data-reveal-inner
                 className="mt-7 flex gap-x-7 gap-y-4 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden md:mt-8 md:flex-wrap md:overflow-visible md:pb-0"
                 role="tablist"
                 aria-label="Filter projects by category"
@@ -686,7 +685,7 @@ export default function ProjectsList({ projects = latestProjects }) {
                     key={project.id || project.slug || project.name}
                     data-project-result-motion
                     data-project-card-reveal
-                    data-reveal-mask-active="false"
+                    data-reveal-mask-active="true"
                     className="min-w-0 overflow-visible data-[reveal-mask-active=true]:overflow-hidden data-[reveal-mask-active=true]:contain-[paint]"
                   >
                     <div data-project-card-reveal-inner className="h-full">

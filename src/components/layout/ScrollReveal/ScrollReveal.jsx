@@ -320,6 +320,7 @@ export default function ScrollReveal() {
         if (!targets.length) return;
 
         killIfTargets(targets);
+        section.dataset.scrollRevealState = "hidden";
         setSequenceHidden(groups);
 
         function stopCurrentTimeline() {
@@ -337,12 +338,16 @@ export default function ScrollReveal() {
           controller.timeline = revealSequence(groups);
 
           controller.timeline.call(() => {
+            section.dataset.scrollRevealState = "complete";
+            section.dispatchEvent(new CustomEvent("scroll-reveal:complete"));
             playRevealCounters(section);
           });
         }
 
         function playHide() {
           stopCurrentTimeline();
+          section.dataset.scrollRevealState = "hidden";
+          section.dispatchEvent(new CustomEvent("scroll-reveal:hide"));
           controller.timeline = hideSequence(groups);
         }
 
@@ -356,13 +361,13 @@ export default function ScrollReveal() {
           onLeaveBack: playHide,
         });
 
-        triggers.push({ trigger, targets, masks, controller });
+        triggers.push({ section, trigger, targets, masks, controller });
       });
 
       ScrollTrigger.refresh();
 
       return () => {
-        triggers.forEach(({ trigger, targets, masks, controller }) => {
+        triggers.forEach(({ section, trigger, targets, masks, controller }) => {
           trigger.kill();
           controller.timeline?.kill();
           killIfTargets(targets);
@@ -373,6 +378,7 @@ export default function ScrollReveal() {
           });
 
           setIfTargets(masks, { clearProps: "clipPath" });
+          delete section.dataset.scrollRevealState;
         });
       };
     },
