@@ -6,6 +6,8 @@ import { useCallback, useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { MOTION, detailFrom, detailTo } from "@/lib/motionPresets";
+import TitleLine from "@/components/ui/TitleLine";
+import ReadingText from "@/components/ui/ReadingText";
 
 function formatDate(value) {
   const date = new Date(value);
@@ -81,8 +83,8 @@ export default function ProjectDetailsModal({ project, projectNumber, origin, on
         </div>
         <div className="project-modal-copy">
           <p className="project-detail-eyebrow" data-project-detail>{project.category} / {project.type}</p>
-          <h2 id={titleId} data-project-detail>{project.name}</h2>
-          <p className="project-detail-description" data-project-detail>{project.description}</p>
+          <h2 id={titleId}><TitleLine>{project.name}</TitleLine></h2>
+          <ReadingText className="project-detail-description">{project.description}</ReadingText>
           <dl className="project-detail-facts" data-project-detail>{[["Type", project.type], ["Released", formatDate(project.date)], ["Category", project.category], ["Status", project.status]].filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
           <div className="project-detail-stack" data-project-detail><p>BUILT WITH</p><div>{project.technologies?.map((technology) => <span key={technology}>{technology}</span>)}</div></div>
           <div className="project-detail-actions" data-project-detail>

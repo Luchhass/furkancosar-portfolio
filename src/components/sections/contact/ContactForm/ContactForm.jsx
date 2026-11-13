@@ -1,9 +1,11 @@
 "use client";
+import MiniTitleText from "@/components/ui/MiniTitleText";
+import TitleLine from "@/components/ui/TitleLine";
 import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { createMotionMedia } from "@/lib/motionMedia";
-import RevealTextLine from "@/components/layout/ScrollReveal/RevealTextLine";
+import ReadingText from "@/components/ui/ReadingText";
 import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
 import { bindMagnet } from "@/lib/pointerMotion";
 
@@ -152,9 +154,7 @@ export default function ContactForm() {
           data-reveal-part="kicker"
           className="ui-section-label inline-flex items-center gap-2 text-black/55"
         >
-            <span data-reveal-inner className="inline-flex items-center gap-2">
-            Contact
-          </span>
+          <MiniTitleText>Contact</MiniTitleText>
         </p>
 
         <div className="ui-section-body ui-section-split contact-layout">
@@ -164,28 +164,12 @@ export default function ContactForm() {
               data-reveal-part="title"
               className="ui-section-title"
             >
-              <span className="block">BUILD</span>
-              <span className="gradient-text-flow block">NOW</span>
+              <TitleLine>BUILD</TitleLine>
+              <TitleLine className="gradient-text-flow">NOW</TitleLine>
             </h2>
 
             <div className="contact-description">
-              <p className="ui-section-copy ui-section-copy-spaced text-black/60">
-                <RevealTextLine>
-                  Tell me what you want to build, where the project is right
-                  now,
-                </RevealTextLine>
-                <RevealTextLine>
-                  and what kind of feeling the interface should carry. We can
-                  talk
-                </RevealTextLine>
-                <RevealTextLine>
-                  through the screens, motion details, responsive flow and
-                  launch
-                </RevealTextLine>
-                <RevealTextLine>
-                  priorities before shaping the cleanest frontend path.
-                </RevealTextLine>
-              </p>
+              <ReadingText className="ui-section-copy ui-section-copy-spaced text-black/60">Tell me what you want to build, where the project is right now, and what kind of feeling the interface should carry. We can talk through the screens, motion details, responsive flow and launch priorities before shaping the cleanest frontend path.</ReadingText>
 
               <div
                 ref={notesRef}
@@ -376,7 +360,7 @@ export default function ContactForm() {
               id="contact-result-title"
               className="ui-section-title"
             >
-              {modal.title}
+              <TitleLine>{modal.title}</TitleLine>
             </h3>
 
             <p className="m-0 mt-4 text-sm leading-tight font-medium text-white/70">

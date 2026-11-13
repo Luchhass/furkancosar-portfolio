@@ -1,12 +1,13 @@
 "use client";
 import { MOTION } from "@/lib/motionPresets";
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Code2, Sparkles, Workflow } from "lucide-react";
 import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
-import ResponsiveTextLines from "@/components/ui/ResponsiveTextLines/ResponsiveTextLines";
+import ReadingText from "@/components/ui/ReadingText";
 import styles from "./AboutPanelDeck.module.css";
 import useSectionScene from "@/lib/useSectionScene";
-import useAccordionMotion from "@/lib/useAccordionMotion";
+import MiniTitleText from "@/components/ui/MiniTitleText";
+import TitleLine from "@/components/ui/TitleLine";
 
 
 const accordionItems = [
@@ -35,15 +36,9 @@ const accordionItems = [
 
 export default function AboutMeAccordion() {
   const [openId, setOpenId] = useState(accordionItems[0].id);
-  const [lineLayoutKey, setLineLayoutKey] = useState(0);
   const accordionRef = useRef(null);
   useSectionScene(accordionRef, "accordion");
 
-  const handleLinesChange = useCallback(() => {
-    setLineLayoutKey((currentKey) => currentKey + 1);
-  }, []);
-
-  useAccordionMotion(accordionRef, `about-panel-${openId}`, "[data-accordion-line]", "", lineLayoutKey);
 
   function updateTitleFillOrigin(event) {
     const button = event.currentTarget;
@@ -92,15 +87,14 @@ export default function AboutMeAccordion() {
       </svg>
 
       <div className="ui-section-grid relative z-10">
-        <p data-reveal-part="kicker" className="ui-section-label text-black/55"><span data-reveal-inner>About</span></p>
+        <p data-reveal-part="kicker" className="ui-section-label text-black/55"><MiniTitleText>About</MiniTitleText></p>
         <div className={`ui-section-body ui-section-split about-scene-layout ${styles.layout}`}>
       <div className="min-w-0">
         <h2
           data-reveal-part="title"
           className="ui-section-title flex flex-col"
         >
-          <span>ABOUT</span>
-          <span>ME</span>
+          <TitleLine>ABOUT ME</TitleLine>
         </h2>
 
         <div
@@ -158,13 +152,7 @@ export default function AboutMeAccordion() {
                     }`}
                   >
                     <div className="min-h-0">
-                      <p className="ui-section-copy relative text-black/75">
-                        <ResponsiveTextLines
-                          text={item.description}
-                          lineAttribute="data-accordion-line"
-                          onLinesChange={handleLinesChange}
-                        />
-                      </p>
+                      <ReadingText active={isOpen} className="ui-section-copy relative text-black/75">{item.description}</ReadingText>
                     </div>
                   </div>
                 </div>

@@ -160,6 +160,7 @@ body[data-journey-active="true"] [data-back-to-top] { opacity: 0 !important; poi
 .kinetic-band { position: relative; overflow: hidden; color: white; }
 .kinetic-track, .kinetic-group, .kinetic-item { display: flex; width: max-content; align-items: center; }
 .kinetic-group { flex-shrink: 0; }
+.kinetic-word-mask { display: flex; overflow: hidden; }
 .kinetic-star { transform-origin: center; animation: marquee-symbol-spin var(--motion-orbit-duration, 80s) linear infinite; will-change: transform; }
 .outline-band { overflow: hidden; background: white; }
 .outline-track { display: flex; width: max-content; }

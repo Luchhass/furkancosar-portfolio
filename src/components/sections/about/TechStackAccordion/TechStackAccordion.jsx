@@ -3,15 +3,14 @@ import { useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import { createMotionMedia } from "@/lib/motionMedia";
-import { splitCharacters } from "@/lib/motionText";
-import { MOTION, headingFrom, headingTo, detailFrom, detailTo } from "@/lib/motionPresets";
-import { repeatReveal } from "@/lib/repeatReveal";
+import { MOTION } from "@/lib/motionPresets";
+import TitleLine from "@/components/ui/TitleLine";
+import ReadingText from "@/components/ui/ReadingText";
 import styles from "./Toolkit.module.css";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText);
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 const techGroups = [
   {
     id: "core",
@@ -86,13 +85,6 @@ export default function TechStackAccordion() {
       const intro = section.querySelector("[data-toolkit-intro]");
       const names = Array.from(section.querySelectorAll("[data-toolkit-label]"));
       const tracks = Array.from(section.querySelectorAll("[data-toolkit-track]"));
-      const splits = Array.from(section.querySelectorAll("[data-toolkit-title]")).map(line => {
-        const split = splitCharacters(line);
-        repeatReveal(gsap.from(split.chars, { ...headingFrom(), ...headingTo() }), line);
-        return split;
-      });
-      const copy = section.querySelector("[data-toolkit-copy]");
-      repeatReveal(gsap.from(copy.firstElementChild, { ...detailFrom(), ...detailTo() }), copy);
 
       const setIntroOpacity = gsap.quickSetter(intro, "opacity");
       const setIntroY = gsap.quickSetter(intro, "y", "px");
@@ -148,7 +140,6 @@ export default function TechStackAccordion() {
         resize.disconnect();
         animation.scrollTrigger?.kill();
         animation.kill();
-        splits.forEach(split => split.revert());
       };
     });
     return () => media.revert();
@@ -159,10 +150,10 @@ export default function TechStackAccordion() {
       <div data-toolkit-intro className={`ui-section ${styles.intro}`}>
         <div className={styles.center}>
           <h2 id="toolkit-heading" className="ui-section-title">
-            <span><span data-toolkit-title>TOOLS</span></span>
-            <span><span data-toolkit-title className="gradient-text-flow">I USE</span></span>
+            <TitleLine data-toolkit-title>TOOLS</TitleLine>
+            <TitleLine data-toolkit-title className="gradient-text-flow">I USE</TitleLine>
           </h2>
-          <p data-toolkit-copy className="ui-section-copy"><span className="block">The technologies behind the interfaces I build. From the first line of code to the final interaction, these are the tools I use to turn ideas into thoughtful digital experiences.</span></p>
+          <ReadingText data-toolkit-copy className="ui-section-copy">The technologies behind the interfaces I build. From the first line of code to the final interaction, these are the tools I use to turn ideas into thoughtful digital experiences.</ReadingText>
         </div>
       </div>
       <div data-toolkit-bands className={styles.bands} aria-hidden="true">

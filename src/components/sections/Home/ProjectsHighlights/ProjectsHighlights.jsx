@@ -5,6 +5,8 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { latestProjects } from "@/data/projects";
 import ProjectShelfCard from "@/components/ui/ProjectShelfCard";
+import MiniTitleText from "@/components/ui/MiniTitleText";
+import TitleLine from "@/components/ui/TitleLine";
 import ProjectDetailsModal from "@/components/ui/ProjectDetailsModal/ProjectDetailsModal";
 import useShelfCardReveal from "@/lib/useShelfCardReveal";
 import { bindProjectCardHover } from "@/lib/pointerMotion";
@@ -17,7 +19,6 @@ const projects = latestProjects.slice(0, 6);
 export default function ProjectsHighlights() {
   const sectionRef = useRef(null);
   const viewportRef = useRef(null);
-  const progressRef = useRef(null);
   const drag = useRef(null);
   const suppressClick = useRef(false);
   const scrollMotion = useRef({ base: 0, offset: 0 });
@@ -46,15 +47,7 @@ export default function ProjectsHighlights() {
         viewport.scrollLeft = gsap.utils.clamp(0, max, state.base + state.offset);
       } });
     });
-    const syncProgress = () => {
-      const max = viewport.scrollWidth - viewport.clientWidth;
-      progressRef.current.style.transform = `scaleX(${max > 0 ? viewport.scrollLeft / max : 1})`;
-    };
-    viewport.addEventListener("scroll", syncProgress, { passive: true });
-    const resize = new ResizeObserver(syncProgress);
-    resize.observe(viewport);
-    syncProgress();
-    return () => { media.revert(); resize.disconnect(); viewport.removeEventListener("scroll", syncProgress); };
+    return () => media.revert();
   }, { scope: sectionRef });
 
   function startDrag(event) {
@@ -89,9 +82,9 @@ export default function ProjectsHighlights() {
   return <section ref={sectionRef} data-header-theme="dark" data-scroll-reveal="sequence"
     className="ui-screen ui-fit-panel highlights-scene ui-section bg-[#141414] text-white" aria-labelledby="highlights-title">
     <div className="ui-section-grid">
-      <p data-reveal-part="kicker" className="ui-section-label"><span data-reveal-inner>Projects</span></p>
+      <p data-reveal-part="kicker" className="ui-section-label"><MiniTitleText>Projects</MiniTitleText></p>
       <div className="ui-section-body">
-        <h2 id="highlights-title" data-reveal-part="title" className="ui-section-title">Highlights</h2>
+        <h2 id="highlights-title" data-reveal-part="title" className="ui-section-title"><TitleLine>Highlights</TitleLine></h2>
         <div className="ui-section-content">
           <div ref={viewportRef} className="shelf-viewport highlights-viewport" role="region" aria-roledescription="carousel" aria-label="Latest six projects" tabIndex={0}
             onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag} onLostPointerCapture={() => { drag.current = null; }}
@@ -101,7 +94,6 @@ export default function ProjectsHighlights() {
             <div className="highlights-track">{projects.map((project, index) => <ProjectShelfCard key={project.id} project={project}
               number={String(latestProjects.length - index).padStart(2, "0")} onOpen={setSelected} />)}</div>
           </div>
-          <div className="gallery-progress" aria-hidden="true"><div ref={progressRef} className="gallery-progress-fill" /></div>
         </div>
       </div>
     </div>

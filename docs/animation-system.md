@@ -10,12 +10,15 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 - `src/lib/useAccordionMotion.js`: Home About ve About Tech Stack için aynı satır ve logo açılış sistemi.
 - `src/lib/useShelfCardReveal.js`: Home ve Projects kartları ortak görünürlük sisteminde; bütün kart içeriği tek yatay maske açılışıyla girer.
 - `src/lib/motionMedia.js`: breakpoint ve reduced-motion abonelikleri.
+- `src/components/ui/MiniTitleText.jsx`: bölüm mini başlıkları için sabit iç maske; dış etiketin padding'i maskeye dahil edilmez. `MOTION.miniTitle` yalnızca 2D `yPercent: -110 → 0`, 0,55 sn power3.out kullanır; scale, opacity veya 3D dönüş yok. Ortak reveal/reverse döngüsüne bağlıdır.
+- `src/components/ui/ReadingText.jsx`: düz açıklamalar kelime maskeleri içinde, okuma sırasıyla yukarıdan aşağıya gelir. Eski About paragrafının hareketi korunur: maske yüksekliği + 32px üstten giriş, rotationX 8° → 0, 0,86 sn power3.out. Kelimeler arasında 18ms akış vardır; uzun metinlerde toplam yayılım 0,84 sn ile sınırlandırılır. Harf maskeleri ve kopya blur katmanları yoktur. Font/ekran değişiminde metin yeniden ölçülür; ekran dışında kısa reverse, dönüşte yeniden giriş uygulanır. Screen reader için tek paragraf etiketi korunur; dekoratif gradient kelimeleri asıl kelimeyle aynı anda hareket eder. Reduced-motion'da normal metin bırakılır.
+- `src/components/ui/TitleLine.jsx`: büyük bölüm başlıklarında satırın tamamı maskesi içinde `xPercent: -115 → 0`, 0,75 sn expo.out ile girer. Hero ve CTA satırlarında başlangıç yönü dönüşümlü -115 / +115'tir. Opacity, scale, harf stagger'ı veya 3D giriş yoktur. Hero tilt, CTA magnet/parallax ve Identity harf hover'ı ayrı kapsayıcılarda korunur. Kayan bandın yalnızca metin girişi bu yatay aileye bağlıdır; sürekli akışı değişmez.
 
 ## Eşitlenen aileler
 
 | Aile | Kullanıldığı yerler | Ortak değer / davranış |
 | --- | --- | --- |
-| Harf bazlı başlık reveal | Bölüm başlıkları, CTA, IdentityBand, hero giriş harfleri; kayan bantta kelime bazında aynı hareket | yPercent 105; rotationX -70; 0,85 sn; power3.out; stagger 0,022 sn |
+| Maskeli yatay büyük başlık | Bölüm başlıkları, CTA, IdentityBand, hero, footer ve kayan bant kelimeleri | xPercent -115 → 0; 0,75 sn expo.out; yalnızca 2D yatay kayma. Hero ve CTA'da satırlar dönüşümlü -115 / +115 başlangıç kullanır. Identity harfleri yalnızca mevcut hover tepkisi için ayrılır |
 | Maskeli satır açılışı | ResponsiveTextLines, Home About accordion, About Tech accordion, Journey satırları, footer metinleri, menü alt metinleri | yPercent 112; 0,78 sn; power4.out; stagger 0,075 sn |
 | İçerik fade/slide | Bölüm içeriği, kicker, CTA metni/butonu, GitHub satırları, About highlight, Journey ayrıntıları, proje modalı ayrıntıları | y 32 px; 0,8 sn; power3.out; stagger 0,1 sn |
 | Soldan kart gelişi | Home ProjectsHighlights ve ProjectsList | 0,44 sn expo.out yatay maske; bütün içerik birlikte; ayrı metin girişi veya kartlar arasında batch gecikmesi yok |

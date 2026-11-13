@@ -56,18 +56,13 @@ try {
       await page.goto(`http://localhost:3000${route}`, { waitUntil: "domcontentloaded" });
       await page.waitForFunction(() => window.__pageIntroDoneForPath === location.pathname);
       await page.waitForTimeout(1800);
-      await cycle(page, page.locator("[data-hero-title] .hero-letter").first(), `${width}${route} hero`);
-      await cycle(page, page.locator("[data-reveal-part='title'] .motion-letter").first(), `${width}${route} heading`);
-      const line = page.locator("[data-reveal-part='content'] > [data-reveal-inner]").first();
-      if (await line.count()) await cycle(page, line, `${width}${route} paragraph`);
-      const cta = page.locator("[data-cta-title] .motion-letter").first();
+      await cycle(page, page.locator("[data-hero-title]").first(), `${width}${route} hero`);
+      await cycle(page, page.locator("[data-reveal-part='title'] [data-title-reveal]").first(), `${width}${route} heading`);
+      const cta = page.locator("[data-cta-title]").first();
       if (await cta.count()) await cycle(page, cta, `${width}${route} CTA`);
-      if (route === "/") {
-        const panel = page.locator('[id^="about-panel-"][aria-hidden="false"]');
-        await cycle(page, panel.locator("[data-accordion-line]").first(), `${width}${route} accordion`);
-      }
+      // Paragraph/accordion reading masks are covered by verify-reading-reveal.mjs.
       if (route === "/about") {
-        await cycle(page, page.locator("[data-toolkit-title] .motion-letter").first(), `${width}${route} toolkit`);
+        await cycle(page, page.locator("[data-toolkit-title]").first(), `${width}${route} toolkit`);
       }
       await cycle(page, page.locator("[data-footer-primary]").first(), `${width}${route} footer`);
     }

@@ -2,6 +2,9 @@
 export const MOTION = Object.freeze({
   ease: "power3.out",
   reverseDuration: .26,
+  miniTitle: { yPercent: -110, duration: .55, ease: "power3.out", force3D: false },
+  titleSlide: { duration: .75, ease: "expo.out", force3D: false },
+  reading: { duration: .86, wordStagger: .018, maxSpread: .84, hiddenOffset: 32, rotationX: 8, ease: "power3.out" },
   heading: { yPercent: 105, rotationX: -70, duration: .85, stagger: .022, lineGap: .14 },
   detail: { y: 32, duration: .8, stagger: .1 },
   line: { yPercent: 112, duration: .78, ease: "power4.out", stagger: .075 },
@@ -32,3 +35,5 @@ export const headingFrom = () => ({ yPercent: MOTION.heading.yPercent, rotationX
 export const headingTo = () => ({ duration: MOTION.heading.duration, stagger: MOTION.heading.stagger, ease: MOTION.ease });
 export const detailFrom = () => ({ y: MOTION.detail.y, opacity: 0 });
 export const detailTo = () => ({ duration: MOTION.detail.duration, stagger: MOTION.detail.stagger, ease: MOTION.ease });
+export const titleSlideFrom = (fromRight = false) => ({ xPercent: fromRight ? MOTION.maskedSlidePercent : -MOTION.maskedSlidePercent });
+export const titleSlideTo = () => ({ ...MOTION.titleSlide, xPercent: 0 });

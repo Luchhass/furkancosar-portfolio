@@ -1,6 +1,6 @@
 "use client";
 import { createMotionMedia } from "@/lib/motionMedia";
-import { MOTION } from "@/lib/motionPresets";
+import { MOTION, titleSlideFrom, titleSlideTo } from "@/lib/motionPresets";
 import { repeatReveal } from "@/lib/repeatReveal";
 
 import { useRef } from "react";
@@ -40,6 +40,10 @@ export default function Footer() {
       const address = footer.querySelectorAll("[data-footer-address-item]");
       const socials = footer.querySelectorAll("[data-footer-social-item]");
       [...primary, ...address, ...socials].forEach(item => {
+        if (item.closest("h2")) {
+          repeatReveal(gsap.fromTo(item, titleSlideFrom(), titleSlideTo()), item.parentElement);
+          return;
+        }
         repeatReveal(gsap.from(item, {
           yPercent: MOTION.line.yPercent,
           rotateX: item.hasAttribute("data-footer-primary") ? -8 : -6,

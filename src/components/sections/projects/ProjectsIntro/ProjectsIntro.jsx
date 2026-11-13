@@ -1,4 +1,6 @@
-import RevealTextLine from "@/components/layout/ScrollReveal/RevealTextLine";
+import ReadingText from "@/components/ui/ReadingText";
+import MiniTitleText from "@/components/ui/MiniTitleText";
+import TitleLine from "@/components/ui/TitleLine";
 import RevealCounter from "@/components/ui/RevealCounter/RevealCounter";
 import { projectCount } from "@/data/projects";
 export default function ProjectsIntro() {
@@ -16,23 +18,16 @@ export default function ProjectsIntro() {
           data-reveal-part="kicker"
           className="ui-section-label text-black/55"
         >
-          <span data-reveal-inner>
-            Archive
-          </span>
+          <MiniTitleText>Archive</MiniTitleText>
         </p>
 
         <div className="ui-section-body ui-section-stack">
           <h2 id="projects-intro-title" data-reveal-part="title" className="ui-section-title flex flex-col">
-            <span>Projects</span>
-            <span className="gradient-text-flow">Showcase</span>
+            <TitleLine>Projects</TitleLine>
+            <TitleLine className="gradient-text-flow">Showcase</TitleLine>
           </h2>
 
-          <p className="ui-section-copy text-black/65">
-            <RevealTextLine>This archive brings together interfaces built with clean structure,</RevealTextLine>
-            <RevealTextLine>responsive layouts, strong visual rhythm and polished interaction details.</RevealTextLine>
-            <RevealTextLine>Each project is shaped to turn a simple idea into a clear digital</RevealTextLine>
-            <RevealTextLine>experience that feels modern, usable and carefully finished.</RevealTextLine>
-          </p>
+          <ReadingText className="ui-section-copy text-black/65">This archive brings together interfaces built with clean structure, responsive layouts, strong visual rhythm and polished interaction details. Each project is shaped to turn a simple idea into a clear digital experience that feels modern, usable and carefully finished.</ReadingText>
 
           <div data-reveal-part="content" className="flex w-fit items-center gap-3 border-t border-black/10 pt-4" aria-label={`${countLabel} selected projects`}>
             <span className="text-[28px] leading-[0.82] font-black md:text-[30px] lg:text-[32px]">

@@ -28,6 +28,14 @@
 .ui-section-body { min-width: 0; }
 .ui-section-stack { display: grid; gap: var(--ui-stack); }
 .ui-section-label { margin: 0; align-self: start; font-size: 13px; font-weight: 900; line-height: 1.2; letter-spacing: .08em; text-transform: uppercase; }
+.mini-title-mask { display: block; overflow: hidden; }
+.mini-title-mask > [data-mini-title-inner] { display: block; }
+.shelf-card-description [data-reading-reveal] { max-height: 2lh; overflow: hidden; }
+@media (max-width: 767px) { .shelf-card-description [data-reading-reveal] { max-height: 1lh; } }
+.title-reveal-mask { display: block; overflow: hidden; padding-block: .12em; margin-block: -.12em; }
+.title-reveal-mask > [data-title-reveal] { display: block; }
+.title-reveal-mask > .identity-title-reveal { display: inline-block; }
+.cta-center h2 .title-reveal-mask { width: fit-content; max-width: 100%; margin-inline: auto; }
 .ui-section-title, .ui-hero .ui-hero-title, .ui-cta .cta-center h2, .ui-footer-title, .ui-journey .journey-deck-heading h2 {
   margin: 0;
   font-family: var(--font-geist-sans), sans-serif;

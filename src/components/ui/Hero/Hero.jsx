@@ -1,6 +1,6 @@
 "use client";
 import { createMotionMedia } from "@/lib/motionMedia";
-import { MOTION, headingFrom, headingTo } from "@/lib/motionPresets";
+import { MOTION } from "@/lib/motionPresets";
 import { bindTilt } from "@/lib/pointerMotion";
 import { observeReveal, reverseReveal } from "@/lib/repeatReveal";
 
@@ -8,14 +8,13 @@ import { useRef } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { SplitText } from "gsap/SplitText";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { splitCharacters } from "@/lib/motionText";
 import GradientActionButton from "@/components/ui/GradientActionButton/GradientActionButton";
 import RevealCounter, { playRevealCounters } from "@/components/ui/RevealCounter/RevealCounter";
 import { GeometricPentagonBackground } from "../Backgrounds/GeometricPentagonBackground";
+import ReadingText from "@/components/ui/ReadingText";
 
-gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger);
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 function normalizeCopyLines(copyLines) {
   if (Array.isArray(copyLines)) {
@@ -43,7 +42,6 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       if (prefersReducedMotion.matches) return;
 
       const q = gsap.utils.selector(heroRef);
-      const isHome = pathname === "/";
 
       const isVisibleElement = (element) => {
         if (!(element instanceof HTMLElement)) return false;
@@ -64,13 +62,12 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         "[data-hero-intro='menu-button']",
       );
 
-      const headerBrandIntroTarget = isHome ? null : headerBrand;
 
       const headerLeftItems = [
         headerProjectsLink,
         headerFullscreenButton,
       ].filter(isVisibleElement);
-      const headerCenterItems = [headerBrandIntroTarget].filter(
+      const headerCenterItems = [headerBrand].filter(
         isVisibleElement,
       );
       const headerRightItems = [headerMenuButton].filter(isVisibleElement);
@@ -82,36 +79,19 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       ];
 
       const titleItems = [...q("[data-hero-title]")].filter(isVisibleElement);
-      const titleSplits = titleItems.map((item) => splitCharacters(item, "hero-letter"));
       const statItems = [...q("[data-hero-stat]")].filter(isVisibleElement);
-      const copyItems = [...q("[data-hero-copy-line]")].filter(
-        isVisibleElement,
-      );
       const buttonItems = [...q("[data-hero-button]")].filter(isVisibleElement);
+      const cueItems = [...q("[data-hero-cue]")].filter(isVisibleElement);
+      const auxiliaryItems = [...statItems, ...buttonItems, ...cueItems];
       const buttonFillItems = [
         ...q("[data-hero-button] .gradient-action-fill"),
       ].filter(isVisibleElement);
 
-      const brandOnlyHold = 0;
-      const chainGap = 0.14;
       const detailDuration = MOTION.line.duration;
-      const titleDuration = MOTION.slide.duration;
+      const titleDuration = MOTION.titleSlide.duration;
       const titleLineGap = MOTION.heading.lineGap;
 
-      let cursor = brandOnlyHold;
-
-      const nextStart = () => {
-        const start = cursor;
-        cursor += chainGap;
-        return start;
-      };
-
-      const headerLeftStart = headerLeftItems.length ? nextStart() : null;
-      const headerCenterStart = headerCenterItems.length ? nextStart() : null;
-      const headerRightStart = headerRightItems.length ? nextStart() : null;
       const statStart = 0;
-      const buttonStart = 0;
-      const copyStart = 0;
       const titleStart = 0;
 
       const lastTitleStart =
@@ -122,36 +102,25 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       gsap.set(headerItems, {
         autoAlpha: 1,
         y: -34,
-        scale: 0.985,
+        force3D: false,
         willChange: "transform",
       });
 
-      gsap.set([...statItems, ...buttonItems], {
-        autoAlpha: 1,
-        yPercent: 118,
-        rotateX: -7,
-        scaleY: 1.025,
-        transformOrigin: "50% 100%",
-        willChange: "transform",
-      });
+      if (auxiliaryItems.length) {
+        gsap.set(auxiliaryItems, {
+          yPercent: 118,
+          force3D: false,
+          willChange: "transform",
+        });
+      }
 
-      gsap.set(copyItems, {
-        autoAlpha: 1,
-        yPercent: 118,
-        rotateX: -7,
-        scaleY: 1.025,
-        transformOrigin: "50% 100%",
-        willChange: "transform",
-      });
 
       titleItems.forEach((item, index) => {
         const comesFromLeft = index % 2 === 0;
 
         gsap.set(item, {
-          autoAlpha: 1,
           xPercent: comesFromLeft ? -MOTION.maskedSlidePercent : MOTION.maskedSlidePercent,
-          scaleX: 1.045,
-          transformOrigin: comesFromLeft ? "0% 50%" : "100% 50%",
+          force3D: false,
           willChange: "transform",
         });
       });
@@ -167,47 +136,17 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       });
       const contentTimeline = gsap.timeline({ paused: true });
 
-      timeline.to({}, { duration: brandOnlyHold });
-
-      if (headerLeftItems.length) {
+      if (headerItems.length) {
         timeline.to(
-          headerLeftItems,
+          headerItems,
           {
             y: 0,
-            scale: 1,
+            force3D: false,
             duration: detailDuration,
             ease: "power4.out",
             clearProps: "transform,willChange",
           },
-          headerLeftStart,
-        );
-      }
-
-      if (headerCenterItems.length) {
-        timeline.to(
-          headerCenterItems,
-          {
-            y: 0,
-            scale: 1,
-            duration: detailDuration,
-            ease: "power4.out",
-            clearProps: "transform,willChange",
-          },
-          headerCenterStart,
-        );
-      }
-
-      if (headerRightItems.length) {
-        timeline.to(
-          headerRightItems,
-          {
-            y: 0,
-            scale: 1,
-            duration: detailDuration,
-            ease: "power4.out",
-            clearProps: "transform,willChange",
-          },
-          headerRightStart,
+          0,
         );
       }
 
@@ -219,65 +158,35 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
           [],
           statStart + 0.06,
         );
+      }
 
+      if (auxiliaryItems.length) {
         contentTimeline.to(
-          statItems,
+          auxiliaryItems,
           {
             yPercent: 0,
-            rotateX: 0,
-            scaleY: 1,
+            force3D: false,
             duration: detailDuration,
             ease: "power4.out",
             clearProps: "transform,transformOrigin,willChange",
           },
-          statStart,
+          0,
         );
       }
 
-      if (buttonItems.length) {
-        contentTimeline.to(
-          buttonItems,
-          {
-            yPercent: 0,
-            rotateX: 0,
-            scaleY: 1,
-            duration: detailDuration,
-            ease: "power4.out",
-            clearProps: "transform,transformOrigin,willChange",
-          },
-          buttonStart,
-        );
-      }
-
-      if (copyItems.length) {
-        contentTimeline.to(
-          copyItems,
-          {
-            yPercent: 0,
-            rotateX: 0,
-            scaleY: 1,
-            duration: detailDuration,
-            ease: "power4.out",
-            stagger: copyItems.length > 1 ? 0.035 : 0,
-            clearProps: "transform,transformOrigin,willChange",
-          },
-          copyStart,
-        );
-      }
 
       titleItems.forEach((item, index) => {
         contentTimeline.to(
           item,
           {
             xPercent: 0,
-            scaleX: 1,
             duration: titleDuration,
-            ease: MOTION.slide.ease,
+            ease: MOTION.titleSlide.ease,
+            force3D: false,
             clearProps: "transform,transformOrigin,willChange",
           },
           titleStart + index * titleLineGap,
         );
-        contentTimeline.from(titleSplits[index].chars, { ...headingFrom(), ...headingTo(), clearProps: "transform,opacity,transformOrigin" }, titleStart + index * titleLineGap);
       });
 
       if (buttonFillItems.length) {
@@ -332,7 +241,6 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         timeline.kill();
         stopObserving();
         contentTimeline.kill();
-        titleSplits.forEach((split) => split.revert());
       };
     },
     { dependencies: [pathname], scope: heroRef, revertOnUpdate: true },
@@ -437,12 +345,14 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       className="ui-hero portfolio-hero relative isolate grid h-dvh grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] overflow-x-clip bg-black"
     >
       <div data-hero-background className="absolute inset-0 -z-10"><GeometricPentagonBackground /></div>
-      <div className="hero-scroll-cue" data-hero-exit="cue" aria-hidden="true">
-        <span>SCROLL TO EXPLORE</span>
-        <span className="hero-scroll-arrow">
-          <span className="hero-scroll-arrow-shaft" />
-          <svg className="hero-scroll-arrow-head" width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="m3 2 6 6 6-6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        </span>
+      <div className="hero-scroll-cue overflow-hidden" data-hero-exit="cue" aria-hidden="true">
+        <div data-hero-cue className="flex items-center gap-3">
+          <span>SCROLL TO EXPLORE</span>
+          <span className="hero-scroll-arrow">
+            <span className="hero-scroll-arrow-shaft" />
+            <svg className="hero-scroll-arrow-head" width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="m3 2 6 6 6-6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </span>
+        </div>
       </div>
 
       <div className="relative z-10 row-start-2 flex items-center justify-center">
@@ -451,6 +361,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
             <span key={line.text} data-hero-line-mask className="block overflow-hidden">
               <span
                 data-hero-title
+                data-title-reveal
                 className={`${line.gradient ? "gradient-text-flow " : ""}block`}
               >
                 {line.text}
@@ -495,19 +406,10 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
           data-hero-exit="copy"
           className={`ui-hero-copy col-span-2 row-start-1 m-0 w-full max-w-[46ch] justify-self-center text-center text-[13px] leading-tight font-medium text-white/90 md:max-w-md md:text-sm lg:text-sm ${copyClassName}`}
         >
-          <span className="block overflow-hidden md:hidden">
-            <span data-hero-copy-line className="block text-wrap">
-              {heroCopyText}
-            </span>
-          </span>
-
-          {heroCopyLines.map((line) => (
-            <span key={line} className="hidden overflow-hidden md:block">
-              <span data-hero-copy-line className="block text-wrap">
-                {line}
-              </span>
-            </span>
-          ))}
+          <ReadingText as="span" waitForIntro className="block text-wrap md:hidden">{heroCopyText}</ReadingText>
+          <ReadingText as="span" waitForIntro className="hidden md:block">
+            {heroCopyLines.map(line => <span key={line} className="block text-wrap">{line}</span>)}
+          </ReadingText>
         </p>
 
         {action ? (

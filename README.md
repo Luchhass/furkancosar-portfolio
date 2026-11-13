@@ -13,7 +13,9 @@ Open http://localhost:3000. Copy `.env.example` to `.env.local` for optional mai
 
 ## Motion architecture
 
-- `Hero`: page-intro coordination, SplitText character choreography, pointer perspective and scroll-driven line separation.
+- `Hero`: page-intro coordination, alternating masked horizontal title entrances, pointer perspective and scroll-driven line separation.
+- `TitleLine`: whole-line 2D horizontal entrance inside a stable mask. Section titles enter from the left; hero/CTA title lines alternate sides. Pointer and scroll effects remain on separate layers.
+- `ReadingText`: masked words enter downward in reading order using the original About paragraph's .86s power3.out motion. Stagger is bounded for long copy; there are no character masks or duplicate blur layers. Reduced motion renders ordinary text. Shared by hero/body/CTA, accordion, Journey and project descriptions.
 - `ScrollReveal` / `repeatReveal`: typography and details enter at first visibility, reverse offscreen within .26s, and restart immediately on re-entry. Stable masks are observed separately rather than delaying all text behind a section timeline.
 - `useSectionScene`: scoped rules, staggered rows, reading opacity and depth layers.
 - `useShelfCardReveal`: whole-card horizontal wipe using the same observer as text; no separate copy stagger or card batch delay. `useProjectCardMotion` is a compatibility export of this hook.

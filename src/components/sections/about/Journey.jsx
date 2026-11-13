@@ -1,7 +1,9 @@
 "use client";
+import MiniTitleText from "@/components/ui/MiniTitleText";
+import ReadingText from "@/components/ui/ReadingText";
 import { createMotionMedia } from "@/lib/motionMedia";
-import { MOTION, detailFrom, detailTo } from "@/lib/motionPresets";
-import { repeatReveal } from "@/lib/repeatReveal";
+import { MOTION, detailFrom, detailTo, titleSlideFrom, titleSlideTo } from "@/lib/motionPresets";
+import { observeReveal, repeatReveal, reverseReveal } from "@/lib/repeatReveal";
 
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
@@ -29,7 +31,7 @@ export default function Journey() {
     const media = createMotionMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const root = ref.current;
-      repeatReveal(gsap.from(root.querySelectorAll(".journey-deck-heading, .journey-slides, .journey-controls"), { ...detailFrom(), ...detailTo() }), root);
+      repeatReveal(gsap.from(root.querySelectorAll(".journey-controls"), { ...detailFrom(), ...detailTo() }), root);
       const panels = Array.from(root.querySelectorAll(".journey-slide"));
       root.classList.add("journey-deck");
       setEnhanced(true);
@@ -39,6 +41,11 @@ export default function Journey() {
       const fill = gsap.quickTo(root.querySelector(".journey-rail-fill"), "scaleX", { duration: MOTION.progressScrub, ease: MOTION.ease });
       gsap.set(panels, { autoAlpha: 0 });
       gsap.set(panels[0], { autoAlpha: 1 });
+      const titleEntrances = panels.map(panel => gsap.fromTo(panel.querySelectorAll(".journey-line"),
+        titleSlideFrom(), { ...titleSlideTo(), paused: true }));
+      const stopObservingTitles = observeReveal(root,
+        () => titleEntrances[current].timeScale(1).restart(true),
+        () => titleEntrances.forEach(reverseReveal));
 
       function show(index) {
         if (index === current) return;
@@ -50,8 +57,10 @@ export default function Journey() {
         transition = gsap.timeline({ defaults: { ease: "power3.out" } })
           .to(previous, { autoAlpha: 0, y: -direction * 18, duration: 0.18 })
           .set(next, { autoAlpha: 1, y: 0 })
-          .fromTo(next.querySelectorAll(".journey-line"), { yPercent: direction * MOTION.line.yPercent }, { yPercent: 0, duration: MOTION.line.duration, stagger: MOTION.line.stagger }, ">")
-          .fromTo(next.querySelectorAll(".journey-slide-index, .journey-slide-label, .journey-slide-copy"), { y: direction * 18, opacity: 0 }, { y: 0, opacity: 1, duration: MOTION.detail.duration, stagger: MOTION.detail.stagger }, "<");
+          .call(() => {
+            titleEntrances[index].timeScale(1).restart(true);
+            next.querySelector("[data-reading-reveal]")?.dispatchEvent(new Event("reading-reveal:play"));
+          });
         current = index;
         setActive(index);
       }
@@ -73,6 +82,8 @@ export default function Journey() {
       show(Math.min(chapters.length - 1, Math.floor(trigger.progress * chapters.length)));
       return () => {
         transition?.revert();
+        stopObservingTitles();
+        titleEntrances.forEach(animation => animation.kill());
         navigationTweenRef.current?.kill();
         gsap.set(root.querySelectorAll(".journey-slide, .journey-line, .journey-slide-index, .journey-slide-label, .journey-slide-copy"), { clearProps: "transform,opacity,visibility" });
         cancelAnimationFrame(refreshFrame);
@@ -100,9 +111,9 @@ export default function Journey() {
 
   return <section ref={ref} className="ui-journey journey-story" data-header-theme="dark" aria-labelledby="journey-title">
     <div className="journey-frame">
-      <header className="journey-deck-heading"><h2 id="journey-title" className="ui-section-label">My journey</h2></header>
+      <header className="journey-deck-heading"><h2 id="journey-title" className="ui-section-label"><MiniTitleText>My journey</MiniTitleText></h2></header>
       <div className="journey-slides">{chapters.map((chapter, index) => <article className="journey-slide" key={chapter.label} aria-hidden={enhanced ? active !== index : undefined}>
-        <div className="journey-slide-words"><h3>{chapter.title.map((line) => <span className="journey-line-mask" key={line}><span className="journey-line">{line}</span></span>)}</h3><p className="journey-slide-copy">{chapter.copy}</p></div>
+        <div className="journey-slide-words"><h3>{chapter.title.map((line) => <span className="journey-line-mask" key={line}><span className="journey-line">{line}</span></span>)}</h3><ReadingText active={enhanced && active === index} className="journey-slide-copy">{chapter.copy}</ReadingText></div>
       </article>)}</div>
       <nav className="journey-controls" aria-label="Journey chapters">
         <div className="journey-rail" aria-hidden="true"><span className="journey-rail-fill" /></div>

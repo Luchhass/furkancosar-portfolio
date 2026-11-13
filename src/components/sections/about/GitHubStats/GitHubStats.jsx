@@ -1,4 +1,6 @@
-import RevealTextLine from "@/components/layout/ScrollReveal/RevealTextLine";
+import ReadingText from "@/components/ui/ReadingText";
+import MiniTitleText from "@/components/ui/MiniTitleText";
+import TitleLine from "@/components/ui/TitleLine";
 import RevealCounter from "@/components/ui/RevealCounter/RevealCounter";
 import { getGitHubProfileStats } from "@/lib/githubStats";
 import GitHubStatsFrame from "./GitHubStatsFrame";
@@ -20,9 +22,7 @@ export default async function GitHubStats() {
           data-reveal-part="kicker"
           className="ui-section-label inline-flex items-center gap-2 text-white"
         >
-          <span data-reveal-inner className="block">
-            @{username}
-          </span>
+          <MiniTitleText>@{username}</MiniTitleText>
         </a>
 
         <div className="ui-section-body">
@@ -31,22 +31,11 @@ export default async function GitHubStats() {
             data-reveal-part="title"
             className="ui-section-title"
           >
-            <span className="block">GitHub</span>
-            <span className="block">Statistics</span>
+            <TitleLine>GitHub</TitleLine>
+            <TitleLine>Statistics</TitleLine>
           </h2>
 
-          <p className="ui-section-copy ui-section-copy-spaced text-white/55">
-            <RevealTextLine>
-              Real-time insights into development activity. From repository
-            </RevealTextLine>
-            <RevealTextLine>
-              management to commit history, track the development flow.
-            </RevealTextLine>
-            <RevealTextLine>
-              Highlighting the dedication behind exceptional digital
-              experiences.
-            </RevealTextLine>
-          </p>
+          <ReadingText className="ui-section-copy ui-section-copy-spaced text-white/55">Real-time insights into development activity. From repository management to commit history, track the development flow. Highlighting the dedication behind exceptional digital experiences.</ReadingText>
 
           <div
             data-reveal-part="content"

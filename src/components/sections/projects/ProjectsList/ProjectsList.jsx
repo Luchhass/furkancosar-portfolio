@@ -1,4 +1,5 @@
 "use client";
+import MiniTitleText from "@/components/ui/MiniTitleText";
 import ProjectShelfCard from "@/components/ui/ProjectShelfCard";
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import gsap from "gsap";
@@ -136,7 +137,7 @@ export default function ProjectsList({ projects = latestProjects }) {
   return <section id="project-archive" ref={sectionRef} data-header-theme="dark"
     className="ui-screen ui-section projects-shelf bg-[#141414] text-white" aria-labelledby="projects-list-title">
     <div className="ui-section-grid">
-      <h2 id="projects-list-title" className="ui-section-label">Selected work</h2>
+      <h2 id="projects-list-title" className="ui-section-label"><MiniTitleText>Selected work</MiniTitleText></h2>
       <div className="ui-section-body shelf-body">
         <div ref={viewportRef} className="shelf-viewport" tabIndex={0} role="region" aria-roledescription="carousel" aria-label="Project shelf"
           onScroll={syncPage} onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}

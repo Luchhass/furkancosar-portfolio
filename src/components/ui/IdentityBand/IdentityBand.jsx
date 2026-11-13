@@ -7,7 +7,7 @@ import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/SplitText";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { splitCharacters } from "@/lib/motionText";
-import { MOTION, headingFrom, headingTo } from "@/lib/motionPresets";
+import { MOTION, titleSlideFrom, titleSlideTo } from "@/lib/motionPresets";
 import { observeReveal, repeatReveal } from "@/lib/repeatReveal";
 gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger);
 
@@ -19,7 +19,7 @@ export default function IdentityBand() {
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const text = textRef.current;
       const split = splitCharacters(text, "identity-letter");
-      const entrance = repeatReveal(gsap.from(split.chars, { ...headingFrom(), ...headingTo() }), titleRef.current);
+      const entrance = repeatReveal(gsap.fromTo(text, titleSlideFrom(), titleSlideTo()), text.parentElement);
       const bounces = new Map();
       const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
       const resetBounces = () => {
@@ -121,9 +121,9 @@ export default function IdentityBand() {
           ref={titleRef}
           className="gradient-text-flow m-0 block w-full overflow-visible whitespace-nowrap text-[clamp(28px,11cqw,220px)] leading-[0.84] font-black tracking-[-0.04em] uppercase"
         >
-          <span ref={textRef} className="inline-block whitespace-nowrap">
+          <span className="title-reveal-mask"><span ref={textRef} data-title-reveal className="identity-title-reveal inline-block whitespace-nowrap">
             Furkancosar
-          </span>
+          </span></span>
         </h2>
       </div>
     </section>
