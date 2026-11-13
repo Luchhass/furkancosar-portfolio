@@ -39,6 +39,8 @@ const TRAIL_HEAD_DEDUP_DISTANCE = 18;
 const HERO_FLOW_DURATION = 15000;
 const HERO_FLOW_GRADIENT_SIZE = 2.6;
 const BURST = { travelSeconds: .9, settleSeconds: .34, displacement: 7, maxActive: 3 };
+const BURST_COLOR_DELAY = .045;
+const BURST_Y_RATIO = 1.12;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -491,7 +493,7 @@ export function GeometricPentagonBackground() {
       clearRegion(gradientCtx, previousGradientBounds);
       previousGradientBounds = null;
 
-      if (sources.length === 0) {
+      if (sources.length === 0 && bursts.length === 0) {
         return;
       }
 
@@ -502,6 +504,11 @@ export function GeometricPentagonBackground() {
         const radius = scene.glowRadius * (source.radiusScale ?? 1);
         left = Math.min(left, source.x - radius); top = Math.min(top, source.y - radius);
         right = Math.max(right, source.x + radius); bottom = Math.max(bottom, source.y + radius);
+      }
+      for (const burst of bursts) {
+        const radius = Math.max(0, (now - burst.time) / 1000 - BURST_COLOR_DELAY) * burst.speed;
+        left = Math.min(left, burst.x - radius); top = Math.min(top, burst.y - radius / BURST_Y_RATIO);
+        right = Math.max(right, burst.x + radius); bottom = Math.max(bottom, burst.y + radius / BURST_Y_RATIO);
       }
       const bounds = clipBounds(left - 1, top - 1, right + 1, bottom + 1);
       previousGradientBounds = bounds;
@@ -526,6 +533,34 @@ export function GeometricPentagonBackground() {
           glowCanvas.height / scene.dpr * scale,
         );
       });
+
+      // The color follows the same elliptical distance and travel speed as the
+      // tile vibration. A short delay places it just behind the moving front.
+      for (const burst of bursts) {
+        const age = (now - burst.time) / 1000 - BURST_COLOR_DELAY;
+        if (age <= 0) continue;
+        const outer = age * burst.speed;
+        const inner = Math.max(0, outer - burst.speed * BURST.settleSeconds);
+        const mask = gradientCtx.createRadialGradient(0, 0, inner, 0, 0, outer);
+        for (let step = 0; step <= 32; step++) {
+          const position = step / 32;
+          const distance = inner + (outer - inner) * position;
+          const phase = clamp((age - distance / burst.speed) / BURST.settleSeconds, 0, 1);
+          const vibration = Math.pow(Math.sin(phase * Math.PI * 3), 2);
+          const envelope = Math.sin(phase * Math.PI) * Math.pow(1 - phase, .7);
+          const attenuation = clamp(1 - .25 * distance / burst.reach, 0, 1);
+          mask.addColorStop(position, `rgba(255,255,255,${vibration * envelope * attenuation * .95})`);
+        }
+        gradientCtx.save();
+        gradientCtx.translate(burst.x, burst.y);
+        gradientCtx.scale(1, 1 / BURST_Y_RATIO);
+        gradientCtx.globalAlpha = 1;
+        gradientCtx.fillStyle = mask;
+        gradientCtx.beginPath();
+        gradientCtx.arc(0, 0, outer, 0, Math.PI * 2);
+        gradientCtx.fill();
+        gradientCtx.restore();
+      }
 
       gradientCtx.globalAlpha = 1;
       gradientCtx.globalCompositeOperation = "source-in";
@@ -566,7 +601,7 @@ export function GeometricPentagonBackground() {
       pointer.intensity = Math.abs(deltaIntensity) < 0.0001 ? pointer.targetIntensity : pointer.intensity + deltaIntensity * smoothing;
 
       trail = trail.filter((point) => now - point.createdAt < trailLifetime);
-      bursts = bursts.filter(burst => now - burst.time < (BURST.travelSeconds + BURST.settleSeconds) * 1000);
+      bursts = bursts.filter(burst => now - burst.time < (BURST.travelSeconds + BURST.settleSeconds + BURST_COLOR_DELAY) * 1000);
 
       if (pointer.targetIntensity > 0) {
         const distance = lastTrailPoint ? Math.hypot((pointer.x - lastTrailPoint.x) * scene.width, (pointer.y - lastTrailPoint.y) * scene.height) : 0;
@@ -914,7 +949,7 @@ export function GeometricPentagonBackground() {
       scene.cells.forEach((cell, index) => {
         const dx = cell.x - x;
         const dy = cell.y - y;
-        const distance = Math.hypot(dx, dy * 1.12);
+        const distance = Math.hypot(dx, dy * BURST_Y_RATIO);
         const directionLength = Math.hypot(dx, dy) || 1;
         distances[index * 3] = distance;
         distances[index * 3 + 1] = dx / directionLength;
