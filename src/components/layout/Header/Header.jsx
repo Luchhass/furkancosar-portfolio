@@ -6,7 +6,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { contactItems, navigationItems, siteConfig, socialItems } from "@/data/site";
 import gsap from "gsap";
-import { Maximize2, Minimize2 } from "lucide-react";
+import { Lock, LockOpen } from "lucide-react";
 import Link from "next/link";
 import SocialMediaButtons from "../../ui/SocialMediaButtons/SocialMediaButtons";
 
@@ -511,7 +511,7 @@ export default function Header() {
     enterHeroFullscreen();
   }
 
-  const FullscreenIcon = isHeroFullscreen ? Minimize2 : Maximize2;
+  const FullscreenIcon = isHeroFullscreen ? Lock : LockOpen;
 
   return (
     <>

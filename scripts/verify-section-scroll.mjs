@@ -17,28 +17,48 @@ try {
       assert.ok(await page.locator("html").evaluate(el=>el.classList.contains("lenis")), "Smooth scroll mounted");
       const anchor = page.locator("main .ui-screen").first();
       const top = await anchor.evaluate(el=>scrollY+el.getBoundingClientRect().top);
-      await page.evaluate(y=>scrollTo(0,y),top-130);
+      await page.evaluate(y=>scrollTo(0,y),top-160);
       await page.waitForTimeout(100);
       await page.mouse.move(10,height/2);
       await page.mouse.wheel(0,35);
       await page.waitForTimeout(1400);
       const approach = await page.evaluate(()=>scrollY);
-      assert.ok(approach > top-130 && approach < top-50, "Approach adds resistance");
+      assert.ok(Math.abs(approach-(top-125))<3, "Scroll input keeps its full distance outside alignment range");
       await page.waitForTimeout(600);
-      assert.ok(Math.abs(await page.evaluate(()=>scrollY)-approach)<2,"Stopping never triggers a later alignment correction");
-      for (let step=0;step<12;step++) {
-        if (Math.abs(await page.evaluate(()=>scrollY)-top)<3) break;
-        await page.mouse.wheel(0,80);
-        await page.waitForTimeout(650);
-      }
+      assert.ok(Math.abs(await page.evaluate(()=>scrollY)-approach)<2,"No distant snap after stopping");
+      await page.mouse.wheel(0,60);
+      await page.waitForTimeout(1400);
       const actual = await page.evaluate(()=>scrollY);
       if (Math.abs(actual-top)>=3) console.log(await page.evaluate(()=>({html:document.documentElement.className,bodyOverflow:document.body.style.overflow,htmlOverflow:document.documentElement.style.overflow,intro:window.__pageIntroDoneForPath,menu:document.body.dataset.siteMenuOpen,body:document.body.style.cssText})));
       assert.ok(Math.abs(actual-top)<3, route+": gentle input docks "+JSON.stringify({actual,top}));
+      const innerBefore = await anchor.evaluate(el=>el.scrollTop);
+      await page.mouse.wheel(0,20);
+      await page.waitForTimeout(1200);
+      const departure = await page.evaluate(()=>scrollY);
+      const innerAfter = await anchor.evaluate(el=>el.scrollTop);
+      assert.ok(Math.abs(departure-(top+20))<3 || innerAfter-innerBefore>10,
+        "Even small input moves the page or overflowing section without resistance: "+JSON.stringify({departure,top,innerBefore,innerAfter}));
       await page.mouse.wheel(0,240);
       await page.waitForTimeout(650);
       const progressed = await page.evaluate(()=>scrollY)>top+160 || await anchor.evaluate(el=>el.classList.contains("ui-screen-scroll") && el.scrollTop>0);
       assert.ok(progressed, route+": strong input continues page or nested content");
-      console.log(width+" "+route+": gentle dock / fast release passed");
+      if (route === "/") {
+        await page.waitForTimeout(700);
+        await page.evaluate(y=>scrollTo(0,y),top-260);
+        await page.waitForTimeout(150);
+        await page.mouse.wheel(0,240);
+        await page.waitForTimeout(1400);
+        const fastEnd = await page.evaluate(()=>scrollY);
+        assert.ok(Math.abs(fastEnd-(top-20))<3, "Fast gesture stays free even when it ends near a section: "+JSON.stringify({fastEnd,top}));
+        await page.evaluate(y=>scrollTo(0,y),top-140);
+        await page.waitForTimeout(300);
+        await page.mouse.wheel(0,70);
+        await page.waitForFunction(y=>scrollY>y-65 && scrollY<y-3,top);
+        await page.mouse.wheel(0,-25);
+        await page.waitForTimeout(1400);
+        assert.ok(await page.evaluate(()=>scrollY)<top-50, "New input interrupts alignment immediately");
+      }
+      console.log(width+" "+route+": full input / nearby resting alignment / immediate departure passed");
     }
     await page.getByRole("button",{name:"Open navigation",exact:true}).click();
     await page.waitForTimeout(1100);
@@ -56,7 +76,8 @@ try {
     await page.mouse.move(width/2,height/2);
     await page.mouse.wheel(0,220);
     await page.waitForTimeout(600);
-    assert.ok(await archive.evaluate(el=>el.scrollTop)>50, "Nested archive stays scrollable");
+    assert.ok(await archive.locator(".shelf-viewport").evaluate(el=>el.scrollLeft)>20,
+      "Archive retains its horizontal shelf progression");
     if (touch) {
       await page.goto("http://localhost:3000/contact");
       await page.waitForFunction(() => window.__pageIntroDoneForPath === location.pathname);
@@ -69,6 +90,18 @@ try {
       await cdp.send("Input.dispatchTouchEvent",{type:"touchEnd",touchPoints:[]});
       await page.waitForTimeout(600);
       assert.ok(await page.evaluate(()=>scrollY)>50,"Touch swipe moves page");
+      await page.waitForTimeout(700);
+      const formTop = await page.locator("main .ui-screen").first().evaluate(el=>scrollY+el.getBoundingClientRect().top);
+      await page.evaluate(y=>scrollTo(0,y),formTop-100);
+      await page.waitForTimeout(300);
+      await cdp.send("Input.dispatchTouchEvent",{type:"touchStart",touchPoints:[{x:10,y:height*.7}]});
+      await cdp.send("Input.dispatchTouchEvent",{type:"touchMove",touchPoints:[{x:10,y:height*.7-35}]});
+      await page.waitForTimeout(600);
+      const held = await page.evaluate(()=>scrollY);
+      assert.ok(held<formTop-20 && held>formTop-100, "No alignment while the finger remains down");
+      await cdp.send("Input.dispatchTouchEvent",{type:"touchEnd",touchPoints:[]});
+      await page.waitForTimeout(1500);
+      assert.ok(Math.abs(await page.evaluate(()=>scrollY)-formTop)<3, "Touch aligns only after release and momentum");
     }
     await context.close();
   }

@@ -4,41 +4,37 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export const SECTION_SCROLL = Object.freeze({
   lerp: .105,
-  captureRatio: .16,
-  captureMax: 135,
-  minimumResistance: .34,
+  captureRatio: .1,
+  captureMax: 100,
+  idleDelay: 150,
+  settleVelocity: .65,
+  settleDistance: 6,
+  duration: .24,
   fastDelta: 180,
   fastSpeed: 2.4,
-  fastCooldown: 800,
-  releaseDistance: 55,
 });
 
-// Resistance is applied to the user's current input, never to a later correction.
-export function approachSection(delta, position, targets, ranges, viewport, limit) {
-  if (ranges.some(([start, end]) => position > start + 3 && position < end - 3)) return { delta, dock: null };
-  const sign = Math.sign(delta);
+// Choose only a nearby resting frame, never a point inside a pinned story.
+export function restingSection(position, targets, ranges, viewport, limit, direction, origin) {
+  if (ranges.some(([start, end]) => position > start + 3 && position < end - 3)) return null;
   const radius = Math.min(SECTION_SCROLL.captureMax, viewport * SECTION_SCROLL.captureRatio);
-  const ahead = targets.filter(target => target >= 0 && target <= limit && (target - position) * sign > .5);
-  const target = ahead.reduce((best, value) => Math.abs(value - position) < Math.abs(best - position) ? value : best, Infinity);
-  const distance = Math.abs(target - position);
-  if (distance > radius) return { delta, dock: null };
-  const t = distance / radius;
-  const weighted = delta * (SECTION_SCROLL.minimumResistance + (1 - SECTION_SCROLL.minimumResistance) * t * t);
-  if (Math.abs(weighted) >= distance || (distance < 3 && Math.abs(delta) >= distance)) {
-    return { delta: target - position, dock: target };
-  }
-  return { delta: weighted, dock: null };
+  // A tiny overshoot can settle back; don't pull the user far backwards.
+  const nearby = targets.filter(target => target >= 0 && target <= limit &&
+    Math.abs(target - origin) > 4 &&
+    Math.abs(target - position) <= radius && (target - position) * direction >= -24);
+  return nearby.reduce((best, value) => best === null || Math.abs(value - position) < Math.abs(best - position) ? value : best, null);
 }
 
 export function createSectionScroll() {
   let lastDeltaTime = 0;
-  let cooldown = 0;
-  let dock = null;
-  let release = 0;
+  let armed = false;
+  let fastGesture = false;
+  let aligning = false;
   let targets = [];
   let ranges = [];
   let disposed = false;
   let direction = 0;
+  let gestureOrigin = 0;
   const nested = ".ui-screen, .journey-slide-words, textarea, [data-lenis-prevent]";
 
   function nestedConsumes(target, delta) {
@@ -61,36 +57,28 @@ export function createSectionScroll() {
     prevent: node => node instanceof Element && node.matches(nested) && nestedConsumes(node, direction),
     virtualScroll: data => {
       const { event } = data;
-      if (Math.abs(data.deltaX) > Math.abs(data.deltaY) || event.ctrlKey) return false;
+      cancelAlignment();
+      if (Math.abs(data.deltaX) > Math.abs(data.deltaY) || event.ctrlKey) {
+        armed = false;
+        return false;
+      }
+      if (!data.deltaY) return true;
       direction = data.deltaY;
-      // Once a touch has arrived at the edge, don't let its trailing fling undo it.
-      if (event.type === "touchend" && dock !== null) return false;
-      if (!data.deltaY || nestedConsumes(event.target, data.deltaY)) {
+      if (nestedConsumes(event.target, data.deltaY)) {
+        armed = false;
         return true;
       }
       const now = performance.now();
+      if (now - lastDeltaTime > 220) {
+        fastGesture = false;
+        gestureOrigin = lenis.actualScroll;
+      }
       const speed = Math.abs(data.deltaY) / Math.max(16, now - lastDeltaTime);
       lastDeltaTime = now;
       const fast = Math.abs(data.deltaY) >= SECTION_SCROLL.fastDelta || speed > SECTION_SCROLL.fastSpeed;
-      if (fast) {
-        cooldown = now + SECTION_SCROLL.fastCooldown;
-        dock = null;
-      }
-      if (dock !== null) {
-        release += Math.abs(data.deltaY);
-        if (fast || release >= SECTION_SCROLL.releaseDistance) {
-          dock = null;
-          cooldown = now + 350;
-        } else {
-          data.deltaY = 0;
-          return true;
-        }
-      }
-      if (now >= cooldown && !blocked() && event.type !== "touchend") {
-        const shaped = approachSection(data.deltaY, lenis.targetScroll, targets, ranges, window.innerHeight, lenis.limit);
-        data.deltaY = shaped.delta;
-        if (shaped.dock !== null) { dock = shaped.dock; release = 0; }
-      }
+      fastGesture ||= fast;
+      armed = !fastGesture && !blocked();
+      // Never reduce, trap or discard the user's scroll delta.
       return true;
     },
   });
@@ -104,7 +92,7 @@ export function createSectionScroll() {
     targets = [...nodes].flatMap(node => {
       const pin = triggers.find(trigger => trigger.pin === node);
       const top = pin ? pin.start : y + node.getBoundingClientRect().top;
-      if (node.matches(".journey-deck")) {
+      if (node.matches(".journey-deck") || (!pin && node.offsetHeight > window.innerHeight + 4)) {
         const end = top + node.offsetHeight - window.innerHeight;
         ranges.push([top, end]);
         return [top, end];
@@ -121,15 +109,37 @@ export function createSectionScroll() {
   }
 
   function syncLock() {
-    if (blocked()) { lenis.stop(); dock = null; }
+    if (blocked()) { interrupt(); lenis.stop(); }
     else lenis.start();
   }
-  function interrupt() {
-    cooldown = performance.now() + 500;
-    dock = null;
+  function cancelAlignment() {
+    if (!aligning) return;
+    aligning = false;
+    lenis.scrollTo(lenis.actualScroll, { immediate: true });
   }
-  const touchStart = () => { dock = null; release = 0; cooldown = 0; };
-  const tick = time => { if (!document.hidden) lenis.raf(time * 1000); };
+  function interrupt() {
+    armed = false;
+    cancelAlignment();
+  }
+  const touchStart = () => { interrupt(); fastGesture = false; lastDeltaTime = 0; gestureOrigin = lenis.actualScroll; };
+  const tick = time => {
+    if (document.hidden) return;
+    lenis.raf(time * 1000);
+    if (!armed || aligning || lenis.isTouching || blocked() ||
+      performance.now() - lastDeltaTime < SECTION_SCROLL.idleDelay ||
+      Math.abs(lenis.velocity) > SECTION_SCROLL.settleVelocity ||
+      Math.abs(lenis.targetScroll - lenis.animatedScroll) > SECTION_SCROLL.settleDistance) return;
+    armed = false;
+    const target = restingSection(lenis.targetScroll, targets, ranges, window.innerHeight, lenis.limit, Math.sign(direction), gestureOrigin);
+    if (target === null || Math.abs(target - lenis.actualScroll) < 2) return;
+    aligning = true;
+    lenis.scrollTo(target, {
+      duration: SECTION_SCROLL.duration,
+      lerp: 0,
+      easing: t => 1 - Math.pow(1 - t, 3),
+      onComplete: () => { aligning = false; },
+    });
+  };
   const introDone = () => { measure(); syncLock(); };
   const lockObserver = new MutationObserver(syncLock);
   lockObserver.observe(document.body, { attributes: true, attributeFilter: ["style", "data-site-menu-open"] });

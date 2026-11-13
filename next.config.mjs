@@ -2,6 +2,7 @@
 const nextConfig = {
   reactCompiler: true,
   allowedDevOrigins: [
+    "mainstream-islamic-president-promotion.trycloudflare.com",
     "192.168.*.*",
     "10.*.*.*",
     "172.16.*.*",
