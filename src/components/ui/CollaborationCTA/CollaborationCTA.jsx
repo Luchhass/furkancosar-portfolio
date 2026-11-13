@@ -23,8 +23,8 @@ export default function CollaborationCTA() {
       root.querySelectorAll("[data-cta-detail]").forEach(detail => {
         if (detail.tagName === "P") return;
         repeatReveal(gsap.fromTo(detail.querySelector("[data-cta-reveal]"),
-          { yPercent: MOTION.miniTitle.yPercent },
-          { ...MOTION.miniTitle, yPercent: 0 }), detail);
+          { scale: 0, transformOrigin: "50% 50%" },
+          { scale: 1, duration: .65, ease: "back.out(1.25)", force3D: false }), detail);
       });
       gsap.fromTo(root.querySelector(".cta-title-first"), { xPercent: -7 }, { xPercent: 7, ease: "none", scrollTrigger: { trigger: root, start: "top bottom", end: "bottom top", scrub: MOTION.scrub } });
       gsap.fromTo(root.querySelector(".cta-title-second"), { xPercent: 7 }, { xPercent: -7, ease: "none", scrollTrigger: { trigger: root, start: "top bottom", end: "bottom top", scrub: MOTION.scrub } });
@@ -39,7 +39,7 @@ export default function CollaborationCTA() {
     <div className="cta-center">
       <h2 id="collaboration-title"><span className="cta-title-first"><span className="title-reveal-mask"><span data-cta-title data-title-reveal>LET&apos;S BUILD</span></span></span><span className="cta-title-second"><span className="title-reveal-mask"><span data-cta-title data-title-reveal className="gradient-text-flow">TOGETHER</span></span></span></h2>
       <p className="cta-description"><ReadingText as="span" className="block">Have an idea, project or interface that needs a clean frontend touch? Let&apos;s turn it into a polished web experience.</ReadingText></p>
-      <div data-cta-detail><div data-cta-follow><div className="overflow-hidden"><div data-cta-reveal><GradientActionButton className="w-fit! px-8" href="/contact" id="collaboration-contact" label="LET’S MAKE IT HAPPEN" /></div></div></div></div>
+      <div data-cta-detail><div data-cta-follow><div data-cta-reveal><GradientActionButton className="w-fit! px-8" href="/contact" id="collaboration-contact" label="LET’S MAKE IT HAPPEN" /></div></div></div>
     </div>
   </section>;
 }
