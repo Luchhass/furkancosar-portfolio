@@ -1,13 +1,13 @@
 "use client";
-
+import { MOTION } from "@/lib/motionPresets";
 import { useCallback, useRef, useState } from "react";
 import { Code2, Sparkles, Workflow } from "lucide-react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
 import ResponsiveTextLines from "@/components/ui/ResponsiveTextLines/ResponsiveTextLines";
+import styles from "./AboutPanelDeck.module.css";
+import useSectionScene from "@/lib/useSectionScene";
+import useAccordionMotion from "@/lib/useAccordionMotion";
 
-gsap.registerPlugin(useGSAP);
 
 const accordionItems = [
   {
@@ -37,80 +37,13 @@ export default function AboutMeAccordion() {
   const [openId, setOpenId] = useState(accordionItems[0].id);
   const [lineLayoutKey, setLineLayoutKey] = useState(0);
   const accordionRef = useRef(null);
-  const animationFrameRef = useRef(null);
+  useSectionScene(accordionRef, "accordion");
 
   const handleLinesChange = useCallback(() => {
     setLineLayoutKey((currentKey) => currentKey + 1);
   }, []);
 
-  useGSAP(
-    () => {
-      const accordion = accordionRef.current;
-
-      if (!accordion) return;
-
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      );
-
-      const allLines = gsap.utils.toArray(
-        accordion.querySelectorAll("[data-accordion-line]"),
-      );
-
-      const activeLines = gsap.utils.toArray(
-        accordion.querySelectorAll(
-          `#about-panel-${openId} [data-accordion-line]`,
-        ),
-      );
-
-      if (animationFrameRef.current !== null) {
-        window.cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-
-      gsap.killTweensOf(allLines);
-
-      gsap.set(allLines, {
-        yPercent: 112,
-        autoAlpha: 1,
-        willChange: "transform",
-      });
-
-      if (prefersReducedMotion.matches) {
-        gsap.set(activeLines, {
-          yPercent: 0,
-          clearProps: "willChange",
-        });
-
-        return;
-      }
-
-      animationFrameRef.current = window.requestAnimationFrame(() => {
-        animationFrameRef.current = window.requestAnimationFrame(() => {
-          gsap.to(activeLines, {
-            yPercent: 0,
-            duration: 0.78,
-            ease: "power4.out",
-            stagger: 0.075,
-            overwrite: true,
-            clearProps: "willChange",
-          });
-
-          animationFrameRef.current = null;
-        });
-      });
-
-      return () => {
-        if (animationFrameRef.current !== null) {
-          window.cancelAnimationFrame(animationFrameRef.current);
-          animationFrameRef.current = null;
-        }
-
-        gsap.killTweensOf(allLines);
-      };
-    },
-    { scope: accordionRef, dependencies: [openId, lineLayoutKey] },
-  );
+  useAccordionMotion(accordionRef, `about-panel-${openId}`, "[data-accordion-line]", "", lineLayoutKey);
 
   function updateTitleFillOrigin(event) {
     const button = event.currentTarget;
@@ -129,7 +62,7 @@ export default function AboutMeAccordion() {
       ref={accordionRef}
       data-header-theme="light"
       data-scroll-reveal="sequence"
-      className="relative isolate min-h-dvh overflow-hidden bg-white px-8 py-20 text-black md:px-10 md:py-24 lg:px-16 lg:py-32"
+      className={`ui-screen ui-fit-panel ui-screen-about relative isolate overflow-hidden bg-white ui-section text-black ${styles.section}`}
     >
       <OutlineCirclesBackground />
       
@@ -151,25 +84,28 @@ export default function AboutMeAccordion() {
               attributeName="gradientTransform"
               type="translate"
               values="-1 0; 1 0; -1 0"
-              dur="8s"
+              dur={`${MOTION.gradientSeconds}s`}
               repeatCount="indefinite"
             />
           </linearGradient>
         </defs>
       </svg>
 
-      <div className="relative z-10 grid w-full max-w-205 grid-cols-[40px_minmax(0,1fr)] gap-x-4 md:grid-cols-[120px_minmax(0,1fr)] md:gap-x-5 lg:grid-cols-[160px_minmax(0,1fr)]">
+      <div className="ui-section-grid relative z-10">
+        <p data-reveal-part="kicker" className="ui-section-label text-black/55"><span data-reveal-inner>About</span></p>
+        <div className={`ui-section-body ui-section-split about-scene-layout ${styles.layout}`}>
+      <div className="min-w-0">
         <h2
           data-reveal-part="title"
-          className="col-start-2 m-0 flex flex-col text-[44px] leading-[0.9] font-black tracking-[-0.04em] uppercase md:text-[80px] lg:text-[120px]"
+          className="ui-section-title flex flex-col"
         >
           <span>ABOUT</span>
-          <span className="gradient-text-flow">ME</span>
+          <span>ME</span>
         </h2>
 
         <div
           data-reveal-part="content"
-          className="col-span-2 mt-8 border-t border-black/10 md:mt-10"
+          className="ui-accordion"
         >
           {accordionItems.map((item) => {
             const isOpen = openId === item.id;
@@ -178,9 +114,11 @@ export default function AboutMeAccordion() {
             return (
               <div
                 key={item.id}
-                className="grid grid-cols-[40px_minmax(0,1fr)] gap-x-4 border-b border-black/10 py-5 md:grid-cols-[120px_minmax(0,1fr)] md:gap-x-5 md:py-6 lg:grid-cols-[160px_minmax(0,1fr)]"
+                data-scene-row
+                className={`ui-accordion-row ${styles.row}`}
               >
                 <Icon
+                  data-scene-icon
                   color="url(#accordion-icon-gradient)"
                   strokeWidth={2.3}
                   className="gradient-icon-flow mt-1 h-5 w-5 md:h-6 md:w-6"
@@ -198,7 +136,7 @@ export default function AboutMeAccordion() {
                     onPointerEnter={updateTitleFillOrigin}
                     onPointerLeave={updateTitleFillOrigin}
                   >
-                    <span className="gradient-title-text text-[28px] leading-[0.82] font-black tracking-[-0.03em] text-black/90 uppercase md:text-[30px] lg:text-[32px]">
+                    <span className="gradient-title-text ui-accordion-title text-black/90">
                       <span>{item.title}</span>
 
                       <span
@@ -220,7 +158,7 @@ export default function AboutMeAccordion() {
                     }`}
                   >
                     <div className="min-h-0">
-                      <p className="relative m-0 max-w-2xl pt-2 text-[13px] leading-tight font-medium text-black/75 md:text-sm">
+                      <p className="ui-section-copy relative text-black/75">
                         <ResponsiveTextLines
                           text={item.description}
                           lineAttribute="data-accordion-line"
@@ -234,6 +172,8 @@ export default function AboutMeAccordion() {
             );
           })}
         </div>
+      </div>
+      </div>
       </div>
     </section>
   );

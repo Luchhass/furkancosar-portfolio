@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 
@@ -84,6 +84,17 @@ function Word({
 export default function PageIntroAnimation() {
   const pathname = usePathname();
 
+  return <PageIntroForRoute key={pathname} pathname={pathname} />;
+}
+
+function PageIntroForRoute({ pathname }) {
+  const [mounted, setMounted] = useState(true);
+
+  return mounted ? <PageIntroStage pathname={pathname} onFinished={() => setMounted(false)} /> : null;
+}
+
+function PageIntroStage({ pathname, onFinished }) {
+
   const overlayRef = useRef(null);
   const whiteLeftRef = useRef(null);
   const whiteRightRef = useRef(null);
@@ -138,6 +149,7 @@ export default function PageIntroAnimation() {
       window.dispatchEvent(
         new CustomEvent("page-intro:complete", { detail: { pathname } }),
       );
+      requestAnimationFrame(onFinished);
     };
 
     window.__pageIntroActivePath = pathname;
@@ -455,7 +467,7 @@ export default function PageIntroAnimation() {
         window.__pageIntroActivePath = null;
       }
     };
-  }, [pathname]);
+  }, [pathname, onFinished]);
 
   return (
     <div

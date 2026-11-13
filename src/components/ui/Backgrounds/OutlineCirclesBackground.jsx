@@ -1,4 +1,22 @@
+"use client";
+import { MOTION } from "@/lib/motionPresets";
+import { createMotionMedia } from "@/lib/motionMedia";
+
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
 export default function OutlineCirclesBackground() {
+  const ref = useRef(null);
+  useGSAP(() => {
+    const media = createMotionMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.to(ref.current.children, { y: (i) => (i % 2 ? -1 : 1) * (25 + i * 8), ease: "none", scrollTrigger: { trigger: ref.current.parentElement, start: "top bottom", end: "bottom top", scrub: MOTION.scrub } });
+    });
+    return () => media.revert();
+  }, { scope: ref });
   const circles = [
     {
       className:
@@ -56,6 +74,8 @@ export default function OutlineCirclesBackground() {
 
   return (
     <div
+      ref={ref}
+      data-motion-circles
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
     >

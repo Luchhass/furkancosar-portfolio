@@ -6,6 +6,7 @@ import GitHubStats from "@/components/sections/about/GitHubStats/GitHubStats";
 import TechStackAccordion from "@/components/sections/about/TechStackAccordion/TechStackAccordion";
 import CollaborationCTA from "@/components/ui/CollaborationCTA/CollaborationCTA";
 import { createPageMetadata } from "@/lib/seo";
+import Journey from "@/components/sections/about/Journey";
 
 export const metadata = createPageMetadata({
   title: "Furkan Cosar | About",
@@ -28,6 +29,7 @@ export default function AboutPage() {
       <MarqueeText text="FURKAN COSAR" duration="50s" />
       <ScrollMarqueeText text="FRONTEND DEV" />
       <AboutMeIntro />
+      <Journey />
       <GitHubStats />
       <TechStackAccordion />
       <CollaborationCTA />

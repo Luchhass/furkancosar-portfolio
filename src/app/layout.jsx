@@ -1,6 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { baseKeywords, siteConfig } from "@/lib/seo";
 import "./globals.css";
+import "lenis/dist/lenis.css";
+import "./motion.css";
+import "./ui.css";
 import PageIntroAnimation from "@/components/layout/PageIntroAnimation/PageIntroAnimation";
 import PageIntroPrepaintMask from "@/components/layout/PageIntroPrepaintMask/PageIntroPrepaintMask";
 import ScrollReveal from "@/components/layout/ScrollReveal/ScrollReveal";
@@ -9,6 +12,7 @@ import Footer from "@/components/layout/Footer/Footer";
 import BackToTop from "@/components/ui/BackToTop/BackToTop";
 import SeoStructuredData from "@/components/layout/SeoStructuredData/SeoStructuredData";
 import GoogleAnalytics from "@/components/layout/GoogleAnalytics/GoogleAnalytics";
+import MotionExperience from "@/components/layout/MotionExperience";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -123,12 +127,17 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      {/* Browser extensions can inject attributes into <body> before hydration. */}
+      <body
+        className="min-h-full flex flex-col"
+        suppressHydrationWarning
+      >
         <SeoStructuredData />
         <GoogleAnalytics />
         <PageIntroPrepaintMask />
         <PageIntroAnimation />
         <ScrollReveal />
+        <MotionExperience />
         <BackToTop />
 
         <Header />

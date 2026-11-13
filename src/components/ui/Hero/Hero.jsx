@@ -1,14 +1,20 @@
 "use client";
+import { createMotionMedia } from "@/lib/motionMedia";
+import { MOTION, headingFrom, headingTo } from "@/lib/motionPresets";
+import { bindTilt } from "@/lib/pointerMotion";
 
 import { useRef } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { SplitText } from "gsap/SplitText";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { splitCharacters } from "@/lib/motionText";
 import GradientActionButton from "@/components/ui/GradientActionButton/GradientActionButton";
 import RevealCounter, { playRevealCounters } from "@/components/ui/RevealCounter/RevealCounter";
 import { GeometricPentagonBackground } from "../Backgrounds/GeometricPentagonBackground";
 
-gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger);
 
 function normalizeCopyLines(copyLines) {
   if (Array.isArray(copyLines)) {
@@ -75,6 +81,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       ];
 
       const titleItems = [...q("[data-hero-title]")].filter(isVisibleElement);
+      const titleSplits = titleItems.map((item) => splitCharacters(item, "hero-letter"));
       const statItems = [...q("[data-hero-stat]")].filter(isVisibleElement);
       const copyItems = [...q("[data-hero-copy-line]")].filter(
         isVisibleElement,
@@ -86,9 +93,9 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
 
       const brandOnlyHold = isHome ? 0.26 : 0.14;
       const chainGap = 0.14;
-      const detailDuration = 0.82;
-      const titleDuration = 1.04;
-      const titleLineGap = 0.12;
+      const detailDuration = MOTION.line.duration;
+      const titleDuration = MOTION.slide.duration;
+      const titleLineGap = MOTION.heading.lineGap;
 
       let cursor = brandOnlyHold;
 
@@ -141,7 +148,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
 
         gsap.set(item, {
           autoAlpha: 1,
-          xPercent: comesFromLeft ? -114 : 114,
+          xPercent: comesFromLeft ? -MOTION.maskedSlidePercent : MOTION.maskedSlidePercent,
           scaleX: 1.045,
           transformOrigin: comesFromLeft ? "0% 50%" : "100% 50%",
           willChange: "transform",
@@ -263,11 +270,12 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
             xPercent: 0,
             scaleX: 1,
             duration: titleDuration,
-            ease: "power4.out",
+            ease: MOTION.slide.ease,
             clearProps: "transform,transformOrigin,willChange",
           },
           titleStart + index * titleLineGap,
         );
+        timeline.from(titleSplits[index].chars, { ...headingFrom(), ...headingTo(), clearProps: "transform,opacity,transformOrigin" }, titleStart + index * titleLineGap);
       });
 
       if (buttonFillItems.length) {
@@ -308,10 +316,35 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
           handlePageIntroComplete,
         );
         timeline.kill();
+        titleSplits.forEach((split) => split.revert());
       };
     },
     { dependencies: [pathname], scope: heroRef, revertOnUpdate: true },
   );
+
+  useGSAP(() => {
+    const media = createMotionMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      const hero = heroRef.current;
+      const heading = hero.querySelector("h1");
+      const lines = hero.querySelectorAll("[data-hero-line-mask]");
+      const exit = gsap.timeline({ scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: MOTION.scrub } });
+      exit.to(lines, { xPercent: (i) => i % 2 ? 18 : -18, y: -70, opacity: 0, stagger: 0.06, ease: "none" }, 0)
+        .to(hero.querySelector("[data-hero-background]"), { scale: 1.12, opacity: 0.2, ease: "none" }, 0)
+        .to(hero.querySelectorAll("[data-hero-exit]"), {
+          autoAlpha: 0,
+          y: -32,
+          x: (_index, target) => target.dataset.heroExit === "stat" ? -18 : target.dataset.heroExit === "action" ? 18 : 0,
+          scale: 0.98,
+          ease: "none",
+        }, 0);
+      const cue = hero.querySelector(".hero-scroll-arrow");
+      if (cue) gsap.to(cue, { "--arrow-length": "180px", ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "top -50%", scrub: MOTION.progressScrub } });
+      gsap.set(heading, { transformPerspective: 1000 });
+      return bindTilt(hero, heading);
+    });
+    return () => media.revert();
+  }, { scope: heroRef, dependencies: [pathname], revertOnUpdate: true });
 
   useGSAP(
     () => {
@@ -385,14 +418,21 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       data-hero-fullscreen-surface
       data-header-theme="dark"
       data-scroll-reveal="off"
-      className="relative isolate grid h-dvh grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] overflow-x-clip bg-black px-8 py-6 md:px-10 md:py-8 lg:px-16 lg:py-12"
+      className="ui-hero portfolio-hero relative isolate grid h-dvh grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] overflow-x-clip bg-black"
     >
-      <GeometricPentagonBackground />
+      <div data-hero-background className="absolute inset-0 -z-10"><GeometricPentagonBackground /></div>
+      <div className="hero-scroll-cue" data-hero-exit="cue" aria-hidden="true">
+        <span>SCROLL TO EXPLORE</span>
+        <span className="hero-scroll-arrow">
+          <span className="hero-scroll-arrow-shaft" />
+          <svg className="hero-scroll-arrow-head" width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="m3 2 6 6 6-6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </span>
+      </div>
 
       <div className="relative z-10 row-start-2 flex items-center justify-center">
-        <h1 className="m-0 flex flex-col items-center text-center text-[44px] leading-[0.9] font-black tracking-[-0.04em] text-white uppercase md:text-[80px] lg:text-[120px]">
+        <h1 className="ui-hero-title m-0 flex flex-col items-center text-center text-white">
           {titleLines.map((line) => (
-            <span key={line.text} className="block overflow-hidden">
+            <span key={line.text} data-hero-line-mask className="block overflow-hidden">
               <span
                 data-hero-title
                 className={`${line.gradient ? "gradient-text-flow " : ""}block`}
@@ -410,6 +450,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       >
         {stat ? (
           <div
+            data-hero-exit="stat"
             className="pointer-events-auto col-start-1 row-start-2 min-w-0 overflow-hidden pr-3 md:pr-0"
             aria-label={stat.ariaLabel}
           >
@@ -435,7 +476,8 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         )}
 
         <p
-          className={`col-span-2 row-start-1 m-0 w-full max-w-[46ch] justify-self-center text-center text-[13px] leading-tight font-medium text-white/90 md:max-w-md md:text-sm lg:text-sm ${copyClassName}`}
+          data-hero-exit="copy"
+          className={`ui-hero-copy col-span-2 row-start-1 m-0 w-full max-w-[46ch] justify-self-center text-center text-[13px] leading-tight font-medium text-white/90 md:max-w-md md:text-sm lg:text-sm ${copyClassName}`}
         >
           <span className="block overflow-hidden md:hidden">
             <span data-hero-copy-line className="block text-wrap">
@@ -453,7 +495,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         </p>
 
         {action ? (
-          <div className="col-start-2 row-start-2 flex justify-end overflow-hidden">
+          <div data-hero-exit="action" className="col-start-2 row-start-2 flex justify-end overflow-hidden">
             <div data-hero-button>
               <GradientActionButton
                 href={action.href}

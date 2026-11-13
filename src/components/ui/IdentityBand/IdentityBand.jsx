@@ -1,10 +1,53 @@
 "use client";
+import { createMotionMedia } from "@/lib/motionMedia";
 
 import { useLayoutEffect, useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { SplitText } from "gsap/SplitText";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { splitCharacters } from "@/lib/motionText";
+import { MOTION, headingFrom, headingTo } from "@/lib/motionPresets";
+import { observeReveal, repeatReveal } from "@/lib/repeatReveal";
+gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger);
 
 export default function IdentityBand() {
   const titleRef = useRef(null);
   const textRef = useRef(null);
+  useGSAP(() => {
+    const media = createMotionMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      const text = textRef.current;
+      const split = splitCharacters(text, "identity-letter");
+      const entrance = repeatReveal(gsap.from(split.chars, { ...headingFrom(), ...headingTo() }), titleRef.current);
+      const bounces = new Map();
+      const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+      const resetBounces = () => {
+        bounces.forEach((animation) => animation.kill());
+        bounces.clear();
+        gsap.set(split.chars, { y: 0 });
+      };
+      const stopObserving = observeReveal(titleRef.current, () => {}, resetBounces);
+      const onVisibility = () => { if (document.hidden) resetBounces(); };
+      const hover = (event) => {
+        const letter = event.target.closest?.(".identity-letter");
+        if (!letter || event.pointerType === "touch" || !finePointer.matches || document.hidden || entrance.isActive() || entrance.progress() < 1 || bounces.has(letter)) return;
+        const motion = MOTION.letterBounce;
+        const height = gsap.utils.clamp(motion.minHeight, motion.maxHeight, parseFloat(getComputedStyle(letter).fontSize) * motion.heightRatio);
+        // Animate from the current resting position, without rotation or skew.
+        // Ignore re-entry while airborne so the moving glyph cannot retrigger itself.
+        const bounce = gsap.timeline({ onComplete: () => bounces.delete(letter) })
+          .to(letter, { y: -height, duration: motion.rise, ease: MOTION.ease })
+          .to(letter, { y: height * motion.reboundRatio, duration: motion.fall, ease: "power2.inOut" })
+          .to(letter, { y: 0, duration: motion.settle, ease: MOTION.ease });
+        bounces.set(letter, bounce);
+      };
+      text.addEventListener("pointerover", hover);
+      document.addEventListener("visibilitychange", onVisibility);
+      return () => { text.removeEventListener("pointerover", hover); document.removeEventListener("visibilitychange", onVisibility); stopObserving(); resetBounces(); gsap.killTweensOf(split.chars); split.revert(); };
+    });
+    return () => media.revert();
+  }, { scope: titleRef });
 
   useLayoutEffect(() => {
     const title = titleRef.current;
@@ -63,7 +106,7 @@ export default function IdentityBand() {
   return (
     <section
       data-header-theme="light"
-      className="relative overflow-hidden border-y border-black/10 bg-white px-8 py-6 text-black md:px-10 md:py-8 lg:px-16 lg:py-12"
+      className="ui-identity relative overflow-hidden border-y border-black/10 bg-white py-6 text-black md:py-8 lg:py-12"
       style={{ containerType: "inline-size" }}
       aria-labelledby="identity-band-title"
     >

@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 
 export const runtime = "nodejs";
 
-const REQUIRED_FIELDS = ["name", "email", "projectType", "message"];
+const REQUIRED_FIELDS = ["name", "email", "phone", "project", "message"];
 
 function cleanValue(value) {
   return String(value || "").trim();
@@ -17,11 +17,11 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
-function getMailHtml({ name, email, projectType, timeline, message }) {
+function getMailHtml({ name, email, phone, project, message }) {
   const safeName = escapeHtml(name);
   const safeEmail = escapeHtml(email);
-  const safeProjectType = escapeHtml(projectType);
-  const safeTimeline = escapeHtml(timeline || "Not specified");
+  const safePhone = escapeHtml(phone);
+  const safeProject = escapeHtml(project);
   const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
 
   return `
@@ -44,8 +44,8 @@ function getMailHtml({ name, email, projectType, timeline, message }) {
         <div style="display:grid;gap:0;border-bottom:1px solid rgba(255,255,255,.14);">
           ${getMailRow("Name", safeName)}
           ${getMailRow("Email", safeEmail)}
-          ${getMailRow("Project Type", safeProjectType)}
-          ${getMailRow("Timeline", safeTimeline)}
+          ${getMailRow("Phone", safePhone)}
+          ${getMailRow("Project", safeProject)}
         </div>
 
         <div style="padding:24px 0 0;">
@@ -70,14 +70,14 @@ function getMailRow(label, value) {
   `;
 }
 
-function getMailText({ name, email, projectType, timeline, message }) {
+function getMailText({ name, email, phone, project, message }) {
   return [
     "New portfolio contact request",
     "",
     `Name: ${name}`,
     `Email: ${email}`,
-    `Project Type: ${projectType}`,
-    `Timeline: ${timeline || "Not specified"}`,
+    `Phone: ${phone}`,
+    `Project: ${project}`,
     "",
     "Message:",
     message,
@@ -100,8 +100,8 @@ export async function POST(request) {
     const payload = {
       name: cleanValue(body.name),
       email: cleanValue(body.email),
-      projectType: cleanValue(body.projectType),
-      timeline: cleanValue(body.timeline),
+      phone: cleanValue(body.phone),
+      project: cleanValue(body.project),
       message: cleanValue(body.message),
     };
 
@@ -117,6 +117,14 @@ export async function POST(request) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
       return Response.json(
         { message: "Please enter a valid email address." },
+        { status: 400 },
+      );
+    }
+
+    const phoneDigits = payload.phone.replace(/\D/g, "");
+    if (!/^[+\d\s().-]+$/.test(payload.phone) || phoneDigits.length < 7 || phoneDigits.length > 15) {
+      return Response.json(
+        { message: "Please enter a valid phone number." },
         { status: 400 },
       );
     }

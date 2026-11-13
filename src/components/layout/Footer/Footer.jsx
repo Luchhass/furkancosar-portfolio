@@ -1,4 +1,7 @@
 "use client";
+import { createMotionMedia } from "@/lib/motionMedia";
+import { MOTION } from "@/lib/motionPresets";
+import { repeatReveal } from "@/lib/repeatReveal";
 
 import { useRef } from "react";
 import Link from "next/link";
@@ -15,201 +18,36 @@ export default function Footer() {
   const pathname = usePathname();
   const footerRef = useRef(null);
   const footerTimelineRef = useRef(null);
-
-  useGSAP(
-    () => {
+  useGSAP(() => {
+    const media = createMotionMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
       const footer = footerRef.current;
-
-      if (!footer) return;
-
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      );
-
-      const primaryItems = gsap.utils.toArray(
-        footer.querySelectorAll("[data-footer-primary]"),
-      );
-      const addressItems = gsap.utils.toArray(
-        footer.querySelectorAll("[data-footer-address-item]"),
-      );
-      const footerSocialItems = gsap.utils.toArray(
-        footer.querySelectorAll("[data-footer-social-item]"),
-      );
-
-      if (prefersReducedMotion.matches) {
-        gsap.set([...primaryItems, ...addressItems, ...footerSocialItems], {
-          autoAlpha: 1,
-          yPercent: 0,
-          scale: 1,
-        });
-
-        return;
-      }
-
-      function killCurrent() {
-        footerTimelineRef.current?.kill();
-        footerTimelineRef.current = null;
-        gsap.killTweensOf([
-          ...primaryItems,
-          ...addressItems,
-          ...footerSocialItems,
-        ]);
-      }
-
-      function resetFooter() {
-        killCurrent();
-
-        gsap.set(primaryItems, {
-          autoAlpha: 1,
-          yPercent: 115,
-          rotateX: -8,
-          transformOrigin: "50% 100%",
-          willChange: "transform",
-        });
-
-        gsap.set(addressItems, {
-          autoAlpha: 1,
-          yPercent: 120,
-          rotateX: -6,
-          transformOrigin: "50% 100%",
-          willChange: "transform",
-        });
-
-        gsap.set(footerSocialItems, {
-          autoAlpha: 1,
-          yPercent: 120,
-          scale: 0.94,
-          transformOrigin: "50% 100%",
-          willChange: "transform",
-        });
-      }
-
-      function playFooter() {
-        resetFooter();
-
-        const timeline = gsap.timeline({
-          defaults: {
-            ease: "power4.out",
-          },
-        });
-
-        timeline.to(primaryItems, {
-          yPercent: 0,
-          rotateX: 0,
-          duration: 0.86,
-          stagger: {
-            each: 0.12,
-            from: "start",
-          },
-          clearProps: "transform,willChange",
-        });
-
-        timeline.to(
-          addressItems,
-          {
-            yPercent: 0,
-            rotateX: 0,
-            duration: 0.68,
-            stagger: 0.07,
-            clearProps: "transform,willChange",
-          },
-          "-=0.58",
-        );
-
-        timeline.to(
-          footerSocialItems,
-          {
-            yPercent: 0,
-            scale: 1,
-            duration: 0.68,
-            stagger: 0.06,
-            clearProps: "transform,willChange",
-          },
-          "-=0.52",
-        );
-
-        footerTimelineRef.current = timeline;
-      }
-
-      function hideFooter() {
-        killCurrent();
-
-        const timeline = gsap.timeline({
-          defaults: {
-            ease: "power2.inOut",
-            overwrite: true,
-          },
-        });
-
-        timeline.to(
-          footerSocialItems,
-          {
-            yPercent: 120,
-            scale: 0.94,
-            duration: 0.36,
-            stagger: {
-              each: 0.035,
-              from: "end",
-            },
-          },
-          0,
-        );
-
-        timeline.to(
-          addressItems,
-          {
-            yPercent: 120,
-            rotateX: -6,
-            transformOrigin: "50% 100%",
-            duration: 0.36,
-            stagger: {
-              each: 0.035,
-              from: "end",
-            },
-          },
-          0,
-        );
-
-        timeline.to(
-          primaryItems,
-          {
-            yPercent: 115,
-            rotateX: -8,
-            transformOrigin: "50% 100%",
-            duration: 0.42,
-            stagger: {
-              each: 0.035,
-              from: "end",
-            },
-          },
-          0,
-        );
-
-        footerTimelineRef.current = timeline;
-      }
-
-      resetFooter();
-
-      const trigger = ScrollTrigger.create({
-        trigger: footer,
-        start: "top 78%",
-        end: "bottom 10%",
-        onEnter: playFooter,
-        onEnterBack: playFooter,
-        onLeave: hideFooter,
-        onLeaveBack: hideFooter,
+      const travel = () => Math.min(footer.clientHeight * MOTION.rings.travelRatio, MOTION.rings.travelMax);
+      const sideways = () => Math.min(footer.clientWidth * MOTION.rings.sidewaysRatio, MOTION.rings.sidewaysMax);
+      const timeline = gsap.timeline({ defaults: { ease: MOTION.rings.ease }, scrollTrigger: { trigger: footer, start: "top bottom", end: "+=180%", scrub: MOTION.scrub, invalidateOnRefresh: true } });
+      MOTION.ringPaths.forEach(([fromX, fromY, toX, toY], index) => {
+        const name = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"][index];
+        timeline.fromTo(`.footer-ring-${name}`, { x: () => sideways() * fromX, y: () => travel() * fromY, scale: 1.08 }, { x: () => sideways() * toX, y: () => travel() * toY, scale: 1 }, 0);
       });
+    });
+    return () => media.revert();
+  }, { scope: footerRef, dependencies: [pathname], revertOnUpdate: true });
 
-      return () => {
-        trigger.kill();
-        killCurrent();
-        gsap.set([...primaryItems, ...addressItems, ...footerSocialItems], {
-          clearProps: "transform,opacity,visibility,willChange,transformOrigin",
-        });
-      };
-    },
-    { scope: footerRef, dependencies: [pathname] },
-  );
+  useGSAP(() => {
+    const media = createMotionMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      const footer = footerRef.current;
+      const primary = footer.querySelectorAll("[data-footer-primary]");
+      const address = footer.querySelectorAll("[data-footer-address-item]");
+      const socials = footer.querySelectorAll("[data-footer-social-item]");
+      const timeline = gsap.timeline({ defaults: { ease: MOTION.line.ease } });
+      timeline.from(primary, { yPercent: MOTION.line.yPercent, rotateX: -8, duration: MOTION.line.duration, stagger: MOTION.line.stagger }, 0)
+        .from(address, { yPercent: MOTION.line.yPercent, rotateX: -6, duration: MOTION.line.duration, stagger: MOTION.line.stagger }, .28)
+        .from(socials, { yPercent: MOTION.line.yPercent, scale: .94, duration: MOTION.line.duration, stagger: MOTION.line.stagger }, .42);
+      footerTimelineRef.current = repeatReveal(timeline, footer);
+    });
+    return () => { media.revert(); footerTimelineRef.current = null; };
+  }, { scope: footerRef, dependencies: [pathname], revertOnUpdate: true });
 
   function updateTitleFillOrigin(event) {
     const link = event.currentTarget;
@@ -227,12 +65,21 @@ export default function Footer() {
     <footer
       ref={footerRef}
       data-header-theme="dark"
-      className="grid h-screen grid-rows-[auto_minmax(0,1fr)_auto] bg-black px-8 py-6 text-white md:px-10 md:py-8 lg:px-16 lg:py-12"
+      className="ui-chrome portfolio-footer grid grid-rows-[minmax(0,1fr)_auto] text-white"
     >
-      <span />
-
+      <div className="footer-backdrop" aria-hidden="true">
+        <span className="footer-ring footer-ring-one" />
+        <span className="footer-ring footer-ring-two" />
+        <span className="footer-ring footer-ring-three" />
+        <span className="footer-ring footer-ring-four" />
+        <span className="footer-ring footer-ring-five" />
+        <span className="footer-ring footer-ring-six" />
+        <span className="footer-ring footer-ring-seven" />
+        <span className="footer-ring footer-ring-eight" />
+        <span className="footer-ring footer-ring-nine" />
+      </div>
       <div className="grid min-h-0 items-center gap-8 md:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.42fr)] lg:gap-16">
-        <h2 className="m-0 max-w-4xl text-[44px] leading-[0.9] font-black tracking-[-0.04em] uppercase md:text-[80px] lg:text-[120px]">
+        <h2 className="ui-footer-title m-0 max-w-4xl font-black uppercase">
           <span className="block overflow-hidden">
             <span data-footer-primary className="block">
               Designing
@@ -252,7 +99,7 @@ export default function Footer() {
           </span>
         </h2>
 
-        <nav aria-label="Footer navigation" className="lg:justify-self-end">
+        <nav aria-label="Footer navigation" className="ui-footer-nav lg:justify-self-end">
           <ul className="m-0 flex list-none flex-col gap-1 p-0 lg:items-end">
             {navigationItems.map(({ href, label }) => {
               const isActive = pathname === href;
@@ -266,7 +113,7 @@ export default function Footer() {
                     data-footer-primary
                     onPointerEnter={updateTitleFillOrigin}
                     onPointerLeave={updateTitleFillOrigin}
-                    className="gradient-title-button inline-flex w-fit max-w-full text-[28px] leading-[0.82] font-black tracking-[-0.03em] text-white uppercase no-underline md:text-[30px] lg:text-[32px]"
+                    className="ui-navigation-link gradient-title-button inline-flex w-fit max-w-full text-[28px] leading-[0.82] font-black tracking-[-0.03em] text-white uppercase no-underline md:text-[30px] lg:text-[32px]"
                   >
                     <span className="gradient-title-text">
                       <span>{label}</span>
@@ -287,7 +134,7 @@ export default function Footer() {
       </div>
 
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <address className="m-0 flex flex-wrap items-center gap-x-2 gap-y-3 text-[13px] leading-tight font-medium tracking-[0.08em] text-white not-italic md:flex-col md:items-start md:gap-3 md:text-sm lg:flex-row lg:items-center lg:gap-4">
+        <address className="ui-chrome-contact m-0 flex flex-col items-start gap-3 text-white not-italic lg:flex-row lg:items-center lg:gap-4">
           {contactItems.map((item, index) => (
             <span key={item.href} className="contents">
               <span className="inline-block overflow-hidden">
@@ -304,7 +151,7 @@ export default function Footer() {
 
               {index === 0 && (
                 <span
-                  className="inline-block overflow-hidden md:hidden lg:inline-block"
+                  className="hidden overflow-hidden lg:inline-block"
                   aria-hidden="true"
                 >
                   <span
@@ -320,7 +167,7 @@ export default function Footer() {
         </address>
 
         <ul
-          className="m-0 flex list-none items-center gap-3 p-0 md:gap-5"
+          className="ui-chrome-socials m-0 flex list-none items-center p-0"
           aria-label="Social links"
         >
           {socialItems.map((item) => (

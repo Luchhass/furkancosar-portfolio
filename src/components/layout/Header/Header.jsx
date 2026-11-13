@@ -1,5 +1,6 @@
 "use client";
 
+import { MOTION } from "@/lib/motionPresets";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
@@ -284,6 +285,7 @@ export default function Header() {
         menuSocialsRef.current?.querySelectorAll("[data-menu-social-item]") ||
           [],
       );
+      const menuRings = gsap.utils.toArray(menu.querySelectorAll(".menu-ring"));
 
       if (prefersReducedMotion.matches) {
         gsap.set(menu, { clipPath: "inset(0% 0% 0% 0%)" });
@@ -306,14 +308,14 @@ export default function Header() {
 
       gsap.set(navItems, {
         autoAlpha: 1,
-        xPercent: -115,
+        xPercent: -MOTION.maskedSlidePercent,
         transformOrigin: "0% 50%",
         willChange: "transform",
       });
 
       gsap.set(addressItems, {
         autoAlpha: 1,
-        yPercent: 120,
+        yPercent: MOTION.line.yPercent,
         rotateX: -6,
         transformOrigin: "50% 100%",
         willChange: "transform",
@@ -321,11 +323,15 @@ export default function Header() {
 
       gsap.set(menuSocialItems, {
         autoAlpha: 1,
-        yPercent: 120,
+        yPercent: MOTION.line.yPercent,
         scale: 0.94,
         transformOrigin: "50% 100%",
         willChange: "transform",
       });
+      const travel = () => Math.min(menu.clientHeight * MOTION.rings.travelRatio, MOTION.rings.travelMax);
+      const sideways = () => Math.min(menu.clientWidth * MOTION.rings.sidewaysRatio, MOTION.rings.sidewaysMax);
+      const ringPaths = MOTION.ringPaths;
+      gsap.set(menuRings, { autoAlpha: 0, scale: 1.08, transformOrigin: "50% 50%" });
 
       const timeline = gsap.timeline({
         defaults: {
@@ -348,27 +354,36 @@ export default function Header() {
         ease: "power3.inOut",
         clearProps: "clipPath,willChange",
       });
+      menuRings.forEach((ring, index) => {
+        const [fromX, fromY, toX, toY] = ringPaths[index];
+        timeline.fromTo(ring,
+          { x: () => sideways() * fromX, y: () => travel() * fromY, scale: 1.08, autoAlpha: 0 },
+          { x: () => sideways() * toX, y: () => travel() * toY, scale: 1, autoAlpha: 0.66, duration: MOTION.rings.duration, ease: MOTION.rings.ease },
+          0.12,
+        );
+      });
 
       timeline.to(navItems, {
         xPercent: 0,
-        duration: 0.86,
+        duration: MOTION.slide.duration,
+        ease: MOTION.slide.ease,
         stagger: {
           each: 0.12,
           from: "start",
         },
         clearProps: "transform,willChange",
-      });
+      }, 0.28);
 
       timeline.to(
         addressItems,
         {
           yPercent: 0,
           rotateX: 0,
-          duration: 0.68,
-          stagger: 0.07,
+          duration: MOTION.line.duration,
+          stagger: MOTION.line.stagger,
           clearProps: "transform,willChange",
         },
-        "-=0.58",
+        0.62,
       );
 
       timeline.to(
@@ -376,11 +391,11 @@ export default function Header() {
         {
           yPercent: 0,
           scale: 1,
-          duration: 0.68,
-          stagger: 0.06,
+          duration: MOTION.line.duration,
+          stagger: MOTION.line.stagger,
           clearProps: "transform,willChange",
         },
-        "-=0.52",
+        0.82,
       );
     },
     { dependencies: [isMenuOpen], scope: menuRef, revertOnUpdate: true },
@@ -501,10 +516,10 @@ export default function Header() {
   return (
     <>
       <header
-        className={`pointer-events-none fixed top-0 left-0 z-50 grid h-[88px] w-full grid-cols-[48px_minmax(0,1fr)_48px] items-center px-8 py-0 transition-[color,opacity] duration-300 md:h-[96px] md:grid-cols-3 md:px-10 lg:h-[120px] lg:px-16 ${headerColorClass}`}
+        className={`ui-header pointer-events-none fixed top-0 left-0 z-50 grid w-full grid-cols-[48px_minmax(0,1fr)_48px] items-center py-0 transition-[color,opacity] duration-300 md:grid-cols-3 ${headerColorClass}`}
         aria-label="Primary navigation"
       >
-        <div className="col-start-1 flex h-8 items-center justify-self-start overflow-hidden">
+        <div className="ui-header-cell col-start-1 flex h-11 items-center justify-self-start overflow-hidden">
           <button
             type="button"
             data-hero-fullscreen-toggle
@@ -516,7 +531,7 @@ export default function Header() {
             aria-pressed={isHeroFullscreen}
             title={isHeroFullscreen ? "Exit full screen" : "Full screen"}
             onClick={toggleHeroFullscreen}
-            className={`group relative h-8 w-12 cursor-pointer border-0 bg-transparent p-0 text-current transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current md:hidden ${
+            className={`group ui-header-control relative h-11 w-12 cursor-pointer border-0 bg-transparent p-0 text-current transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current md:hidden ${
               showHeroFullscreenControl || isHeroFullscreen
                 ? "pointer-events-auto opacity-100"
                 : "pointer-events-none opacity-0"
@@ -573,13 +588,13 @@ export default function Header() {
           </div>
         </div>
 
-        <div className="col-start-2 flex h-8 min-w-0 items-center justify-self-center overflow-hidden">
+        <div className="ui-header-cell col-start-2 flex h-11 min-w-0 items-center justify-self-center overflow-hidden">
           <Link
             href="/"
             aria-label={`${siteConfig.name} home`}
             onClick={closeMenuImmediately}
             data-hero-intro="brand"
-            className="pointer-events-auto inline-flex h-8 items-center text-lg leading-none font-black text-current no-underline md:text-2xl lg:text-3xl"
+            className="pointer-events-auto inline-flex h-11 items-center text-lg leading-none font-black text-current no-underline md:text-2xl lg:text-3xl"
           >
             <span>{siteConfig.brand}</span>
 
@@ -592,11 +607,11 @@ export default function Header() {
           </Link>
         </div>
 
-        <div className="col-start-3 flex h-8 items-center justify-self-end overflow-hidden">
+        <div className="ui-header-cell col-start-3 flex h-11 items-center justify-self-end overflow-hidden">
           <button
             type="button"
             data-hero-intro="menu-button"
-            className="group pointer-events-auto relative h-8 w-12 cursor-pointer border-0 bg-transparent p-0"
+            className="group pointer-events-auto ui-header-control relative h-11 w-12 cursor-pointer border-0 bg-transparent p-0"
             aria-label={isMenuOpen ? "Close navigation" : "Open navigation"}
             aria-expanded={isMenuOpen}
             aria-controls="site-menu"
@@ -632,13 +647,24 @@ export default function Header() {
         <div
           ref={menuRef}
           id="site-menu"
-          className="fixed inset-0 z-40 flex h-dvh flex-col justify-between overflow-hidden bg-white px-8 py-6 text-black md:px-10 md:py-8 lg:px-16 lg:py-12"
+          className="ui-chrome fixed inset-0 z-40 isolate flex h-dvh flex-col justify-between overflow-hidden bg-[#f8f8f5] text-[#111]"
           style={{ clipPath: "inset(0% 0% 100% 0%)" }}
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"
         >
           <div aria-hidden="true" />
+          <div className="menu-footer-backdrop" aria-hidden="true">
+            <span className="footer-ring footer-ring-one menu-ring" />
+            <span className="footer-ring footer-ring-two menu-ring" />
+            <span className="footer-ring footer-ring-three menu-ring" />
+            <span className="footer-ring footer-ring-four menu-ring" />
+            <span className="footer-ring footer-ring-five menu-ring" />
+            <span className="footer-ring footer-ring-six menu-ring" />
+            <span className="footer-ring footer-ring-seven menu-ring" />
+            <span className="footer-ring footer-ring-eight menu-ring" />
+            <span className="footer-ring footer-ring-nine menu-ring" />
+          </div>
 
           <nav ref={menuNavRef} aria-label="Main menu">
             <ul className="m-0 flex list-none flex-col gap-1 p-0">
@@ -658,7 +684,7 @@ export default function Header() {
                       onClick={closeMenuImmediately}
                       onPointerEnter={updateTitleFillOrigin}
                       onPointerLeave={updateTitleFillOrigin}
-                      className="gradient-title-button inline-flex w-fit max-w-full text-[44px] leading-[0.9] font-black tracking-[-0.04em] text-black uppercase no-underline md:text-[80px] lg:text-[120px]"
+                      className="ui-navigation-link gradient-title-button inline-flex w-fit max-w-full text-[44px] leading-[0.9] font-black tracking-[-0.04em] text-black uppercase no-underline md:text-[80px] lg:text-[120px]"
                     >
                       <span className="gradient-title-text">
                         <span>{item.label}</span>
@@ -682,9 +708,9 @@ export default function Header() {
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <address
               ref={menuAddressRef}
-              className="m-0 flex flex-wrap items-center gap-x-2 gap-y-3 text-[13px] leading-tight font-medium tracking-[0.08em] text-black not-italic md:flex-col md:items-start md:gap-3 md:text-sm"
+              className="ui-chrome-contact m-0 flex flex-col items-start gap-3 text-black not-italic"
             >
-              {contactItems.map((item, index) => (
+              {contactItems.map((item) => (
                 <span key={item.href} className="inline-block overflow-hidden">
                   <a
                     href={item.href}
@@ -696,21 +722,13 @@ export default function Header() {
                     </span>
                   </a>
 
-                  {index === 0 && (
-                    <span
-                      className="text-black/60 md:hidden"
-                      aria-hidden="true"
-                    >
-                      |
-                    </span>
-                  )}
                 </span>
               ))}
             </address>
 
             <ul
               ref={menuSocialsRef}
-              className="m-0 flex list-none items-center gap-3 p-0 md:gap-5"
+              className="ui-chrome-socials m-0 flex list-none items-center p-0"
               aria-label="Social links"
             >
               {socialItems.map((item) => (
@@ -718,7 +736,7 @@ export default function Header() {
                   <SocialMediaButtons
                     item={item}
                     animationAttribute="data-menu-social-item"
-                    className="text-black"
+                className="text-black"
                   />
                 </li>
               ))}

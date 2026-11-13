@@ -1,0 +1,6 @@
+.section:global(.ui-fit-panel.ui-screen-about) .layout { grid-template-rows: auto minmax(0, 1fr); }
+.section:global(.ui-fit-panel) .layout :global(.ui-accordion) { grid-row: 2; align-self: start; }
+.row + .row { border-top: 1px solid #0000001a; }
+@media (max-width: 767px) {
+  .section:global(.ui-fit-panel.ui-screen-about) .layout { grid-template-rows: auto minmax(0, 1fr); gap: 20px; }
+}

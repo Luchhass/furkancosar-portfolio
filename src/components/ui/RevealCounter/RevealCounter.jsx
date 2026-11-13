@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import gsap from "gsap";
+import { MOTION } from "@/lib/motionPresets";
+import { observeReveal } from "@/lib/repeatReveal";
 
 export const REVEAL_COUNTER_EVENT = "reveal-counter:play";
 
@@ -48,12 +50,7 @@ function formatCounterValue(
   return `${prefix}${formattedValue}${suffix}`;
 }
 
-function getDefaultDuration(target) {
-  if (target > 500) return 12;
-  if (target > 120) return 8.5;
-
-  return 5.8;
-}
+function getDefaultDuration() { return MOTION.counterDuration; }
 
 function smoothStep(progress) {
   return progress * progress * (3 - 2 * progress);
@@ -161,7 +158,7 @@ export default function RevealCounter({
       tracks.forEach((track, trackIndex) => {
         const column = digitColumns[trackIndex];
 
-        gsap.set(track, { y: -(column?.steps || 0) * getLineHeight(track) });
+        gsap.set(track, { y: -((column?.steps || 0) % 10) * getLineHeight(track), clearProps: "willChange" });
       });
     }
 
@@ -175,6 +172,7 @@ export default function RevealCounter({
       }
 
       setZero();
+      gsap.set(tracks, { willChange: "transform" });
 
       const totalDuration = duration ?? getDefaultDuration(target);
       const lineHeights = tracks.map(getLineHeight);
@@ -189,7 +187,7 @@ export default function RevealCounter({
           const lineHeight = lineHeights[trackIndex];
           const columnStep = getColumnStep(progress, column, target);
 
-          setters[trackIndex](-columnStep * lineHeight);
+          setters[trackIndex](-(columnStep % 10) * lineHeight);
         });
       }
 
@@ -204,11 +202,18 @@ export default function RevealCounter({
       });
     }
 
-    setZero();
-    root.addEventListener(REVEAL_COUNTER_EVENT, play);
+    if (prefersReducedMotion.matches) setFinal();
+    else setZero();
+    const reverse = () => tweenRef.current?.reverse();
+    const isHero = Boolean(root.closest(".portfolio-hero"));
+    const stopObserving = !isHero && !prefersReducedMotion.matches ? observeReveal(root, play, reverse) : () => {};
+    if (isHero) root.addEventListener(REVEAL_COUNTER_EVENT, play);
+    root.addEventListener("reveal-counter:reverse", reverse);
 
     return () => {
       root.removeEventListener(REVEAL_COUNTER_EVENT, play);
+      stopObserving();
+      root.removeEventListener("reveal-counter:reverse", reverse);
       tweenRef.current?.kill();
       gsap.killTweensOf(tracks);
     };
@@ -256,9 +261,9 @@ export default function RevealCounter({
                 ref={(element) => {
                   tracksRef.current[columnIndex] = element;
                 }}
-                className="absolute top-0 left-0 block will-change-transform"
+                className="absolute top-0 left-0 block"
               >
-                {Array.from({ length: column.steps + 1 }, (_item, step) => (
+                {Array.from({ length: Math.min(column.steps + 1, 11) }, (_item, step) => (
                   <span
                     key={`${column.id}-${step}`}
                     className={`block ${textClassName}`}
