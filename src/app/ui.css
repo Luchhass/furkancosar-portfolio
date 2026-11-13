@@ -90,12 +90,12 @@
 .contact-actions > p { min-width: 0; }
 @media (max-width: 767px) {
   .contact-layout { display: block; }
-  .contact-form > .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .contact-form > div.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .contact-form label { min-width: 0; }
   .contact-form label > [data-contact-field-reveal] { min-width: 0; }
   .contact-form input { min-width: 0; }
-  .contact-form > .grid > label:first-child { padding-right: 12px; border-right: 1px solid #0000001a; }
-  .contact-form > .grid > label:last-child { padding-left: 12px; }
+  .contact-form > div.grid > label:first-child { padding-right: 12px; border-right: 1px solid #0000001a; }
+  .contact-form > div.grid > label:last-child { padding-left: 12px; }
 }
 @media (min-width: 1280px) {
   .contact-layout { align-items: stretch; }

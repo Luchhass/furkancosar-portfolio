@@ -75,7 +75,7 @@ export default function ProjectsList({ projects = latestProjects }) {
       scrollTrigger: {
         id: "project-shelf",
         trigger: sectionRef.current, start: "top top",
-        end: () => "+=" + (Math.max(distance, innerHeight * (pages.length - 1) * .7) + innerHeight * .2),
+        end: () => "+=" + (Math.max(distance, innerHeight * (pages.length - 1) * .7) + innerHeight * .2) * .8,
         pin: true, scrub: true, anticipatePin: 1, invalidateOnRefresh: true,
         onRefreshInit: measure,
       },
