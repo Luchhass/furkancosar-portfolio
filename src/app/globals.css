@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-.motion-page-progress{position:fixed;inset:0 0 auto;height:3px;z-index:120;pointer-events:none;background:linear-gradient(90deg,#ee4b67,#a53cdd,#6768ff);transform:scaleX(0);transform-origin:left}
 .motion-project-cursor{position:fixed;left:0;top:0;width:88px;height:88px;margin:-44px;z-index:85;pointer-events:none;visibility:hidden;opacity:0;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,#ee4b67e8,#884cffe8);color:white;box-shadow:0 0 35px #884cff35;font-size:9px;font-weight:900;letter-spacing:.08em;backdrop-filter:blur(6px)}
 @media(hover:none),(pointer:coarse),(prefers-reduced-motion:reduce){.motion-project-cursor{display:none}}
 .orbital-sculpture{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;perspective:1000px;z-index:-1;opacity:.6}
@@ -20,7 +19,7 @@
 .journey-marker{position:absolute;top:-6px;left:0;width:11px;height:11px;transform:translateX(-50%);border-radius:50%;background:#dc46b4;box-shadow:0 0 25px #dc46b4}
 .journey-orbit{position:absolute;z-index:-1;width:65vw;height:65vw;right:-20%;top:5%;border:1px solid #ffffff0c;border-radius:42% 58% 65% 35%;box-shadow:0 0 0 70px #ffffff02,0 0 0 140px #ffffff02}
 @media(max-width:899px),(max-height:599px){.journey-stage{display:grid;gap:60px}.journey-chapter{grid-template-columns:65px 1fr;gap:20px}.journey-number{font-size:65px}.journey-track{display:none}.journey-heading h2{max-width:none}}
-@media(prefers-reduced-motion:reduce){.motion-page-progress{display:none}.orbital-sculpture{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.orbital-sculpture{opacity:.35}}
 
 body {
   background: #ffffff;

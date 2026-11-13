@@ -3,17 +3,10 @@ import { MOTION } from "@/lib/motionPresets";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { createSectionScroll } from "@/lib/sectionScroll";
 import { usePathname } from "next/navigation";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useRef } from "react";
-
-gsap.registerPlugin(useGSAP, ScrollTrigger);
+import { useEffect } from "react";
 
 export default function MotionExperience() {
   const pathname = usePathname();
-  const progressRef = useRef(null);
-
   useEffect(() => {
     const media = createMotionMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => createSectionScroll());
@@ -44,7 +37,7 @@ export default function MotionExperience() {
   }, [pathname]);
 
   useEffect(() => {
-    const selector = ".gradient-focus-flow, .gradient-text-flow, .gradient-bg-flow, .gradient-action-fill, .gradient-action-border, .gradient-action-dot, .gradient-icon-flow, .motion-page-progress, .orbital-ring, .orbital-core, .journey-rail-fill, .sculpture-bottom i, .gallery-progress-fill, .envelope-front, .envelope-progress i, .contact-scene-grid form label";
+    const selector = ".gradient-focus-flow, .gradient-text-flow, .gradient-bg-flow, .gradient-action-fill, .gradient-action-border, .gradient-action-dot, .gradient-icon-flow, .orbital-ring, .orbital-core, .journey-rail-fill, .sculpture-bottom i, .gallery-progress-fill, .envelope-front, .envelope-progress i, .contact-scene-grid form label";
     const tracked = new Set();
     const visible = new Map();
     const observer = new IntersectionObserver((entries) => {
@@ -91,15 +84,5 @@ export default function MotionExperience() {
     };
   }, [pathname]);
 
-  useGSAP(() => {
-    const media = createMotionMedia();
-    media.add("(prefers-reduced-motion: no-preference)", () => {
-      gsap.fromTo(progressRef.current, { scaleX: 0 }, { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: MOTION.progressScrub } });
-    });
-    const refresh = () => ScrollTrigger.refresh();
-    window.addEventListener("page-intro:complete", refresh);
-    return () => { media.revert(); window.removeEventListener("page-intro:complete", refresh); };
-  }, { dependencies: [pathname], revertOnUpdate: true });
-
-  return <div ref={progressRef} aria-hidden="true" className="motion-page-progress" />;
+  return null;
 }
