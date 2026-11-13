@@ -17,7 +17,7 @@ try {
     });
     await page.locator(".ui-hero").evaluate(el=>{
       const r=el.getBoundingClientRect();
-      const init={bubbles:true,clientX:r.width*.3,clientY:r.height*.35,button:0,pointerType:"mouse"};
+      const init={bubbles:true,clientX:r.width*.3,clientY:r.height*.35,button:0,pointerType:"mouse",isPrimary:true,pointerId:1};
       el.dispatchEvent(new PointerEvent("pointerdown",init));
       el.dispatchEvent(new PointerEvent("pointerup",init));
     });

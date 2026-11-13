@@ -41,6 +41,9 @@ const HERO_FLOW_GRADIENT_SIZE = 2.6;
 const BURST = { travelSeconds: .9, settleSeconds: .34, displacement: 7, maxActive: 3 };
 const BURST_COLOR_DELAY = .045;
 const BURST_Y_RATIO = 1.12;
+const TAP_MAX_DISTANCE = 10;
+const TAP_MAX_DURATION = 450;
+const INTERACTIVE_TARGET = "a, button, input, textarea, select, [role='button'], [role='dialog']";
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -314,6 +317,7 @@ export function GeometricPentagonBackground() {
     let lastHeadEnergy = NaN;
     let bursts = [];
     let lastHadBurst = false;
+    let tapCandidate = null;
 
     const pointer = {
       intensity: 0,
@@ -811,6 +815,7 @@ export function GeometricPentagonBackground() {
     }
 
     function deactivatePointer() {
+      tapCandidate = null;
       pointer.targetIntensity = 0;
       lastInput = null;
       pointer.speed = 0;
@@ -820,6 +825,7 @@ export function GeometricPentagonBackground() {
     }
 
     function suspendInteraction() {
+      tapCandidate = null;
       if (frameId) cancelAnimationFrame(frameId);
       if (pointerFrameId) cancelAnimationFrame(pointerFrameId);
       frameId = 0;
@@ -910,6 +916,10 @@ export function GeometricPentagonBackground() {
     }
 
     function handlePointerMove(event) {
+      if (tapCandidate && event.pointerId === tapCandidate.pointerId &&
+        Math.hypot(event.clientX - tapCandidate.x, event.clientY - tapCandidate.y) > TAP_MAX_DISTANCE) {
+        tapCandidate = null;
+      }
       if (
         !isVisible ||
         !scene ||
@@ -936,9 +946,24 @@ export function GeometricPentagonBackground() {
 
     function handlePointerDown(event) {
       handlePointerMove(event);
+      const alreadyPressed = tapCandidate !== null;
+      tapCandidate = null;
       if (!scene || !shouldUseInteraction || !isVisible || isPageIntroActive || document.hidden ||
-        event.button !== 0 || document.body.dataset.siteMenuOpen === "true" ||
-        event.target.closest?.("a, button, input, textarea, select, [role='button'], [role='dialog']")) return;
+        alreadyPressed || event.isPrimary === false || event.button !== 0 || document.body.dataset.siteMenuOpen === "true" ||
+        event.target.closest?.(INTERACTIVE_TARGET)) return;
+      rootRect = root.getBoundingClientRect();
+      if (!isInsideRootRect(event.clientX, event.clientY)) return;
+      tapCandidate = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, time: performance.now() };
+    }
+
+    function handlePointerUp(event) {
+      const tap = tapCandidate;
+      deactivatePointer();
+      if (!tap || event.pointerId !== tap.pointerId || event.button !== 0 ||
+        performance.now() - tap.time > TAP_MAX_DURATION ||
+        Math.hypot(event.clientX - tap.x, event.clientY - tap.y) > TAP_MAX_DISTANCE ||
+        !scene || !shouldUseInteraction || !isVisible || isPageIntroActive || document.hidden ||
+        document.body.dataset.siteMenuOpen === "true" || event.target.closest?.(INTERACTIVE_TARGET)) return;
       rootRect = root.getBoundingClientRect();
       if (!isInsideRootRect(event.clientX, event.clientY)) return;
       const x = (event.clientX - rootRect.left) / rootRect.width * scene.width;
@@ -963,6 +988,11 @@ export function GeometricPentagonBackground() {
 
     function handleWindowPointerOut(event) {
       if (!event.relatedTarget) deactivatePointer();
+    }
+
+    function handleScroll() {
+      tapCandidate = null;
+      scheduleRootRectUpdate();
     }
 
     function handlePageShow() {
@@ -1013,7 +1043,7 @@ export function GeometricPentagonBackground() {
       window.addEventListener("pointerdown", handlePointerDown, {
         passive: true,
       });
-      window.addEventListener("pointerup", handlePointerLeave, {
+      window.addEventListener("pointerup", handlePointerUp, {
         passive: true,
       });
       window.addEventListener("pointercancel", handlePointerLeave, {
@@ -1024,7 +1054,7 @@ export function GeometricPentagonBackground() {
 
     window.addEventListener("resize", scheduleResize);
     window.addEventListener("orientationchange", scheduleResize);
-    window.addEventListener("scroll", scheduleRootRectUpdate, {
+    window.addEventListener("scroll", handleScroll, {
       passive: true,
     });
     window.addEventListener("pageshow", handlePageShow);
@@ -1042,14 +1072,14 @@ export function GeometricPentagonBackground() {
       if (shouldUseInteraction) {
         window.removeEventListener("pointermove", handlePointerMove);
         window.removeEventListener("pointerdown", handlePointerDown);
-        window.removeEventListener("pointerup", handlePointerLeave);
+        window.removeEventListener("pointerup", handlePointerUp);
         window.removeEventListener("pointercancel", handlePointerLeave);
         window.removeEventListener("pointerout", handleWindowPointerOut);
       }
 
       window.removeEventListener("resize", scheduleResize);
       window.removeEventListener("orientationchange", scheduleResize);
-      window.removeEventListener("scroll", scheduleRootRectUpdate);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("pageshow", handlePageShow);
       window.removeEventListener("blur", deactivatePointer);
       window.removeEventListener("page-intro:start", handlePageIntroStart);
