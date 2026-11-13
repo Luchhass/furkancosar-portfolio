@@ -1,6 +1,7 @@
 // Shared choreography. Components choose a family, never a local multiplier.
 export const MOTION = Object.freeze({
   ease: "power3.out",
+  reverseDuration: .26,
   heading: { yPercent: 105, rotationX: -70, duration: .85, stagger: .022, lineGap: .14 },
   detail: { y: 32, duration: .8, stagger: .1 },
   line: { yPercent: 112, duration: .78, ease: "power4.out", stagger: .075 },

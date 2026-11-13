@@ -17,7 +17,6 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 export default function Footer() {
   const pathname = usePathname();
   const footerRef = useRef(null);
-  const footerTimelineRef = useRef(null);
   useGSAP(() => {
     const media = createMotionMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
@@ -40,13 +39,15 @@ export default function Footer() {
       const primary = footer.querySelectorAll("[data-footer-primary]");
       const address = footer.querySelectorAll("[data-footer-address-item]");
       const socials = footer.querySelectorAll("[data-footer-social-item]");
-      const timeline = gsap.timeline({ defaults: { ease: MOTION.line.ease } });
-      timeline.from(primary, { yPercent: MOTION.line.yPercent, rotateX: -8, duration: MOTION.line.duration, stagger: MOTION.line.stagger }, 0)
-        .from(address, { yPercent: MOTION.line.yPercent, rotateX: -6, duration: MOTION.line.duration, stagger: MOTION.line.stagger }, .28)
-        .from(socials, { yPercent: MOTION.line.yPercent, scale: .94, duration: MOTION.line.duration, stagger: MOTION.line.stagger }, .42);
-      footerTimelineRef.current = repeatReveal(timeline, footer);
+      [...primary, ...address, ...socials].forEach(item => {
+        repeatReveal(gsap.from(item, {
+          yPercent: MOTION.line.yPercent,
+          rotateX: item.hasAttribute("data-footer-primary") ? -8 : -6,
+          duration: MOTION.line.duration, ease: MOTION.line.ease,
+        }), item.parentElement);
+      });
     });
-    return () => { media.revert(); footerTimelineRef.current = null; };
+    return () => media.revert();
   }, { scope: footerRef, dependencies: [pathname], revertOnUpdate: true });
 
   function updateTitleFillOrigin(event) {

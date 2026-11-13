@@ -5,10 +5,10 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 ## Ortak kaynaklar
 
 - `src/lib/motionPresets.js`: ailelerin kuvvet, mesafe, süre, ease, stagger ve scrub değerleri.
-- `src/lib/repeatReveal.js`: sabit kapsayıcıları izleyen tek IntersectionObserver; görünürken play, ekrandan tamamen çıkınca aynı timeline üzerinde reverse, dönüşte yeniden play. Hem aşağı hem yukarı yönde çalışır. Son kullanıcı ayrılınca gözlemci kaldırılır.
+- `src/lib/repeatReveal.js`: sabit kapsayıcıları izleyen tek IntersectionObserver. İlk görünürlükte beklemeden baştan giriş; tamamen ekran dışında en fazla 0,26 sn içinde reverse; hızlı dönüşte dahi yeniden baştan giriş. `rootMargin: 0px`, `threshold: 0`; ekran dışında bekleme, giriş yüzdesi veya kart batch gecikmesi yok. Son kullanıcı ayrılınca gözlemci kaldırılır.
 - `src/lib/pointerMotion.js`: magnet ve üç boyutlu eğim hesapları, ortak pointer easing'i ve temizleme davranışı.
 - `src/lib/useAccordionMotion.js`: Home About ve About Tech Stack için aynı satır ve logo açılış sistemi.
-- `src/lib/useProjectCardMotion.js`: Home ve Projects kartlarında aynı kart/resim/içerik sıralaması.
+- `src/lib/useShelfCardReveal.js`: Home ve Projects kartları ortak görünürlük sisteminde; bütün kart içeriği tek yatay maske açılışıyla girer.
 - `src/lib/motionMedia.js`: breakpoint ve reduced-motion abonelikleri.
 
 ## Eşitlenen aileler
@@ -18,7 +18,7 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 | Harf bazlı başlık reveal | Bölüm başlıkları, CTA, IdentityBand, hero giriş harfleri; kayan bantta kelime bazında aynı hareket | yPercent 105; rotationX -70; 0,85 sn; power3.out; stagger 0,022 sn |
 | Maskeli satır açılışı | ResponsiveTextLines, Home About accordion, About Tech accordion, Journey satırları, footer metinleri, menü alt metinleri | yPercent 112; 0,78 sn; power4.out; stagger 0,075 sn |
 | İçerik fade/slide | Bölüm içeriği, kicker, CTA metni/butonu, GitHub satırları, About highlight, Journey ayrıntıları, proje modalı ayrıntıları | y 32 px; 0,8 sn; power3.out; stagger 0,1 sn |
-| Soldan kart gelişi | Home ProjectsHighlights ve ProjectsList; filtre sonucu yeniden kurulurken de aynı hook | x -120 px; 0,9 sn; expo.out; resim 1,08 → 1; içerik y -22 px ve clip reveal; stagger 0,11 sn |
+| Soldan kart gelişi | Home ProjectsHighlights ve ProjectsList | 0,44 sn expo.out yatay maske; bütün içerik birlikte; ayrı metin girişi veya kartlar arasında batch gecikmesi yok |
 | Genişliği kadar maskeli başlık kayması | Hero başlık satırları ve menü linkleri | yüzde 115 başlangıç kayması; 0,9 sn; expo.out. Satırın sağdan gelmesi kompozisyon yönüdür, süre/ease farkı değildir |
 | Logo/icon pop | TechStackAccordion logoları, TechConstellation düğümleri, bölüm satırı ikonları | scale 0,5; rotation -80; 0,8 sn; back.out(1.5); stagger 0,07 sn |
 | Magnet | Contact 01–04 ve CTA'nın iki başlık satırı, açıklaması, butonu | Etki yarıçapı 360 px; kuvvet 0,42; yakınlık üssü 1,25; x sınırı 28 px; y sınırı 22 px; 0,7 sn power3.out. Artık bileşen bazında çarpan yok |
@@ -47,7 +47,9 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 - TechConstellation: halka ve ikon girişi tekrar ediyor; dönüşler ekran dışında ve gizli sekmede duruyor.
 - Genel bölüm satırları, çizgileri ve ikonları: `once` kaldırıldı.
 - About metin highlight'ları: yalnızca yukarı çıkışta sıfırlamak yerine her iki yönde aynı timeline reverse ediyor.
-- Footer: ayrı giriş/çıkış timeline'ları yerine tek timeline play/reverse kullanılıyor.
+- Footer: metin ve bağlantılar kendi sabit maskelerinden izlenir; tüm footer'ın görünürlüğünü veya uzun bir sıralamayı beklemez.
+- Başlık, kicker ve metin satırları: section'ın ortak zaman çizelgesi yerine kendi maskelerine göre hemen giriş ve ekran dışında reverse kullanır. CTA ve Toolkit metinleri de aynı kurala bağlıdır.
+- Hero: header girişinden ayrı içerik timeline'ı ilk sayfa girişinden sonra başlar; hero tamamen çıkınca reverse, geri gelince baştan giriş. Sayfa intro'su yeniden oynatılmaz.
 - Accordion içerikleri: yalnızca açık panel değişince çalışmak yerine scroll dönüşlerinde de aynı hook ile yeniden oynuyor.
 - Journey: aktif bölüm değişimi ve ilerleme mantığı korunurken dış başlık/içerik/kontrol girişi ortak görünürlük sistemiyle tekrar ediyor.
 - Sayaçlar: bölüm tamamlanmasına bağımlı tekrar tetikleme yerine kendi ortak görünürlük aboneliğini kullanıyor.
@@ -58,7 +60,7 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 - PageIntro: route girişine bağlı sinematik sıralama; bitince unmount. Scroll reveal değildir.
 - Menü ve proje modalı: aç/kapat eylemleriyle çalışır. Scroll çıkışında kapatılmaz; menü kendi timeline'ını reverse eder, modal kendi kapanışını oynar.
 - Journey bölüm değişimi: scroll ilerlemesine bağlı sunumdur; aşağı/yukarı geçiş yönünü korur. İçeriğin tamamını rastgele tek reveal'a dönüştürmez.
-- Hero çıkışı ve yatay galeri: scroll'a bağlı scrub/pin koreografisidir. Viewport'tan çıkışta tekrar bir reveal reverse uygulanmaz; aksi halde iki sistem aynı transformu yönetir.
+- Hero çıkışı ve yatay galeri: scroll'a bağlı scrub/pin koreografisidir. Reveal farklı iç kapsayıcılar üzerinde çalışır; aynı transform iki sistem tarafından yönetilmez.
 - Hero canvas izi: hız, yay ve sönümleme kullanan fizik efektidir. UI magnet/tilt ailesinin yerine geçirilmez.
 - IdentityBand harf hover'ı: tek harfin elastik tepkisidir; magnet veya sürekli dönüş değildir.
 - Form gönderim beklemesi/başarı kaplaması, arama odak çizgisi, BackToTop pop ve yukarı kaydırma: ilgili durum/eylem tarafından tetiklenir. Reveal görünürlüğü bu durumları yeniden başlatmaz.
@@ -66,10 +68,11 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 
 ## Tekrar kontrolü
 
-`scripts/verify-animation-system.mjs` başlık, CTA, accordion, kart, filtre sonrası kart ve footer için görünür → gizli/reverse → görünür döngüsünü kontrol eder. Contact ve CTA magnetlerine aynı pointer ofseti uygulanıp gerçek transform farkları karşılaştırılır. Proje modalı, menü kapanışı, intro unmount, yatay taşma ve reduced-motion da kontrol edilir.
+`scripts/verify-reveal-lifecycle.mjs` dört sayfada hero, başlık, paragraf ve footer için giriş → ekran dışında kısa reverse → tekrar giriş ve hızlı geri dönüş döngülerini masaüstü/mobil boyutlarında kontrol eder. `verify-shelf-reveal.mjs` bütün kartın birlikte açılmasını ve reverse davranışını kontrol eder. Reduced-motion statik kalır.
 
 ```powershell
-node scripts/verify-animation-system.mjs
+node scripts/verify-reveal-lifecycle.mjs
+node scripts/verify-shelf-reveal.mjs
 npm run lint
 npm run build
 ```

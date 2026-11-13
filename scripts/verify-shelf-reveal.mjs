@@ -20,9 +20,6 @@ try {
     await page.evaluate(y=>scrollTo(0,y),metrics.start+1);
     await page.waitForTimeout(1000);
     const target=root.locator("[data-shelf-page]").nth(1).locator("[data-project-card-reveal]").first();
-    await page.evaluate(y=>scrollTo(0,y),yFor(metrics.next-metrics.viewport+metrics.card*.15));
-    await page.waitForTimeout(650);
-    assert.ok((await target.evaluate(el=>getComputedStyle(el).clipPath)).includes("100%"),"Must stay hidden at first visible sliver");
     const samples=await target.evaluate(async (el,y)=>{
       scrollTo(0,y);
       const samples=[];
@@ -41,24 +38,21 @@ try {
         });
       }
       return samples;
-    },yFor(metrics.next-metrics.viewport+metrics.card*.75));
-    const partial=samples.filter(({clip})=>clip!=="none"&&!clip.includes("100%")&&!clip.includes("inset(0% 0%"));
+    },yFor(metrics.next-metrics.viewport+metrics.card*.15));
+    const partial=samples.filter(({clip})=>clip!=="none"&&!clip.includes("100%")&&!/^inset\(0%(?: 0%){0,3}\)$/.test(clip));
     assert.ok(partial.length>=3,"Wipe must visibly animate across multiple frames");
     assert.ok(partial.every(frame=>frame.visibility==="visible" && frame.opacity>.99 && frame.ready==="true"),
       "The actual card content must remain visible DURING the moving wipe, not pop in at its end");
-    assert.ok(partial.every(frame=>frame.copy.every(item=>item.opacity===0)),
-      "Text stays empty until the card wipe has finished");
-    const onset=[0,1,2,3].map(index=>samples.findIndex(frame=>frame.copy[index].opacity>.01));
-    assert.ok(onset.every((value,index)=>value>=0 && (index===0 || value>onset[index-1])),
-      "Number, heading, description and link enter one after another");
+    assert.ok(samples.every(frame=>frame.copy.every(item=>item.opacity>.99 && Math.abs(item.y)<.1)),
+      "All content stays visible and stationary throughout the card wipe; no separate text stagger");
     assert.ok(samples.at(-1).copy.every(item=>item.opacity>.99 && Math.abs(item.y)<.1),
       "Every item reaches its resting position");
-    assert.equal(samples.at(-1).clip,"none","Wipe must finish fully open");
+    assert.ok(/^inset\(0%(?: 0%){0,3}\)$/.test(samples.at(-1).clip),"Wipe must finish fully open");
     assert.equal(await target.locator("[data-project-card-reveal-inner]").evaluate(el=>getComputedStyle(el).transform),"none");
-    await page.evaluate(y=>scrollTo(0,y),metrics.start);
-    await page.waitForTimeout(1200);
+    await page.evaluate(y=>scrollTo(0,y),metrics.start-1000);
+    await page.waitForFunction(el=>getComputedStyle(el).clipPath.includes("100%"), await target.elementHandle(), { timeout: 5000 });
     assert.ok((await target.evaluate(el=>getComputedStyle(el).clipPath)).includes("100%"),"Exit restores the closed mask");
-    console.log(width+": empty card wipe, strictly ordered text stagger, final positions and reverse passed");
+    console.log(width+": whole-card wipe, stationary visible content, final positions and reverse passed");
     await page.close();
   }
 } finally {await browser.close();}

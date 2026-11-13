@@ -3,7 +3,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { createMotionMedia } from "./motionMedia";
 import { MOTION } from "./motionPresets";
-import { observeReveal } from "./repeatReveal";
+import { observeReveal, reverseReveal } from "./repeatReveal";
 
 export default function useAccordionMotion(scope, panelId, lineSelector, logoSelector, layoutKey) {
   useGSAP(() => {
@@ -24,7 +24,7 @@ export default function useAccordionMotion(scope, panelId, lineSelector, logoSel
       if (logos.length) timeline.fromTo(logos,
         { autoAlpha: 0, scale: MOTION.pop.scale, rotation: MOTION.pop.rotation },
         { autoAlpha: 1, scale: 1, rotation: 0, duration: MOTION.pop.duration, stagger: MOTION.pop.stagger, ease: MOTION.pop.ease }, .35);
-      const release = observeReveal(root, () => timeline.play(), () => timeline.reverse());
+      const release = observeReveal(panel, () => timeline.timeScale(1).restart(true), () => reverseReveal(timeline));
       return () => {
         release();
         timeline.kill();

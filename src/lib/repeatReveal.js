@@ -1,4 +1,5 @@
 import gsap from "gsap";
+import { MOTION } from "./motionPresets";
 
 // Observe stationary layout anchors, never the transformed reveal target.
 // One observer serves cards, headings, details and decorative entrances.
@@ -8,10 +9,18 @@ let observer;
 
 export function repeatReveal(animation, anchor) {
   if (!anchor) return animation;
-  animation.pause(0);
-  const release = observeReveal(anchor, () => animation.play(), () => animation.reverse());
+  animation.delay(0).pause(0);
+  const release = observeReveal(anchor,
+    () => animation.timeScale(1).restart(true),
+    () => reverseReveal(animation));
   gsap.context()?.add(() => release);
   return animation;
+}
+
+export function reverseReveal(animation) {
+  // Reverse from the current pose immediately, without waiting through a long
+  // entrance sequence. Re-entry always starts a fresh, visible entrance.
+  animation.timeScale(Math.max(1, animation.time() / MOTION.reverseDuration)).reverse();
 }
 
 export function observeReveal(anchor, enter, exit) {

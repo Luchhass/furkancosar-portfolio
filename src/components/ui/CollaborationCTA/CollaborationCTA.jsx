@@ -18,11 +18,14 @@ export default function CollaborationCTA() {
     const media = createMotionMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const root = ref.current;
-      const splits = Array.from(root.querySelectorAll("[data-cta-title]")).map((line) => splitCharacters(line));
-      const entrance = gsap.timeline();
-      splits.forEach((split, i) => entrance.from(split.chars, { ...headingFrom(), ...headingTo() }, .12 + i * MOTION.heading.lineGap));
-      entrance.from(root.querySelectorAll("[data-cta-detail]"), { ...detailFrom(), ...detailTo() }, .35);
-      repeatReveal(entrance, root);
+      const splits = Array.from(root.querySelectorAll("[data-cta-title]")).map((line) => {
+        const split = splitCharacters(line);
+        repeatReveal(gsap.from(split.chars, { ...headingFrom(), ...headingTo() }), line);
+        return split;
+      });
+      root.querySelectorAll("[data-cta-detail]").forEach(detail => {
+        repeatReveal(gsap.from(detail.querySelector("[data-cta-reveal]"), { ...detailFrom(), ...detailTo() }), detail);
+      });
       gsap.fromTo(root.querySelector(".cta-title-first"), { xPercent: -7 }, { xPercent: 7, ease: "none", scrollTrigger: { trigger: root, start: "top bottom", end: "bottom top", scrub: MOTION.scrub } });
       gsap.fromTo(root.querySelector(".cta-title-second"), { xPercent: 7 }, { xPercent: -7, ease: "none", scrollTrigger: { trigger: root, start: "top bottom", end: "bottom top", scrub: MOTION.scrub } });
       const followers = Array.from(root.querySelectorAll("[data-cta-follow]"));
@@ -35,8 +38,8 @@ export default function CollaborationCTA() {
     <div className="cta-liquid-backdrop" style={{ backgroundImage: "url('/images/cta-liquid-sculpture.png')" }} aria-hidden="true" />
     <div className="cta-center">
       <h2 id="collaboration-title"><span className="cta-title-first" data-cta-follow><span data-cta-title>LET&apos;S BUILD</span></span><span className="cta-title-second" data-cta-follow><span data-cta-title className="gradient-text-flow">TOGETHER</span></span></h2>
-      <p data-cta-detail className="cta-description"><span data-cta-follow className="inline-block">Have an idea, project or interface that needs a clean frontend touch? Let&apos;s turn it into a polished web experience.</span></p>
-      <div data-cta-detail><div data-cta-follow><GradientActionButton className="w-fit! px-8" href="/contact" id="collaboration-contact" label="LET’S MAKE IT HAPPEN" /></div></div>
+      <p data-cta-detail className="cta-description"><span data-cta-reveal className="inline-block"><span data-cta-follow className="inline-block">Have an idea, project or interface that needs a clean frontend touch? Let&apos;s turn it into a polished web experience.</span></span></p>
+      <div data-cta-detail><div data-cta-reveal><div data-cta-follow><GradientActionButton className="w-fit! px-8" href="/contact" id="collaboration-contact" label="LET’S MAKE IT HAPPEN" /></div></div></div>
     </div>
   </section>;
 }

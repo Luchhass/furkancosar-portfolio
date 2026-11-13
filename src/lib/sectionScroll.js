@@ -4,8 +4,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export const SECTION_SCROLL = Object.freeze({
   lerp: .105,
-  captureRatio: .1,
-  captureMax: 100,
+  captureRatio: .14,
+  captureMax: 140,
   idleDelay: 150,
   settleVelocity: .65,
   settleDistance: 6,

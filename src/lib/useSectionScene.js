@@ -19,10 +19,11 @@ export default function useSectionScene(scope) {
       const q = gsap.utils.selector(root);
       const cleanups = [];
       q("[data-scene-rule]").forEach((line) => repeatReveal(gsap.from(line, { scaleX: 0, transformOrigin: "0% 50%", duration: MOTION.detail.duration, ease: MOTION.ease }), line.parentElement));
-      q("[data-scene-row]").forEach((row, i) => {
-        repeatReveal(gsap.from(row, { ...detailFrom(), ...detailTo(), delay: i * MOTION.detail.stagger }), row.parentElement);
+      q("[data-scene-row]").forEach((row) => {
         const icon = row.querySelector("[data-scene-icon]");
-        if (icon) repeatReveal(gsap.from(icon, { rotation: MOTION.pop.rotation, scale: MOTION.pop.scale, duration: MOTION.pop.duration, ease: MOTION.pop.ease }), row.parentElement);
+        const contents = [...row.children].filter(child => child !== icon);
+        if (contents.length) repeatReveal(gsap.from(contents, { ...detailFrom(), ...detailTo() }), row);
+        if (icon) repeatReveal(gsap.from(icon, { rotation: MOTION.pop.rotation, scale: MOTION.pop.scale, duration: MOTION.pop.duration, ease: MOTION.pop.ease }), row);
         if (conditions.desktop) {
           const shift = gsap.quickTo(row, "x", MOTION.pointer);
           const enter = () => shift(8); const leave = () => shift(0);

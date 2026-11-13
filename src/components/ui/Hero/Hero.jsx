@@ -2,6 +2,7 @@
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION, headingFrom, headingTo } from "@/lib/motionPresets";
 import { bindTilt } from "@/lib/pointerMotion";
+import { observeReveal, reverseReveal } from "@/lib/repeatReveal";
 
 import { useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -91,7 +92,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         ...q("[data-hero-button] .gradient-action-fill"),
       ].filter(isVisibleElement);
 
-      const brandOnlyHold = isHome ? 0.26 : 0.14;
+      const brandOnlyHold = 0;
       const chainGap = 0.14;
       const detailDuration = MOTION.line.duration;
       const titleDuration = MOTION.slide.duration;
@@ -108,10 +109,10 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       const headerLeftStart = headerLeftItems.length ? nextStart() : null;
       const headerCenterStart = headerCenterItems.length ? nextStart() : null;
       const headerRightStart = headerRightItems.length ? nextStart() : null;
-      const statStart = statItems.length ? nextStart() : null;
-      const buttonStart = buttonItems.length ? nextStart() : null;
-      const copyStart = copyItems.length ? nextStart() : null;
-      const titleStart = cursor;
+      const statStart = 0;
+      const buttonStart = 0;
+      const copyStart = 0;
+      const titleStart = 0;
 
       const lastTitleStart =
         titleStart + Math.max(titleItems.length - 1, 0) * titleLineGap;
@@ -164,6 +165,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       const timeline = gsap.timeline({
         paused: true,
       });
+      const contentTimeline = gsap.timeline({ paused: true });
 
       timeline.to({}, { duration: brandOnlyHold });
 
@@ -210,15 +212,15 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       }
 
       if (statItems.length) {
-        timeline.call(
+        contentTimeline.call(
           () => {
-            playRevealCounters(heroRef.current);
+            if (!contentTimeline.reversed()) playRevealCounters(heroRef.current);
           },
           [],
           statStart + 0.06,
         );
 
-        timeline.to(
+        contentTimeline.to(
           statItems,
           {
             yPercent: 0,
@@ -233,7 +235,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       }
 
       if (buttonItems.length) {
-        timeline.to(
+        contentTimeline.to(
           buttonItems,
           {
             yPercent: 0,
@@ -248,7 +250,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       }
 
       if (copyItems.length) {
-        timeline.to(
+        contentTimeline.to(
           copyItems,
           {
             yPercent: 0,
@@ -264,7 +266,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       }
 
       titleItems.forEach((item, index) => {
-        timeline.to(
+        contentTimeline.to(
           item,
           {
             xPercent: 0,
@@ -275,11 +277,11 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
           },
           titleStart + index * titleLineGap,
         );
-        timeline.from(titleSplits[index].chars, { ...headingFrom(), ...headingTo(), clearProps: "transform,opacity,transformOrigin" }, titleStart + index * titleLineGap);
+        contentTimeline.from(titleSplits[index].chars, { ...headingFrom(), ...headingTo(), clearProps: "transform,opacity,transformOrigin" }, titleStart + index * titleLineGap);
       });
 
       if (buttonFillItems.length) {
-        timeline.to(
+        contentTimeline.to(
           buttonFillItems,
           {
             opacity: 0,
@@ -292,10 +294,22 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         );
       }
 
+      let heroVisible = false;
+      const playContent = () => {
+        if (heroVisible && window.__pageIntroDoneForPath === pathname) contentTimeline.timeScale(1).restart(true);
+      };
+      const stopObserving = observeReveal(heroRef.current,
+        () => { heroVisible = true; playContent(); },
+        () => {
+          heroVisible = false;
+          reverseReveal(contentTimeline);
+          heroRef.current.querySelectorAll("[data-reveal-counter]").forEach(counter => counter.dispatchEvent(new CustomEvent("reveal-counter:reverse")));
+        });
       const playHeroIntro = () => {
         if (timeline.progress() === 0 && !timeline.isActive()) {
           timeline.play();
         }
+        playContent();
       };
 
       const handlePageIntroComplete = (event) => {
@@ -316,6 +330,8 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
           handlePageIntroComplete,
         );
         timeline.kill();
+        stopObserving();
+        contentTimeline.kill();
         titleSplits.forEach((split) => split.revert());
       };
     },

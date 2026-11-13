@@ -9,7 +9,7 @@ Lenis runs on GSAP's existing ticker and updates ScrollTrigger.
   or extra input threshold for leaving a section.
 - After 150ms without input, once momentum is nearly finished (velocity below
   .65 and remaining travel below 6px), a nearby section may settle into frame.
-  Capture distance is 10% of the viewport, capped at 100px; alignment takes .24s.
+  Capture distance is 14% of the viewport, capped at 140px; alignment takes .24s.
 - Only the nearest eligible point is used. It can correct an overshoot of at most
   24px, and never recaptures the section the current gesture departed from.
 - Fast gestures (180px event or 2.4px/ms) stay free for that gesture. A new gesture

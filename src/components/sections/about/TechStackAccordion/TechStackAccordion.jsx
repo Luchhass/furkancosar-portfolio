@@ -86,14 +86,13 @@ export default function TechStackAccordion() {
       const intro = section.querySelector("[data-toolkit-intro]");
       const names = Array.from(section.querySelectorAll("[data-toolkit-label]"));
       const tracks = Array.from(section.querySelectorAll("[data-toolkit-track]"));
-      const splits = Array.from(section.querySelectorAll("[data-toolkit-title]")).map(line => splitCharacters(line));
-      // Match CTA entrance timing while keeping the pinned stages scroll-driven.
-      splits.forEach((split, index) => repeatReveal(gsap.from(split.chars, {
-        ...headingFrom(), ...headingTo(), delay: .12 + index * MOTION.heading.lineGap,
-      }), frame));
-      repeatReveal(gsap.from(section.querySelector("[data-toolkit-copy]"), {
-        ...detailFrom(), ...detailTo(), delay: .35,
-      }), frame);
+      const splits = Array.from(section.querySelectorAll("[data-toolkit-title]")).map(line => {
+        const split = splitCharacters(line);
+        repeatReveal(gsap.from(split.chars, { ...headingFrom(), ...headingTo() }), line);
+        return split;
+      });
+      const copy = section.querySelector("[data-toolkit-copy]");
+      repeatReveal(gsap.from(copy.firstElementChild, { ...detailFrom(), ...detailTo() }), copy);
 
       const setIntroOpacity = gsap.quickSetter(intro, "opacity");
       const setIntroY = gsap.quickSetter(intro, "y", "px");
@@ -163,7 +162,7 @@ export default function TechStackAccordion() {
             <span><span data-toolkit-title>TOOLS</span></span>
             <span><span data-toolkit-title className="gradient-text-flow">I USE</span></span>
           </h2>
-          <p data-toolkit-copy className="ui-section-copy">The technologies behind the interfaces I build. From the first line of code to the final interaction, these are the tools I use to turn ideas into thoughtful digital experiences.</p>
+          <p data-toolkit-copy className="ui-section-copy"><span className="block">The technologies behind the interfaces I build. From the first line of code to the final interaction, these are the tools I use to turn ideas into thoughtful digital experiences.</span></p>
         </div>
       </div>
       <div data-toolkit-bands className={styles.bands} aria-hidden="true">

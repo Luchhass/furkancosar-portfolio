@@ -14,9 +14,9 @@ Open http://localhost:3000. Copy `.env.example` to `.env.local` for optional mai
 ## Motion architecture
 
 - `Hero`: page-intro coordination, SplitText character choreography, pointer perspective and scroll-driven line separation.
-- `ScrollReveal`: section typography entrances. It deliberately does not hide large sections again after they have been read.
+- `ScrollReveal` / `repeatReveal`: typography and details enter at first visibility, reverse offscreen within .26s, and restart immediately on re-entry. Stable masks are observed separately rather than delaying all text behind a section timeline.
 - `useSectionScene`: scoped rules, staggered rows, reading opacity and depth layers.
-- `useProjectCardMotion`: independent background, image and copy entrances; IntersectionObserver also handles horizontally scrolling cards.
+- `useShelfCardReveal`: whole-card horizontal wipe using the same observer as text; no separate copy stagger or card batch delay. `useProjectCardMotion` is a compatibility export of this hook.
 - `ProjectsHighlights`: scroll-pinned horizontal archive on desktop; native swiping and dragging on smaller screens.
 - `ProjectDetailsModal`: opaque fullscreen body portal, card-origin preview entrance, animated close, readable scrollable content and keyboard focus containment.
 - `AboutMeAccordion` / `InterfaceSculpture`: accordion selection changes the depth of a three-layer interface illustration.

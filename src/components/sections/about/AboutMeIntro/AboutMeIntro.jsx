@@ -3,7 +3,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { MOTION, detailTo } from "@/lib/motionPresets";
+import { detailTo } from "@/lib/motionPresets";
 import { repeatReveal } from "@/lib/repeatReveal";
 import { createMotionMedia } from "@/lib/motionMedia";
 import RevealTextLine from "@/components/layout/ScrollReveal/RevealTextLine";
@@ -28,7 +28,7 @@ export default function AboutMeIntro() {
     const media = createMotionMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const highlightFills = content.querySelectorAll("[data-about-highlight-fill]");
-      repeatReveal(gsap.fromTo(highlightFills, { autoAlpha: 0, yPercent: 12 }, { autoAlpha: 1, yPercent: 0, ...detailTo(), delay: MOTION.detail.stagger }), content);
+      highlightFills.forEach(fill => repeatReveal(gsap.fromTo(fill, { autoAlpha: 0, yPercent: 12 }, { autoAlpha: 1, yPercent: 0, ...detailTo() }), fill.parentElement));
     });
     return () => media.revert();
   }, { scope: sectionRef });

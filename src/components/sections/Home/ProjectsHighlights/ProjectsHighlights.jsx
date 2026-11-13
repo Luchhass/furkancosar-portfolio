@@ -22,7 +22,7 @@ export default function ProjectsHighlights() {
   const suppressClick = useRef(false);
   const scrollMotion = useRef({ base: 0, offset: 0 });
   const [selected, setSelected] = useState(null);
-  useShelfCardReveal(sectionRef, projects.length, { viewportInset: 0, entryRatio: .15 });
+  useShelfCardReveal(sectionRef, projects.length);
 
   useGSAP(() => {
     const root = sectionRef.current;

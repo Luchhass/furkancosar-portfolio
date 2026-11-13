@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import gsap from "gsap";
 import { MOTION } from "@/lib/motionPresets";
-import { observeReveal } from "@/lib/repeatReveal";
+import { observeReveal, reverseReveal } from "@/lib/repeatReveal";
 
 export const REVEAL_COUNTER_EVENT = "reveal-counter:play";
 
@@ -204,7 +204,7 @@ export default function RevealCounter({
 
     if (prefersReducedMotion.matches) setFinal();
     else setZero();
-    const reverse = () => tweenRef.current?.reverse();
+    const reverse = () => { if (tweenRef.current) reverseReveal(tweenRef.current); };
     const isHero = Boolean(root.closest(".portfolio-hero"));
     const stopObserving = !isHero && !prefersReducedMotion.matches ? observeReveal(root, play, reverse) : () => {};
     if (isHero) root.addEventListener(REVEAL_COUNTER_EVENT, play);
