@@ -1,4 +1,5 @@
 "use client";
+import GraphicMark from "@/components/ui/GraphicMark";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION } from "@/lib/motionPresets";
 import { repeatReveal, loopWhileVisible } from "@/lib/repeatReveal";
@@ -35,9 +36,9 @@ export default function InterfaceSculpture({ active = 0 }) {
     <span className="sculpture-caption">DESIGN WITH INTENTION. BUILD WITH FEELING.</span>
     <div className="interface-stack">{labels.map((label, i) => <div key={label} className={`interface-layer interface-layer-${i}`} data-active={i === active}>
       <div className="interface-toolbar"><span /><span /><span /><b>0{i + 1} / {label}</b></div>
-      {i === 0 ? <div className="interface-wireframe"><span /><span /><span /><span /></div> : i === 1 ? <div className="interface-type">Aa<span className="gradient-text-flow">↗</span></div> : <svg viewBox="0 0 260 100"><path d="M0 80 C60 80 40 20 100 20 S180 95 260 5" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="100" cy="20" r="6" fill="currentColor" /></svg>}
+      {i === 0 ? <div className="interface-wireframe"><span /><span /><span /><span /></div> : i === 1 ? <div className="interface-type">Aa<span className="gradient-text-flow"><GraphicMark variant="arrow" /></span></div> : <svg viewBox="0 0 260 100"><path d="M0 80 C60 80 40 20 100 20 S180 95 260 5" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="100" cy="20" r="6" fill="currentColor" /></svg>}
     </div>)}</div>
-    <span className="interface-spark spark-one">✳</span><span className="interface-spark spark-two">+</span>
+    <span className="interface-spark spark-one"><GraphicMark /></span><span className="interface-spark spark-two"><GraphicMark variant="plus" /></span>
     <div className="sculpture-bottom"><span>IDEA</span><i /><span>INTERFACE</span></div>
   </div>;
 }

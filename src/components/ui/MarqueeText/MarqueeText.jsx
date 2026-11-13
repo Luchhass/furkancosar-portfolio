@@ -1,4 +1,5 @@
 "use client";
+import GraphicMark from "@/components/ui/GraphicMark";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION, headingFrom, headingTo } from "@/lib/motionPresets";
 import { repeatReveal, loopWhileVisible } from "@/lib/repeatReveal";
@@ -26,6 +27,6 @@ export default function MarqueeText({ text, className = "", duration = "44s", re
     return () => media.revert();
   }, { scope: ref, dependencies: [text, duration], revertOnUpdate: true });
   return <section ref={ref} className={`ui-marquee kinetic-band gradient-bg-flow ${className}`} data-header-theme="dark" aria-label={text}>
-    <div className="kinetic-track" aria-hidden="true">{[0, 1].map((group) => <div className="kinetic-group" key={group}>{Array.from({ length: repeat }, (_, i) => <div className="kinetic-item" key={i}><span className="kinetic-word">{text}</span><span className="kinetic-star">✳</span></div>)}</div>)}</div>
+    <div className="kinetic-track" aria-hidden="true">{[0, 1].map((group) => <div className="kinetic-group" key={group}>{Array.from({ length: repeat }, (_, i) => <div className="kinetic-item" key={i}><span className="kinetic-word">{text}</span><span className="kinetic-star"><GraphicMark /></span></div>)}</div>)}</div>
   </section>;
 }
