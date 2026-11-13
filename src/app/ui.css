@@ -88,6 +88,15 @@
 .ui-form label > span:first-child { font-size: 11px; line-height: 1.2; }
 .contact-message { align-content: start; }
 .contact-actions > p { min-width: 0; }
+@media (max-width: 767px) {
+  .contact-layout { display: block; }
+  .contact-form > .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .contact-form label { min-width: 0; }
+  .contact-form label > [data-contact-field-reveal] { min-width: 0; }
+  .contact-form input { min-width: 0; }
+  .contact-form > .grid > label:first-child { padding-right: 12px; border-right: 1px solid #0000001a; }
+  .contact-form > .grid > label:last-child { padding-left: 12px; }
+}
 @media (min-width: 1280px) {
   .contact-layout { align-items: stretch; }
   .contact-intro, .contact-description { display: flex; flex-direction: column; }
@@ -115,11 +124,9 @@
 }
 .shelf-body { display: grid; grid-template-rows: minmax(0, 1fr); min-height: 0; }
 .shelf-viewport {
-  /* Paint room for perspective/lift without changing the card grid's box. */
-  --shelf-hover-room: clamp(24px, 4vw, 48px);
-  margin: calc(-1 * var(--shelf-hover-room));
-  padding: var(--shelf-hover-room);
-  min-width: 0; min-height: 0; overflow: hidden;
+  /* Allow hover paint outside the grid without adding layout/scroll space. */
+  min-width: 0; min-height: 0; overflow: clip;
+  overflow-clip-margin: 32px;
   scrollbar-width: none;
   touch-action: pan-y pinch-zoom; cursor: grab;
 }

@@ -1,8 +1,8 @@
 import gsap from "gsap";
 import { MOTION } from "./motionPresets";
 
-export function bindMagnet(anchor, mover) {
-  return bindPointer(anchor, mover, "magnet");
+export function bindMagnet(anchor, mover, strengthScale = 1) {
+  return bindPointer(anchor, mover, "magnet", strengthScale);
 }
 
 export function bindTilt(anchor, mover) {
@@ -49,7 +49,7 @@ export function bindProjectCardHover(card) {
   };
 }
 
-function bindPointer(anchor, mover, type) {
+function bindPointer(anchor, mover, type, strengthScale = 1) {
   if (!anchor || !mover || !matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)").matches) return () => {};
   const x = gsap.quickTo(mover, type === "tilt" ? "rotationY" : "x", MOTION.pointer);
   const y = gsap.quickTo(mover, type === "tilt" ? "rotationX" : "y", MOTION.pointer);
@@ -73,8 +73,8 @@ function bindPointer(anchor, mover, type) {
       } else {
         const { radius, strength, falloff, maxX, maxY } = MOTION.magnet;
         const pull = Math.pow(Math.max(0, 1 - Math.hypot(dx, dy) / radius), falloff) * strength;
-        x(gsap.utils.clamp(-maxX, maxX, dx * pull));
-        y(gsap.utils.clamp(-maxY, maxY, dy * pull));
+        x(gsap.utils.clamp(-maxX, maxX, dx * pull) * strengthScale);
+        y(gsap.utils.clamp(-maxY, maxY, dy * pull) * strengthScale);
       }
     });
   };

@@ -8,6 +8,8 @@ import { createMotionMedia } from "@/lib/motionMedia";
 import ReadingText from "@/components/ui/ReadingText";
 import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
 import { bindMagnet } from "@/lib/pointerMotion";
+import { MOTION } from "@/lib/motionPresets";
+import { repeatReveal } from "@/lib/repeatReveal";
 
 const contactNotes = [
   ["01", "Idea"],
@@ -17,6 +19,12 @@ const contactNotes = [
 ];
 
 gsap.registerPlugin(useGSAP);
+
+function RevealField({ className, children }) {
+  return <label className={`${className} overflow-hidden`}>
+    <span data-contact-field-reveal className="grid gap-2.5">{children}</span>
+  </label>;
+}
 
 function updateActionFillOrigin(event) {
   const button = event.currentTarget;
@@ -80,8 +88,32 @@ export default function ContactForm() {
     media.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
       const notes = notesRef.current;
       const anchors = Array.from(notes.querySelectorAll("[data-contact-note-anchor]"));
-      const cleanups = anchors.map((anchor) => bindMagnet(anchor, anchor.querySelector("[data-contact-note]")));
+      const cleanups = anchors.map((anchor) => bindMagnet(anchor, anchor.querySelector("[data-contact-note]"), 0.3));
       return () => cleanups.forEach((cleanup) => cleanup());
+    });
+    return () => media.revert();
+  }, { scope: notesRef });
+
+  useGSAP(() => {
+    const media = createMotionMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      const form = sectionRef.current.querySelector("form");
+      const targets = form.querySelectorAll("[data-contact-field-reveal]");
+      repeatReveal(gsap.fromTo(targets,
+        { yPercent: MOTION.miniTitle.yPercent },
+        { ...MOTION.miniTitle, yPercent: 0, stagger: MOTION.line.stagger }), form);
+    });
+    return () => media.revert();
+  }, { scope: sectionRef });
+
+  useGSAP(() => {
+    const media = createMotionMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      notesRef.current.querySelectorAll("[data-contact-note-reveal]").forEach(item => {
+        repeatReveal(gsap.fromTo(item,
+          { yPercent: MOTION.miniTitle.yPercent },
+          { ...MOTION.miniTitle, yPercent: 0 }), item.parentElement);
+      });
     });
     return () => media.revert();
   }, { scope: notesRef });
@@ -152,13 +184,13 @@ export default function ContactForm() {
       <div className="ui-section-grid relative z-10">
         <p
           data-reveal-part="kicker"
-          className="ui-section-label inline-flex items-center gap-2 text-black/55"
+          className="ui-section-label hidden items-center gap-2 text-black/55 md:inline-flex"
         >
           <MiniTitleText>Contact</MiniTitleText>
         </p>
 
         <div className="ui-section-body ui-section-split contact-layout">
-          <div className="contact-intro min-w-0">
+          <div className="contact-intro hidden min-w-0 md:block">
             <h2
               id="contact-form-title"
               data-reveal-part="title"
@@ -173,12 +205,13 @@ export default function ContactForm() {
 
               <div
                 ref={notesRef}
-                data-reveal-part="content"
                 className="contact-notes mt-7 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-black/10 pt-5 md:mt-9 md:grid-cols-4"
               >
                 {contactNotes.map(([number, label]) => (
                   <div key={label} data-contact-note-anchor>
                     <div data-contact-note className="w-fit">
+                      <div className="overflow-hidden">
+                        <div data-contact-note-reveal>
                       <span className="gradient-text-flow block text-[28px] leading-[0.82] font-black md:text-[30px] lg:text-[32px]">
                         {number}
                       </span>
@@ -186,6 +219,8 @@ export default function ContactForm() {
                       <span className="mt-2 block text-[10px] leading-none font-black tracking-[0.14em] text-black/45 uppercase">
                         {label}
                       </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -194,7 +229,6 @@ export default function ContactForm() {
           </div>
 
           <form
-            data-reveal-part="content"
             className="ui-form contact-form relative grid min-w-0 border-t border-black/10 pt-5"
             aria-label="Project contact form"
             onSubmit={handleSubmit}
@@ -211,7 +245,7 @@ export default function ContactForm() {
             />
 
             <div className="grid md:grid-cols-2">
-              <label className="group grid gap-2.5 border-b border-black/10 py-3.5 transition-colors duration-300 hover:border-black/25 focus-within:border-black/35 md:border-r md:pr-5">
+              <RevealField className="group grid gap-2.5 border-b border-black/10 py-3.5 transition-colors duration-300 hover:border-black/25 focus-within:border-black/35 md:border-r md:pr-5">
                 <span className="text-[10px] leading-none font-black tracking-[0.16em] text-black/40 uppercase transition-colors duration-300 gradient-focus-flow group-focus-within:animate-[hero-flow_var(--gradient-flow-duration)_ease-in-out_infinite] group-focus-within:bg-[linear-gradient(90deg,#6768ff,#884cff,#a53cdd,#cf3d9f,#ee4b67,#cf3d9f,#884cff,#6768ff)] group-focus-within:bg-size-[260%_100%] group-focus-within:bg-clip-text group-focus-within:text-transparent">
                   Name
                 </span>
@@ -224,9 +258,9 @@ export default function ContactForm() {
                   placeholder="Your name"
                   required
                 />
-              </label>
+              </RevealField>
 
-              <label className="group grid gap-2.5 border-b border-black/10 py-3.5 transition-colors duration-300 hover:border-black/25 focus-within:border-black/35 md:pl-5">
+              <RevealField className="group grid gap-2.5 border-b border-black/10 py-3.5 transition-colors duration-300 hover:border-black/25 focus-within:border-black/35 md:pl-5">
                 <span className="text-[10px] leading-none font-black tracking-[0.16em] text-black/40 uppercase transition-colors duration-300 gradient-focus-flow group-focus-within:animate-[hero-flow_var(--gradient-flow-duration)_ease-in-out_infinite] group-focus-within:bg-[linear-gradient(90deg,#6768ff,#884cff,#a53cdd,#cf3d9f,#ee4b67,#cf3d9f,#884cff,#6768ff)] group-focus-within:bg-size-[260%_100%] group-focus-within:bg-clip-text group-focus-within:text-transparent">
                   Email
                 </span>
@@ -239,11 +273,11 @@ export default function ContactForm() {
                   placeholder="you@email.com"
                   required
                 />
-              </label>
+              </RevealField>
             </div>
 
             <div className="grid md:grid-cols-2">
-              <label className="group relative grid gap-2.5 border-b border-black/10 py-3.5 transition-colors duration-300 hover:border-black/25 focus-within:border-black/35 md:border-r md:pr-5">
+              <RevealField className="group relative grid gap-2.5 border-b border-black/10 py-3.5 transition-colors duration-300 hover:border-black/25 focus-within:border-black/35 md:border-r md:pr-5">
                 <span className="text-[10px] leading-none font-black tracking-[0.16em] text-black/40 uppercase transition-colors duration-300 gradient-focus-flow group-focus-within:animate-[hero-flow_var(--gradient-flow-duration)_ease-in-out_infinite] group-focus-within:bg-[linear-gradient(90deg,#6768ff,#884cff,#a53cdd,#cf3d9f,#ee4b67,#cf3d9f,#884cff,#6768ff)] group-focus-within:bg-size-[260%_100%] group-focus-within:bg-clip-text group-focus-within:text-transparent">
                   Phone
                 </span>
@@ -258,9 +292,9 @@ export default function ContactForm() {
                   maxLength={30}
                   required
                 />
-              </label>
+              </RevealField>
 
-              <label className="group grid gap-2.5 border-b border-black/10 py-3.5 transition-colors duration-300 hover:border-black/25 focus-within:border-black/35 md:pl-5">
+              <RevealField className="group grid gap-2.5 border-b border-black/10 py-3.5 transition-colors duration-300 hover:border-black/25 focus-within:border-black/35 md:pl-5">
                 <span className="text-[10px] leading-none font-black tracking-[0.16em] text-black/40 uppercase transition-colors duration-300 gradient-focus-flow group-focus-within:animate-[hero-flow_var(--gradient-flow-duration)_ease-in-out_infinite] group-focus-within:bg-[linear-gradient(90deg,#6768ff,#884cff,#a53cdd,#cf3d9f,#ee4b67,#cf3d9f,#884cff,#6768ff)] group-focus-within:bg-size-[260%_100%] group-focus-within:bg-clip-text group-focus-within:text-transparent">
                   Project
                 </span>
@@ -273,10 +307,10 @@ export default function ContactForm() {
                   maxLength={160}
                   required
                 />
-              </label>
+              </RevealField>
             </div>
 
-            <label className="contact-message group grid gap-2.5 py-3.5 transition-colors duration-300 md:py-4">
+            <RevealField className="contact-message group grid gap-2.5 py-3.5 transition-colors duration-300 md:py-4">
               <span className="text-[10px] leading-none font-black tracking-[0.16em] text-black/40 uppercase transition-colors duration-300 gradient-focus-flow group-focus-within:animate-[hero-flow_var(--gradient-flow-duration)_ease-in-out_infinite] group-focus-within:bg-[linear-gradient(90deg,#6768ff,#884cff,#a53cdd,#cf3d9f,#ee4b67,#cf3d9f,#884cff,#6768ff)] group-focus-within:bg-size-[260%_100%] group-focus-within:bg-clip-text group-focus-within:text-transparent">
                 Project details / Message
               </span>
@@ -287,14 +321,16 @@ export default function ContactForm() {
                 placeholder="Tell me more about your project and what you need..."
                 required
               />
-            </label>
+            </RevealField>
 
             <div className="contact-actions flex flex-col gap-4 border-t border-black/10 pt-6 md:flex-row md:items-center md:justify-between">
-              <p className="m-0 max-w-58 text-[10px] leading-[1.2] font-bold tracking-[0.12em] text-black/45 uppercase">
+              <div className="overflow-hidden"><p data-contact-field-reveal className="m-0 max-w-58 text-[10px] leading-[1.2] font-bold tracking-[0.12em] text-black/45 uppercase">
                 Usually replies after reviewing scope and availability.
-              </p>
+              </p></div>
 
+              <div className="w-full overflow-hidden md:w-fit">
               <button
+                data-contact-field-reveal
                 ref={submitButtonRef}
                 type="submit"
                 disabled={isSubmitting}
@@ -315,6 +351,7 @@ export default function ContactForm() {
                   {isSubmitting ? "SENDING..." : "SEND MESSAGE"}
                 </span>
               </button>
+              </div>
             </div>
           </form>
         </div>

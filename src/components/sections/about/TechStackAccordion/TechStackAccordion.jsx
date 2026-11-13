@@ -127,9 +127,10 @@ export default function TechStackAccordion() {
         progress: 1, ease: "none", onUpdate: draw,
         scrollTrigger: {
           id: "toolkit-strips", trigger: section, start: "top top",
-          // Every row moves two pixels per scroll pixel, regardless of tool count.
-          end: () => { measure(); return `+=${travelDistance / (.38 * 2)}`; },
-          pin: frame, scrub: MOTION.scrub, invalidateOnRefresh: true,
+          // Keep the same stages with a shorter, more responsive scroll journey.
+          // Each row travels 3.5 pixels per scroll pixel during the strip phase.
+          end: () => { measure(); return `+=${travelDistance / (.38 * 3.5)}`; },
+          pin: frame, scrub: .3, invalidateOnRefresh: true,
           onRefresh: () => { measure(); draw(); },
         },
       });

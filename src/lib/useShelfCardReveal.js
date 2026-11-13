@@ -2,29 +2,51 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { createMotionMedia } from "./motionMedia";
-import { repeatReveal } from "./repeatReveal";
+import { reverseReveal } from "./repeatReveal";
 
-// Observe the stationary slot. All card content shares the original wipe.
+// Start once enough of the stationary slot is visible to see the whole-card slide.
 export default function useShelfCardReveal(scope, renderKey) {
   useGSAP(() => {
     const media = createMotionMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const masks = [...scope.current.querySelectorAll("[data-project-card-reveal]")];
+      const entries = new Map();
+      const observer = new IntersectionObserver(changes => {
+        changes.forEach(change => {
+          const entry = entries.get(change.target);
+          if (!entry) return;
+          if (!change.isIntersecting) {
+            entry.entered = false;
+            reverseReveal(entry.animation);
+          } else if (change.intersectionRatio >= 0.15 && !entry.entered) {
+            entry.entered = true;
+            entry.animation.timeScale(1).restart(true);
+          }
+        });
+      }, { threshold: [0, 0.15] });
       masks.forEach(mask => {
         mask.dataset.revealMaskActive = "true";
         mask.dataset.revealReady = "true";
-        repeatReveal(gsap.fromTo(mask,
-          { clipPath: "inset(0% 100% 0% 0%)" },
-          { clipPath: "inset(0% 0% 0% 0%)", duration: .44, ease: "expo.out",
+        const animation = gsap.fromTo(mask.querySelector("[data-project-card-reveal-inner]"),
+          { xPercent: -105 },
+          { xPercent: 0, duration: .7, ease: "power3.out", force3D: false, paused: true,
             onStart: () => { mask.dataset.revealMaskActive = "true"; },
-            onComplete: () => { mask.dataset.revealMaskActive = "false"; },
+            onUpdate: function () {
+              mask.dataset.revealMaskActive = this.progress() === 1 ? "false" : "true";
+            },
             onReverseComplete: () => { mask.dataset.revealMaskActive = "true"; },
-          }), mask.parentElement);
+          });
+        entries.set(mask.parentElement, { animation, entered: false });
+        observer.observe(mask.parentElement);
       });
-      return () => masks.forEach(mask => {
+      return () => {
+        observer.disconnect();
+        entries.forEach(entry => entry.animation.kill());
+        masks.forEach(mask => {
         mask.dataset.revealMaskActive = "false";
         delete mask.dataset.revealReady;
-      });
+        });
+      };
     });
     return () => media.revert();
   }, { scope, dependencies: [renderKey], revertOnUpdate: true });

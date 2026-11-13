@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import ReadingText from "@/components/ui/ReadingText";
 
 export default function ProjectShelfCard({ project, number, onOpen }) {
   return <div className="shelf-card-slot"><div data-project-card-reveal className="shelf-card-mask"><div data-project-card-reveal-inner className="shelf-card-inner">
@@ -16,7 +15,7 @@ export default function ProjectShelfCard({ project, number, onOpen }) {
         </div>
         <div className="shelf-card-copy">
           <h3 className="project-card-lift"><span className="shelf-card-reveal">{project.name}</span></h3>
-          <p className="shelf-card-description project-card-lift"><ReadingText as="span" className="shelf-card-reveal">{project.description || project.tagline}</ReadingText></p>
+          <p className="shelf-card-description project-card-lift"><span className="shelf-card-reveal">{project.description || project.tagline}</span></p>
           {project.liveUrl && <a className="shelf-card-action project-card-lift" href={project.liveUrl} target="_blank" rel="noopener noreferrer" draggable={false} aria-label={`Visit ${project.name} live site`}>
             <span className="shelf-card-reveal inline-flex items-center gap-2">View project <ArrowUpRight size={14} aria-hidden="true" /></span>
           </a>}

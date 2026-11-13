@@ -36,20 +36,47 @@ export default function Footer() {
     const media = createMotionMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const footer = footerRef.current;
-      const primary = footer.querySelectorAll("[data-footer-primary]");
+      const primary = footer.querySelectorAll("h2 [data-footer-primary]");
+      const navigation = footer.querySelectorAll("nav [data-footer-primary]");
       const address = footer.querySelectorAll("[data-footer-address-item]");
       const socials = footer.querySelectorAll("[data-footer-social-item]");
-      [...primary, ...address, ...socials].forEach(item => {
-        if (item.closest("h2")) {
-          repeatReveal(gsap.fromTo(item, titleSlideFrom(), titleSlideTo()), item.parentElement);
-          return;
-        }
-        repeatReveal(gsap.from(item, {
-          yPercent: MOTION.line.yPercent,
-          rotateX: item.hasAttribute("data-footer-primary") ? -8 : -6,
-          duration: MOTION.line.duration, ease: MOTION.line.ease,
-        }), item.parentElement);
+      primary.forEach(item => {
+        repeatReveal(gsap.fromTo(item, titleSlideFrom(), titleSlideTo()), item.parentElement);
       });
+      repeatReveal(gsap.fromTo(navigation, {
+        autoAlpha: 1,
+        xPercent: -MOTION.maskedSlidePercent,
+        transformOrigin: "0% 50%",
+      }, {
+        xPercent: 0,
+        duration: MOTION.slide.duration,
+        ease: MOTION.slide.ease,
+        stagger: { each: 0.12, from: "start" },
+      }), footer.querySelector("nav"));
+      repeatReveal(gsap.fromTo(address, {
+        autoAlpha: 1,
+        yPercent: MOTION.line.yPercent,
+        rotateX: -6,
+        transformOrigin: "50% 100%",
+      }, {
+        yPercent: 0,
+        rotateX: 0,
+        duration: MOTION.line.duration,
+        ease: "power4.out",
+        stagger: MOTION.line.stagger,
+      }), footer.querySelector("address"));
+      repeatReveal(gsap.fromTo(socials, {
+        autoAlpha: 1,
+        yPercent: MOTION.line.yPercent,
+        scale: 0.94,
+        transformOrigin: "50% 100%",
+      }, {
+        yPercent: 0,
+        scale: 1,
+        duration: MOTION.line.duration,
+        ease: "power4.out",
+        stagger: MOTION.line.stagger,
+      }), footer.querySelector(".ui-chrome-socials"));
     });
     return () => media.revert();
   }, { scope: footerRef, dependencies: [pathname], revertOnUpdate: true });

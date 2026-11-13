@@ -24,6 +24,7 @@ const serverColumns = () => 1;
 export default function ProjectsList({ projects = latestProjects }) {
   const sectionRef = useRef(null);
   const viewportRef = useRef(null);
+  const offsetRef = useRef(0);
   const activePageRef = useRef(0);
   const drag = useRef(null);
   const suppressClick = useRef(false);
@@ -39,6 +40,14 @@ export default function ProjectsList({ projects = latestProjects }) {
   const [activePage, setActivePage] = useState(0);
   const [selected, setSelected] = useState(null);
   const page = Math.min(activePage, Math.max(0, pages.length - 1));
+  function syncPage() {
+    const viewport = viewportRef.current;
+    const items = [...viewport.querySelectorAll("[data-shelf-page]")];
+    if (!items.length) return;
+    const nearest = items.reduce((best, item, index) => Math.abs(item.offsetLeft - offsetRef.current) < Math.abs(items[best].offsetLeft - offsetRef.current) ? index : best, 0);
+    activePageRef.current = nearest;
+    setActivePage(nearest);
+  }
   useShelfCardReveal(sectionRef, columns + ":" + projects.map(project => project.id).join("|"));
 
   useGSAP(() => {
@@ -52,10 +61,14 @@ export default function ProjectsList({ projects = latestProjects }) {
 
   useGSAP(() => {
     const viewport = viewportRef.current;
-    viewport.scrollLeft = 0;
+    offsetRef.current = 0;
+    gsap.set(viewport.querySelector(".shelf-track"), { x: 0 });
     if (pages.length < 2) return;
     let distance = 0;
-    const measure = () => { distance = Math.max(0, viewport.scrollWidth - viewport.clientWidth); };
+    const measure = () => {
+      const last = viewport.querySelector("[data-shelf-page]:last-child");
+      distance = last ? Math.max(0, last.offsetLeft + last.offsetWidth - viewport.clientWidth) : 0;
+    };
     measure();
     const motion = { progress: 0 };
     const timeline = gsap.timeline({
@@ -69,7 +82,11 @@ export default function ProjectsList({ projects = latestProjects }) {
     });
     timeline.to(motion, {
       progress: 1, duration: 1, ease: "none",
-      onUpdate: () => { viewport.scrollLeft = distance * motion.progress; },
+      onUpdate: () => {
+        offsetRef.current = distance * motion.progress;
+        gsap.set(viewport.querySelector(".shelf-track"), { x: -offsetRef.current });
+        syncPage();
+      },
     }).to({}, { duration: .08 });
     triggerRef.current = timeline.scrollTrigger;
     const frame = requestAnimationFrame(() => ScrollTrigger.refresh());
@@ -83,7 +100,8 @@ export default function ProjectsList({ projects = latestProjects }) {
   function scrollPosition(left) {
     const trigger = triggerRef.current;
     const viewport = viewportRef.current;
-    const max = viewport.scrollWidth - viewport.clientWidth;
+    const last = viewport.querySelector("[data-shelf-page]:last-child");
+    const max = last ? last.offsetLeft + last.offsetWidth - viewport.clientWidth : 0;
     return trigger && max > 0 ? trigger.start + (trigger.end - trigger.start) * Math.max(0, Math.min(1, left / max)) / 1.08 : null;
   }
 
@@ -91,23 +109,20 @@ export default function ProjectsList({ projects = latestProjects }) {
     const target = viewportRef.current.querySelectorAll("[data-shelf-page]")[index];
     if (!target) return;
     const y = scrollPosition(target.offsetLeft);
-    if (y === null) { viewportRef.current.scrollLeft = target.offsetLeft; return; }
+    if (y === null) {
+      offsetRef.current = target.offsetLeft;
+      gsap.set(viewportRef.current.querySelector(".shelf-track"), { x: -offsetRef.current });
+      syncPage();
+      return;
+    }
     navigationRef.current?.kill();
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) window.scrollTo(0, y);
     else navigationRef.current = gsap.to(window, { scrollTo: { y, autoKill: true }, duration: .5, ease: "power3.out", overwrite: "auto" });
   }
-  function syncPage() {
-    const viewport = viewportRef.current;
-    const items = [...viewport.querySelectorAll("[data-shelf-page]")];
-    if (!items.length) return;
-    const nearest = items.reduce((best, item, index) => Math.abs(item.offsetLeft - viewport.scrollLeft) < Math.abs(items[best].offsetLeft - viewport.scrollLeft) ? index : best, 0);
-    activePageRef.current = nearest;
-    setActivePage(nearest);
-  }
   function startDrag(event) {
     if (event.pointerType !== "mouse" || event.button !== 0) return;
     suppressClick.current = false;
-    drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY, left: event.currentTarget.scrollLeft, moved: false };
+    drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY, left: offsetRef.current, moved: false };
   }
   function moveDrag(event) {
     const state = drag.current;
@@ -140,7 +155,7 @@ export default function ProjectsList({ projects = latestProjects }) {
       <h2 id="projects-list-title" className="ui-section-label"><MiniTitleText>Selected work</MiniTitleText></h2>
       <div className="ui-section-body shelf-body">
         <div ref={viewportRef} className="shelf-viewport" tabIndex={0} role="region" aria-roledescription="carousel" aria-label="Project shelf"
-          onScroll={syncPage} onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}
+          onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}
           onLostPointerCapture={() => { drag.current = null; }}
           onClickCapture={event => { if (suppressClick.current && event.detail !== 0) { event.preventDefault(); event.stopPropagation(); } }}
           onKeyDown={event => {

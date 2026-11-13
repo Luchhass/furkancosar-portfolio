@@ -67,7 +67,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         headerProjectsLink,
         headerFullscreenButton,
       ].filter(isVisibleElement);
-      const headerCenterItems = [headerBrand].filter(
+      const headerCenterItems = (pathname === "/" ? [] : [headerBrand]).filter(
         isVisibleElement,
       );
       const headerRightItems = [headerMenuButton].filter(isVisibleElement);
