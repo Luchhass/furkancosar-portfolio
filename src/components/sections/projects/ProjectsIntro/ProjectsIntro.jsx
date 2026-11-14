@@ -1,13 +1,16 @@
+"use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import ReadingText from "@/components/ui/ReadingText";
 import MiniTitleText from "@/components/ui/MiniTitleText";
 import TitleLine from "@/components/ui/TitleLine";
 import RevealCounter from "@/components/ui/RevealCounter/RevealCounter";
 import { projectCount } from "@/data/projects";
 export default function ProjectsIntro() {
+  const localize = useLocalizedContent();
   const countLabel = String(projectCount);
 
   return (
-    <section
+    localize(<section
       data-header-theme="light"
       data-scroll-reveal="sequence"
       className="ui-screen overflow-hidden bg-white ui-section text-black"
@@ -37,6 +40,6 @@ export default function ProjectsIntro() {
           </div>
         </div>
       </div>
-    </section>
+    </section>)
   );
 }

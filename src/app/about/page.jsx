@@ -8,19 +8,7 @@ import CollaborationCTA from "@/components/ui/CollaborationCTA/CollaborationCTA"
 import { createPageMetadata } from "@/lib/seo";
 import Journey from "@/components/sections/about/Journey";
 
-export const metadata = createPageMetadata({
-  title: "Furkan Cosar | About",
-  description:
-    "Learn about Furkan Cosar, also written Furkan Coşar, a frontend developer focused on clean UI, responsive websites, React, Next.js, GSAP and real project experience.",
-  path: "/about",
-  keywords: [
-    "about Furkan Cosar",
-    "about Furkan Coşar",
-    "frontend developer about",
-    "React Next.js GSAP developer",
-    "frontend experience",
-  ],
-});
+export const metadata = createPageMetadata("about");
 
 export default function AboutPage() {
   return (

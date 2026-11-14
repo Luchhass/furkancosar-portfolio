@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import GraphicMark from "@/components/ui/GraphicMark";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION } from "@/lib/motionPresets";
@@ -12,6 +13,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export default function ContactEnvelope({ progress = 0, sending = false }) {
+  const localize = useLocalizedContent();
   const ref = useRef(null);
   useGSAP(() => {
     const media = createMotionMedia();
@@ -34,9 +36,9 @@ export default function ContactEnvelope({ progress = 0, sending = false }) {
       return () => loop.kill();
     }
   }, { scope: ref, dependencies: [progress, sending], revertOnUpdate: true });
-  return <div className="contact-envelope" ref={ref} aria-hidden="true">
+  return localize(<div className="contact-envelope" ref={ref} aria-hidden="true">
     <div className="envelope-orbit" />
     <div className="envelope-object"><div className="envelope-tilt"><div className="envelope-back" /><div className="envelope-letter"><span>YOUR NEXT BIG IDEA.</span><b>Let&apos;s make<br /><em>it happen.</em></b><i /><i /><span className="letter-star"><GraphicMark /></span></div><div className="envelope-front"><span>FURKANCOSAR®</span><b><GraphicMark variant="arrow" /></b></div></div></div>
     <div className="envelope-progress"><i /></div><p>{sending ? "YOUR IDEA IS TAKING FLIGHT" : progress === 1 ? "READY WHEN YOU ARE" : "A GOOD CONVERSATION STARTS HERE"}</p>
-  </div>;
+  </div>);
 }

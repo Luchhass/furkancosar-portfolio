@@ -8,13 +8,17 @@ import gsap from "gsap";
 import { MOTION, detailFrom, detailTo } from "@/lib/motionPresets";
 import TitleLine from "@/components/ui/TitleLine";
 import ReadingText from "@/components/ui/ReadingText";
+import { useLocalizedContent } from "@/lib/localizeContent";
+import { useLanguage } from "@/hooks/useLanguage";
 
-function formatDate(value) {
+function formatDate(value, locale) {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "Recent" : new Intl.DateTimeFormat("en", { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
+  return Number.isNaN(date.getTime()) ? "Recent" : new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
 }
 
 export default function ProjectDetailsModal({ project, projectNumber, origin, onClose }) {
+  const localize = useLocalizedContent();
+  const { locale } = useLanguage();
   const titleId = useId();
   const ref = useRef(null);
   const closeButtonRef = useRef(null);
@@ -72,7 +76,7 @@ export default function ProjectDetailsModal({ project, projectNumber, origin, on
 
   if (!project || typeof document === "undefined") return null;
   const number = projectNumber || String(project.id || "").match(/\d+/)?.[0]?.padStart(2, "0") || "01";
-  return createPortal(<div ref={ref} className="project-modal-fullscreen" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+  return createPortal(localize(<div ref={ref} className="project-modal-fullscreen" role="dialog" aria-modal="true" aria-labelledby={titleId}>
     <div className="project-modal-panel">
       <header className="project-modal-topbar"><span>SELECTED WORK <i>/</i> {number}</span><span className="project-modal-category">{project.category}</span><button ref={closeButtonRef} type="button" onClick={close} aria-label="Close project details"><span>BACK TO PROJECTS</span><X size={22} strokeWidth={1.7} /></button></header>
       <div className="project-modal-layout">
@@ -85,7 +89,7 @@ export default function ProjectDetailsModal({ project, projectNumber, origin, on
           <p className="project-detail-eyebrow" data-project-detail>{project.category} / {project.type}</p>
           <h2 id={titleId}><TitleLine>{project.name}</TitleLine></h2>
           <ReadingText className="project-detail-description">{project.description}</ReadingText>
-          <dl className="project-detail-facts" data-project-detail>{[["Type", project.type], ["Released", formatDate(project.date)], ["Category", project.category], ["Status", project.status]].filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+          <dl className="project-detail-facts" data-project-detail>{[["Type", project.type], ["Released", formatDate(project.date, locale)], ["Category", project.category], ["Status", project.status]].filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
           <div className="project-detail-stack" data-project-detail><p>BUILT WITH</p><div>{project.technologies?.map((technology) => <span key={technology}>{technology}</span>)}</div></div>
           <div className="project-detail-actions" data-project-detail>
             {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noreferrer" className="ui-button ui-button--compact project-detail-primary">Visit live site <ArrowUpRight size={21} /></a>}
@@ -94,5 +98,5 @@ export default function ProjectDetailsModal({ project, projectNumber, origin, on
         </div>
       </div>
     </div>
-  </div>, document.body);
+  </div>), document.body);
 }

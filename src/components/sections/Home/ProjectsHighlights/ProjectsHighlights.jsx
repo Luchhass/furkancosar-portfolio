@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -17,6 +18,7 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 const projects = latestProjects.slice(0, 6);
 
 export default function ProjectsHighlights() {
+  const localize = useLocalizedContent();
   const sectionRef = useRef(null);
   const viewportRef = useRef(null);
   const drag = useRef(null);
@@ -96,7 +98,7 @@ export default function ProjectsHighlights() {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
   }
 
-  return <section ref={sectionRef} data-header-theme="dark" data-scroll-reveal="sequence"
+  return localize(<section ref={sectionRef} data-header-theme="dark" data-scroll-reveal="sequence"
     className="ui-screen ui-fit-panel highlights-scene ui-section bg-[#141414] text-white" aria-labelledby="highlights-title">
     <div className="ui-section-grid">
       <p data-reveal-part="kicker" className="ui-section-label"><MiniTitleText>Projects</MiniTitleText></p>
@@ -115,5 +117,5 @@ export default function ProjectsHighlights() {
       </div>
     </div>
     <ProjectDetailsModal project={selected?.project} projectNumber={selected?.number} origin={selected?.origin} onClose={() => setSelected(null)} />
-  </section>;
+  </section>);
 }

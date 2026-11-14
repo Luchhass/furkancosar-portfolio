@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 
 import { MOTION } from "@/lib/motionPresets";
 import { usePathname, useRouter } from "next/navigation";
@@ -9,11 +10,14 @@ import { contactItems, navigationItems, siteConfig, socialItems } from "@/data/s
 import gsap from "gsap";
 import { Lock, LockOpen } from "lucide-react";
 import Link from "next/link";
+import LanguageToggle from "@/components/layout/LanguageToggle";
+import { basePath, localizedPath, routeLocale } from "@/lib/localizedRoutes";
 import SocialMediaButtons from "../../ui/SocialMediaButtons/SocialMediaButtons";
 
 gsap.registerPlugin(useGSAP);
 
 export default function Header() {
+  const localize = useLocalizedContent();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [headerTheme, setHeaderTheme] = useState("dark");
   const [isHeroFullscreen, setIsHeroFullscreen] = useState(false);
@@ -424,7 +428,7 @@ export default function Header() {
   );
 
   function openMenu() {
-    navigationItems.forEach(item => { if (item.href !== pathname) router.prefetch(item.href); });
+    navigationItems.forEach(item => { const href = localizedPath(item.href, routeLocale(pathname)); if (href !== pathname) router.prefetch(href); });
     setIsMenuOpen(true);
   }
 
@@ -449,6 +453,7 @@ export default function Header() {
   }
 
   function navigateFromMenu(event, href) {
+    href = localizedPath(href, routeLocale(pathname));
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     if (pendingNavigationRef.current) return;
@@ -556,7 +561,7 @@ export default function Header() {
   const FullscreenIcon = isHeroFullscreen ? Lock : LockOpen;
 
   return (
-    <>
+    localize(<>
       <header
         className={`ui-header pointer-events-none fixed top-0 left-0 z-50 grid w-full grid-cols-[48px_minmax(0,1fr)_48px] items-center py-0 transition-[color,opacity] duration-300 md:grid-cols-3 ${headerColorClass}`}
         aria-label="Primary navigation"
@@ -610,7 +615,7 @@ export default function Header() {
           </button>
 
           <div className="hidden md:block">
-            {pathname !== "/projects" && (
+            {basePath(pathname) !== "/projects" && (
               <Link
                 href="/projects"
                 onClick={closeMenuImmediately}
@@ -650,6 +655,7 @@ export default function Header() {
         </div>
 
         <div className="ui-header-cell col-start-3 flex h-11 items-center justify-self-end overflow-hidden">
+          <LanguageToggle />
           <button
             type="button"
             data-hero-intro="menu-button"
@@ -711,7 +717,7 @@ export default function Header() {
           <nav ref={menuNavRef} aria-label="Main menu">
             <ul className="m-0 flex list-none flex-col gap-1 p-0">
               {navigationItems.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = basePath(pathname) === item.href;
 
                 return (
                   <li
@@ -786,6 +792,6 @@ export default function Header() {
           </div>
         </div>
       )}
-    </>
+    </>)
   );
 }

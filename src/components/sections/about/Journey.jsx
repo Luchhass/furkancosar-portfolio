@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import MiniTitleText from "@/components/ui/MiniTitleText";
 import ReadingText from "@/components/ui/ReadingText";
 import { createMotionMedia } from "@/lib/motionMedia";
@@ -25,6 +26,7 @@ const chapters = [
 ];
 
 export default function Journey() {
+  const localize = useLocalizedContent();
   const ref = useRef(null);
   const triggerRef = useRef(null);
   const navigationTweenRef = useRef(null);
@@ -136,7 +138,7 @@ export default function Journey() {
     navigationTweenRef.current = gsap.to(window, { scrollTo: { y: trigger.start + (trigger.end - trigger.start) * progress, autoKill: true }, ...MOTION.scrollTo, overwrite: "auto" });
   }
 
-  return <section ref={ref} className="ui-journey journey-story" style={{ "--journey-chapters": chapters.length }} data-header-theme="dark" aria-labelledby="journey-title">
+  return localize(<section ref={ref} className="ui-journey journey-story" style={{ "--journey-chapters": chapters.length }} data-header-theme="dark" aria-labelledby="journey-title">
     <div className="journey-frame">
       <header className="journey-deck-heading"><h2 id="journey-title" className="ui-section-label"><MiniTitleText>My journey</MiniTitleText></h2></header>
       <div className="journey-slides">{chapters.map((chapter, index) => <article className="journey-slide" key={chapter.label} aria-hidden={enhanced ? active !== index : undefined}>
@@ -147,5 +149,5 @@ export default function Journey() {
         <div className="journey-chapter-links">{chapters.map((chapter, index) => <button type="button" key={chapter.label} aria-label={`Go to chapter ${index + 1}: ${chapter.short}`} aria-current={active === index ? "step" : undefined} onClick={() => selectChapter(index)}><span className={navigationStyles.entry} data-journey-step-enter><span className={`${navigationStyles.body} invisible`} aria-hidden="true"><span className={navigationStyles.number}>0{index + 1}</span><span className={navigationStyles.label}>{chapter.short}</span></span><span className={navigationStyles.track} data-journey-step-track aria-hidden="true">{[0, 1].map(copy => <span className={navigationStyles.body} key={copy}><span className={`${navigationStyles.number} ${active === index ? "gradient-text-flow" : ""}`} data-journey-step-number>0{index + 1}</span><span className={navigationStyles.label}>{chapter.short}</span></span>)}</span></span></button>)}</div>
       </nav>
     </div>
-  </section>;
+  </section>);
 }

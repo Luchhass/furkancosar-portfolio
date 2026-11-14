@@ -1,9 +1,12 @@
+"use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import Hero from "@/components/ui/Hero/Hero";
 import { projectCount } from "@/data/projects";
 
 export default function AboutHero() {
+  const localize = useLocalizedContent();
   return (
-    <Hero
+    localize(<Hero
       titleLines={[
         { text: "THE MIND" },
         { text: "BEHIND" },
@@ -27,6 +30,6 @@ export default function AboutHero() {
         rel: "noreferrer",
         target: "_blank",
       }}
-    />
+    />)
   );
 }

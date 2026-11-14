@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION } from "@/lib/motionPresets";
 import { heroTitleExit, heroDetailExit } from "@/lib/heroScrollExit";
@@ -15,6 +16,8 @@ import GradientActionButton from "@/components/ui/GradientActionButton/GradientA
 import RevealCounter, { playRevealCounters } from "@/components/ui/RevealCounter/RevealCounter";
 import { GeometricPentagonBackground } from "../Backgrounds/GeometricPentagonBackground";
 import ReadingText from "@/components/ui/ReadingText";
+import HeroDetails from "./HeroDetails";
+import { basePath } from "@/lib/localizedRoutes";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -29,7 +32,8 @@ function normalizeCopyLines(copyLines) {
     .filter(Boolean);
 }
 
-export default function Hero({ titleLines, copyLines, stat, action, copyClassName = "" }) {
+export default function Hero({ titleLines, copyLines, stat, action, copyClassName = "", detailVariant }) {
+  const localize = useLocalizedContent();
   const heroRef = useRef(null);
   const pathname = usePathname();
   const heroCopyLines = normalizeCopyLines(copyLines);
@@ -69,7 +73,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         headerProjectsLink,
         headerFullscreenButton,
       ].filter(isVisibleElement);
-      const headerCenterItems = (pathname === "/" ? [] : [headerBrand]).filter(
+      const headerCenterItems = (basePath(pathname) === "/" ? [] : [headerBrand]).filter(
         isVisibleElement,
       );
       const headerRightItems = [headerMenuButton].filter(isVisibleElement);
@@ -138,6 +142,13 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       });
       const contentTimeline = gsap.timeline({ paused: true });
       const auxiliaryTimeline = gsap.timeline({ paused: true });
+
+      const projectPreviews = q("[data-preview-selected]");
+      if (projectPreviews.length) {
+        contentTimeline.fromTo(projectPreviews, { scale: 0 }, {
+          scale: 1, duration: .85, stagger: .09, ease: "back.out(1.25)",
+        }, titleStart);
+      }
 
       if (headerItems.length) {
         timeline.to(
@@ -341,7 +352,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
   );
 
   return (
-    <section
+    localize(<section
       ref={heroRef}
       data-hero-fullscreen-surface
       data-header-theme="dark"
@@ -349,6 +360,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       className="ui-hero portfolio-hero relative isolate grid h-dvh grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] overflow-x-clip bg-black"
     >
       <div data-hero-background className="absolute inset-0 -z-10"><GeometricPentagonBackground /></div>
+      {detailVariant && <HeroDetails variant={detailVariant} />}
       <div className="hero-scroll-cue overflow-hidden" data-hero-exit="cue" aria-hidden="true">
         <div data-hero-cue className="flex items-center gap-3">
           <span>SCROLL TO EXPLORE</span>
@@ -432,6 +444,6 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
           <span className="col-start-2 row-start-2" aria-hidden="true" />
         )}
       </div>
-    </section>
+    </section>)
   );
 }

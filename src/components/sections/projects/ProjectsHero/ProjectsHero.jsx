@@ -1,9 +1,13 @@
+"use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import Hero from "@/components/ui/Hero/Hero";
 import { projectCount } from "@/data/projects";
 
 export default function ProjectsHero() {
+  const localize = useLocalizedContent();
   return (
-    <Hero
+    localize(<Hero
+      detailVariant="projects"
       titleLines={[
         { text: "What I've" },
         { text: "Been" },
@@ -24,6 +28,6 @@ export default function ProjectsHero() {
         id: "projects-hero-contact",
         label: "CONTACT ME",
       }}
-    />
+    />)
   );
 }

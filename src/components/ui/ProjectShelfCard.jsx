@@ -1,9 +1,11 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
 export default function ProjectShelfCard({ project, number, onOpen }) {
-  return <div className="shelf-card-slot"><div data-project-card-reveal className="shelf-card-mask"><div data-project-card-reveal-inner className="shelf-card-inner">
+  const localize = useLocalizedContent();
+  return localize(<div className="shelf-card-slot"><div data-project-card-reveal className="shelf-card-mask"><div data-project-card-reveal-inner className="shelf-card-inner">
     <article className="shelf-card project-card-motion">
       <button type="button" className="shelf-card-open" aria-haspopup="dialog" aria-label={`Open details for ${project.name}`}
         onClick={event => onOpen({ project, number, origin: event.currentTarget.getBoundingClientRect().toJSON() })} />
@@ -22,5 +24,5 @@ export default function ProjectShelfCard({ project, number, onOpen }) {
         </div>
       </div>
     </article>
-  </div></div></div>;
+  </div></div></div>);
 }

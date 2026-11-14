@@ -1,11 +1,13 @@
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, SITE_URL } from "@/lib/seo";
 
 export default function robots() {
   return {
-    rules: {
+    rules: [{
       userAgent: "*",
       allow: "/",
-    },
+      disallow: "/api/",
+    }],
     sitemap: absoluteUrl("/sitemap.xml"),
+    host: new URL(SITE_URL).host,
   };
 }

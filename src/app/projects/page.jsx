@@ -5,22 +5,7 @@ import ProjectsList from "@/components/sections/projects/ProjectsList/ProjectsLi
 import CollaborationCTA from "@/components/ui/CollaborationCTA/CollaborationCTA";
 import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = createPageMetadata({
-  title: "Furkan Cosar | Projects",
-  description:
-    "Browse Furkan Cosar's FURKANCOSAR frontend projects, including responsive websites, dashboards, ecommerce interfaces, landing pages and polished UI builds.",
-  path: "/projects",
-  keywords: [
-    "Furkan Cosar projects",
-    "Furkan Coşar projects",
-    "FURKANCOSAR projects",
-    "frontend projects",
-    "React projects",
-    "Next.js projects",
-    "web design projects",
-    "UI portfolio projects",
-  ],
-});
+export const metadata = createPageMetadata("projects");
 
 export default function ProjectsPage() {
   return (

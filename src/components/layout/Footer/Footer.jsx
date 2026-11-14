@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION, titleSlideFrom, titleSlideTo } from "@/lib/motionPresets";
 import { repeatReveal } from "@/lib/repeatReveal";
@@ -6,6 +7,7 @@ import { repeatReveal } from "@/lib/repeatReveal";
 import { useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { basePath } from "@/lib/localizedRoutes";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -15,6 +17,7 @@ import SocialMediaButtons from "@/components/ui/SocialMediaButtons/SocialMediaBu
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export default function Footer() {
+  const localize = useLocalizedContent();
   const pathname = usePathname();
   const footerRef = useRef(null);
   useGSAP(() => {
@@ -95,7 +98,7 @@ export default function Footer() {
   }
 
   return (
-    <footer
+    localize(<footer
       ref={footerRef}
       data-header-theme="dark"
       className="ui-chrome portfolio-footer grid grid-rows-[minmax(0,1fr)_auto] text-white"
@@ -135,7 +138,7 @@ export default function Footer() {
         <nav aria-label="Footer navigation" className="ui-footer-nav lg:justify-self-end">
           <ul className="m-0 flex list-none flex-col gap-1 p-0 lg:items-end">
             {navigationItems.map(({ href, label }) => {
-              const isActive = pathname === href;
+              const isActive = basePath(pathname) === href;
 
               return (
                 <li key={href} className="w-fit max-w-full overflow-hidden">
@@ -213,6 +216,6 @@ export default function Footer() {
           ))}
         </ul>
       </div>
-    </footer>
+    </footer>)
   );
 }

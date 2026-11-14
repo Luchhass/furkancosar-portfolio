@@ -1,8 +1,11 @@
+"use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import Hero from "@/components/ui/Hero/Hero";
 
 export default function ContactHero() {
+  const localize = useLocalizedContent();
   return (
-    <Hero
+    localize(<Hero
       titleLines={[
         { text: "Let's" },
         { text: "Shape Your" },
@@ -13,6 +16,6 @@ export default function ContactHero() {
         "turn it into a clean, responsive and polished frontend experience.",
       ]}
       copyClassName="justify-self-center"
-    />
+    />)
   );
 }

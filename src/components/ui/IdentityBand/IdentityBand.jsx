@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { createMotionMedia } from "@/lib/motionMedia";
 
 import { useLayoutEffect, useRef } from "react";
@@ -12,6 +13,7 @@ import { observeReveal, repeatReveal } from "@/lib/repeatReveal";
 gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger);
 
 export default function IdentityBand() {
+  const localize = useLocalizedContent();
   const titleRef = useRef(null);
   const textRef = useRef(null);
   useGSAP(() => {
@@ -155,7 +157,7 @@ export default function IdentityBand() {
   }, []);
 
   return (
-    <section
+    localize(<section
       data-header-theme="light"
       className="ui-identity relative overflow-hidden border-y border-black/10 bg-white py-6 text-black md:py-8 lg:py-12"
       style={{ containerType: "inline-size" }}
@@ -177,6 +179,6 @@ export default function IdentityBand() {
           </span></span>
         </h2>
       </div>
-    </section>
+    </section>)
   );
 }

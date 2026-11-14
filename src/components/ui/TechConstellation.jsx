@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION } from "@/lib/motionPresets";
 import { repeatReveal, loopWhileVisible } from "@/lib/repeatReveal";
@@ -11,6 +12,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export default function TechConstellation({ items = [] }) {
+  const localize = useLocalizedContent();
   const ref = useRef(null);
   useGSAP(() => {
     const media = createMotionMedia();
@@ -28,5 +30,5 @@ export default function TechConstellation({ items = [] }) {
     });
     return () => media.revert();
   }, { scope: ref, dependencies: [items], revertOnUpdate: true });
-  return <div ref={ref} className="tech-constellation" role="list" aria-label="Tools in this group"><span className="sculpture-caption">A TOOLKIT. NOT A LIMIT.</span><div className="constellation-system"><div className="constellation-ring" /><div className="constellation-ring inner" />{items.map((item, i, all) => <span className="constellation-node" role="listitem" key={item.name} title={item.name} style={{ left: `${(50 + Math.cos(i / all.length * Math.PI * 2) * 39).toFixed(3)}%`, top: `${(50 + Math.sin(i / all.length * Math.PI * 2) * 39).toFixed(3)}%` }}><Image src={item.logo} alt="" width={30} height={30} /><span className="constellation-name">{item.name}</span></span>)}</div><span className="constellation-core gradient-text-flow">&lt;/&gt;</span></div>;
+  return localize(<div ref={ref} className="tech-constellation" role="list" aria-label="Tools in this group"><span className="sculpture-caption">A TOOLKIT. NOT A LIMIT.</span><div className="constellation-system"><div className="constellation-ring" /><div className="constellation-ring inner" />{items.map((item, i, all) => <span className="constellation-node" role="listitem" key={item.name} title={item.name} style={{ left: `${(50 + Math.cos(i / all.length * Math.PI * 2) * 39).toFixed(3)}%`, top: `${(50 + Math.sin(i / all.length * Math.PI * 2) * 39).toFixed(3)}%` }}><Image src={item.logo} alt="" width={30} height={30} /><span className="constellation-name">{item.name}</span></span>)}</div><span className="constellation-core gradient-text-flow">&lt;/&gt;</span></div>);
 }

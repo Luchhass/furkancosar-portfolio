@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { MOTION } from "@/lib/motionPresets";
 
 import { useEffect, useRef, useState } from "react";
@@ -11,6 +12,7 @@ import { usePathname } from "next/navigation";
 gsap.registerPlugin(useGSAP, ScrollToPlugin, ScrollTrigger);
 
 export default function BackToTop() {
+  const localize = useLocalizedContent();
   const [isVisible, setIsVisible] = useState(false);
   const isVisibleRef = useRef(false);
   const ringRef = useRef(null);
@@ -56,7 +58,7 @@ export default function BackToTop() {
   }
 
   return (
-    <button
+    localize(<button
       type="button"
       data-back-to-top
       aria-label="Back to top"
@@ -77,6 +79,6 @@ export default function BackToTop() {
       <span className="absolute -bottom-5 text-[10px] leading-none font-black tracking-[0.08em] whitespace-nowrap uppercase opacity-0 transition-[bottom,opacity] duration-300 group-hover:bottom-5 group-hover:opacity-100 group-focus-visible:bottom-5 group-focus-visible:opacity-100">
         BACK TO TOP
       </span>
-    </button>
+    </button>)
   );
 }

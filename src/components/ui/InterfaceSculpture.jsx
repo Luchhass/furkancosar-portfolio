@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import GraphicMark from "@/components/ui/GraphicMark";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION } from "@/lib/motionPresets";
@@ -13,6 +14,7 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const labels = ["STRUCTURE", "DETAIL", "FLOW"];
 export default function InterfaceSculpture({ active = 0 }) {
+  const localize = useLocalizedContent();
   const ref = useRef(null);
   useGSAP(() => {
     const media = createMotionMedia();
@@ -32,7 +34,7 @@ export default function InterfaceSculpture({ active = 0 }) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     gsap.to(ref.current.querySelectorAll(".interface-layer"), { z: (i) => i === active ? 55 : 0, x: (i) => i === active ? 12 : 0, duration: reduce ? 0 : MOTION.detail.duration, ease: MOTION.ease, overwrite: "auto" });
   }, { scope: ref, dependencies: [active] });
-  return <div ref={ref} className="interface-sculpture" aria-hidden="true">
+  return localize(<div ref={ref} className="interface-sculpture" aria-hidden="true">
     <span className="sculpture-caption">DESIGN WITH INTENTION. BUILD WITH FEELING.</span>
     <div className="interface-stack">{labels.map((label, i) => <div key={label} className={`interface-layer interface-layer-${i}`} data-active={i === active}>
       <div className="interface-toolbar"><span /><span /><span /><b>0{i + 1} / {label}</b></div>
@@ -40,5 +42,5 @@ export default function InterfaceSculpture({ active = 0 }) {
     </div>)}</div>
     <span className="interface-spark spark-one"><GraphicMark /></span><span className="interface-spark spark-two"><GraphicMark variant="plus" /></span>
     <div className="sculpture-bottom"><span>IDEA</span><i /><span>INTERFACE</span></div>
-  </div>;
+  </div>);
 }

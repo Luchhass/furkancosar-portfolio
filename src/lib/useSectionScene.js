@@ -2,6 +2,7 @@
 import { createMotionMedia } from "@/lib/motionMedia";
 
 import { useGSAP } from "@gsap/react";
+import { useLanguage } from "@/hooks/useLanguage";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MOTION, detailFrom, detailTo, titleSlideFrom, titleSlideTo } from "./motionPresets";
@@ -10,6 +11,7 @@ import { repeatReveal } from "./repeatReveal";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export default function useSectionScene(scope) {
+  const { locale } = useLanguage();
   useGSAP(() => {
     const media = createMotionMedia();
     media.add({ motion: "(prefers-reduced-motion: no-preference)", desktop: "(min-width: 1024px) and (pointer: fine)" }, ({ conditions }) => {
@@ -39,5 +41,5 @@ export default function useSectionScene(scope) {
       return () => cleanups.forEach((fn) => fn());
     });
     return () => media.revert();
-  }, { scope });
+  }, { scope, dependencies: [locale], revertOnUpdate: true });
 }

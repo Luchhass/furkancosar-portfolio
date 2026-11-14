@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import GraphicMark from "@/components/ui/GraphicMark";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION, titleSlideFrom, titleSlideTo } from "@/lib/motionPresets";
@@ -11,6 +12,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export default function MarqueeText({ text, className = "", duration = "44s", repeat = 4 }) {
+  const localize = useLocalizedContent();
   const ref = useRef(null);
   useGSAP(() => {
     const media = createMotionMedia();
@@ -26,7 +28,7 @@ export default function MarqueeText({ text, className = "", duration = "44s", re
     });
     return () => media.revert();
   }, { scope: ref, dependencies: [text, duration], revertOnUpdate: true });
-  return <section ref={ref} className={`ui-marquee kinetic-band gradient-bg-flow ${className}`} data-header-theme="dark" aria-label={text}>
+  return localize(<section ref={ref} className={`ui-marquee kinetic-band gradient-bg-flow ${className}`} data-header-theme="dark" aria-label={text}>
     <div className="kinetic-track" aria-hidden="true">{[0, 1].map((group) => <div className="kinetic-group" key={group}>{Array.from({ length: repeat }, (_, i) => <div className="kinetic-item" key={i}><span className="kinetic-word-mask"><span className="kinetic-word">{text}</span></span><span className="kinetic-star"><GraphicMark /></span></div>)}</div>)}</div>
-  </section>;
+  </section>);
 }

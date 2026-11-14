@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
+import { useLanguage } from "@/hooks/useLanguage";
+import { basePath } from "@/lib/localizedRoutes";
 
 const WELCOME = "WELCOME!";
 const BRAND = "FURKANCOSAR";
@@ -48,6 +50,7 @@ function Word({
   letterSpacing = "-0.04em",
   children,
 }) {
+  const { t } = useLanguage();
   return (
     <span
       ref={wordRef}
@@ -71,7 +74,7 @@ function Word({
         ref={lettersRef}
         style={{ display: "inline-flex", alignItems: "flex-start" }}
       >
-        {text.split("").map((char, i) => (
+        {t(text).split("").map((char, i) => (
           <Letter key={i} char={char} index={i} dataKey={dataKey} />
         ))}
       </span>
@@ -96,7 +99,7 @@ export default function PageIntroAnimation() {
 }
 
 function PageIntroForRoute({ pathname, routeReady, origin }) {
-  const [mounted, setMounted] = useState(true);
+  const [mounted, setMounted] = useState(() => typeof window === "undefined" || window.__pageIntroDoneForPath !== pathname);
   const [entryOrigin] = useState(origin);
   const finish = useCallback(() => setMounted(false), []);
 
@@ -151,7 +154,7 @@ function PageIntroStage({ pathname, routeReady, origin, onFinished }) {
     tlRef.current?.kill();
     tlRef.current = null;
 
-    const isHome = pathname === "/";
+    const isHome = basePath(pathname) === "/";
     if (origin) gsap.set(overlay, { clipPath: `circle(0px at ${origin.x}px ${origin.y}px)` });
     const headerBrand = document.querySelector(HEADER_BRAND_SELECTOR);
 

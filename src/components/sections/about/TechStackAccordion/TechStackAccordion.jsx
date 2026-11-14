@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
@@ -74,6 +75,7 @@ const labels = ["Foundation", "Interface", "Workflow", "Collaboration"];
 const phase = (progress, start, end) => gsap.utils.clamp(0, 1, (progress - start) / (end - start));
 
 export default function TechStackAccordion() {
+  const localize = useLocalizedContent();
   const root = useRef(null);
 
   useGSAP(() => {
@@ -146,9 +148,9 @@ export default function TechStackAccordion() {
       };
     });
     return () => media.revert();
-  }, { scope: root });
+  }, { scope: root, dependencies: [localize], revertOnUpdate: true });
 
-  return <section ref={root} className={styles.section} data-header-theme="light" aria-labelledby="toolkit-heading">
+  return localize(<section ref={root} className={styles.section} data-header-theme="light" aria-labelledby="toolkit-heading">
     <div data-toolkit-frame className={styles.frame}>
       <div data-toolkit-intro className={`ui-section ${styles.intro}`}>
         <div className={styles.center}>
@@ -174,5 +176,5 @@ export default function TechStackAccordion() {
         {techGroups.flatMap(group => group.items).map(tool => <li key={tool.name}>{tool.name}</li>)}
       </ul>
     </div>
-  </section>;
+  </section>);
 }

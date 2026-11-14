@@ -1,9 +1,12 @@
+"use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import Hero from "@/components/ui/Hero/Hero";
 import { projectCount } from "@/data/projects";
 
 export default function HomeHero() {
+  const localize = useLocalizedContent();
   return (
-    <Hero
+    localize(<Hero
       titleLines={[
         { text: "CREATIVE" },
         { text: "FRONTEND" },
@@ -24,6 +27,6 @@ export default function HomeHero() {
         id: "home-hero-contact",
         label: "CONTACT ME",
       }}
-    />
+    />)
   );
 }

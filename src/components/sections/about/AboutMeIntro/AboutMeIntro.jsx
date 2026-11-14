@@ -1,15 +1,18 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import ReadingText from "@/components/ui/ReadingText";
 import MiniTitleText from "@/components/ui/MiniTitleText";
 import TitleLine from "@/components/ui/TitleLine";
 
 function Highlight({ children }) {
-  return <span data-about-highlight className="gradient-text-flow relative inline-block">{children}</span>;
+  const localize = useLocalizedContent();
+  return localize(<span data-about-highlight className="gradient-text-flow relative inline-block">{children}</span>);
 }
 
 export default function AboutMeIntro() {
+  const localize = useLocalizedContent();
   return (
-    <section data-header-theme="light" data-scroll-reveal="sequence" className="ui-screen ui-screen-scroll about-now relative overflow-hidden bg-white ui-section text-black" aria-labelledby="about-intro-title">
+    localize(<section data-header-theme="light" data-scroll-reveal="sequence" className="ui-screen ui-screen-scroll about-now relative overflow-hidden bg-white ui-section text-black" aria-labelledby="about-intro-title">
       <div className="ui-section-grid">
         <p data-reveal-part="kicker" className="ui-section-label text-black/55"><MiniTitleText>NOW</MiniTitleText></p>
         <div className="ui-section-body ui-section-stack">
@@ -20,6 +23,6 @@ export default function AboutMeIntro() {
         </div>
       </div>
       <span className="about-curious-badge" data-reveal-order="4" aria-hidden="true"><TitleLine fromRight staggerChildren={.12} className="text-right"><span className="block">Stay</span><span className="block">curious</span></TitleLine></span>
-    </section>
+    </section>)
   );
 }

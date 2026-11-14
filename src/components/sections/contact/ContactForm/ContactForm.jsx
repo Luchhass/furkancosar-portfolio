@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import MiniTitleText from "@/components/ui/MiniTitleText";
 import TitleLine from "@/components/ui/TitleLine";
 import { useEffect, useRef, useState } from "react";
@@ -21,9 +22,10 @@ const contactNotes = [
 gsap.registerPlugin(useGSAP);
 
 function RevealField({ className, children }) {
-  return <label className={`${className} overflow-hidden`}>
+  const localize = useLocalizedContent();
+  return localize(<label className={`${className} overflow-hidden`}>
     <span data-contact-field-reveal className="grid gap-2.5">{children}</span>
-  </label>;
+  </label>);
 }
 
 function updateActionFillOrigin(event) {
@@ -42,6 +44,7 @@ function updateActionFillOrigin(event) {
 }
 
 export default function ContactForm() {
+  const localize = useLocalizedContent();
   const notesRef = useRef(null);
   const sectionRef = useRef(null);
   const submitButtonRef = useRef(null);
@@ -172,7 +175,7 @@ export default function ContactForm() {
   }
 
   return (
-    <section
+    localize(<section
       data-header-theme="light"
       data-scroll-reveal="sequence"
       ref={sectionRef}
@@ -196,8 +199,8 @@ export default function ContactForm() {
               data-reveal-part="title"
               className="ui-section-title"
             >
-              <TitleLine>BUILD</TitleLine>
-              <TitleLine className="gradient-text-flow">NOW</TitleLine>
+              <TitleLine>contact.build</TitleLine>
+              <TitleLine className="gradient-text-flow">contact.now</TitleLine>
             </h2>
 
             <div className="contact-description">
@@ -363,7 +366,7 @@ export default function ContactForm() {
             <span className="contact-success-check" aria-hidden="true">
               <svg viewBox="0 0 48 48" fill="none"><path d="m13 25 8 8 15-17" /></svg>
             </span>
-            <p className="mt-7 mb-0 text-[clamp(28px,5vw,72px)] leading-none font-black tracking-[-0.05em] uppercase">Mesajınız gönderildi</p>
+            <p className="mt-7 mb-0 text-[clamp(28px,5vw,72px)] leading-none font-black tracking-[-0.05em] uppercase">Message sent</p>
           </div>
         </div>
       ) : null}
@@ -431,6 +434,6 @@ export default function ContactForm() {
           </div>
         </div>
       ) : null}
-    </section>
+    </section>)
   );
 }

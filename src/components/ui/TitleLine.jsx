@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -9,6 +10,7 @@ import { titleSlideFrom, titleSlideTo } from "@/lib/motionPresets";
 gsap.registerPlugin(useGSAP);
 
 export default function TitleLine({ children, className = "", fromRight = false, staggerChildren = 0, ...attributes }) {
+  const localize = useLocalizedContent();
   const ref = useRef(null);
   useGSAP(() => {
     const media = createMotionMedia();
@@ -18,6 +20,6 @@ export default function TitleLine({ children, className = "", fromRight = false,
       repeatReveal(gsap.fromTo(targets, titleSlideFrom(fromRight), { ...titleSlideTo(), stagger: staggerChildren }), ref.current);
     });
     return () => media.revert();
-  }, { scope: ref, dependencies: [fromRight, staggerChildren], revertOnUpdate: true });
-  return <span ref={ref} className="title-reveal-mask"><span data-title-reveal {...attributes} className={className}>{children}</span></span>;
+  }, { scope: ref, dependencies: [fromRight, staggerChildren, localize], revertOnUpdate: true });
+  return localize(<span ref={ref} className="title-reveal-mask"><span data-title-reveal {...attributes} className={className}>{children}</span></span>);
 }

@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -11,6 +12,7 @@ import { sequenceReveal } from "@/lib/revealSequence";
 gsap.registerPlugin(useGSAP, SplitText);
 
 export default function ReadingText({ as: Tag = "p", children, active = true, waitForIntro = false, ...attributes }) {
+  const localize = useLocalizedContent();
   const ref = useRef(null);
   useGSAP(() => {
     if (!active) return;
@@ -76,5 +78,5 @@ export default function ReadingText({ as: Tag = "p", children, active = true, wa
     });
     return () => media.revert();
   }, { scope: ref, dependencies: [active, waitForIntro, children], revertOnUpdate: true });
-  return <Tag ref={ref} data-reading-reveal {...attributes}>{children}</Tag>;
+  return localize(<Tag ref={ref} data-reading-reveal {...attributes}>{children}</Tag>);
 }

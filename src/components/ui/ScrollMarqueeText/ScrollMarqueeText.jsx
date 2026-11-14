@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import GraphicMark from "@/components/ui/GraphicMark";
 import { MOTION } from "@/lib/motionPresets";
 import { createMotionMedia } from "@/lib/motionMedia";
@@ -10,6 +11,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export default function ScrollMarqueeText({ text }) {
+  const localize = useLocalizedContent();
   const ref = useRef(null);
   useGSAP(() => {
     const media = createMotionMedia();
@@ -21,5 +23,5 @@ export default function ScrollMarqueeText({ text }) {
     });
     return () => media.revert();
   }, { scope: ref });
-  return <section ref={ref} className="ui-marquee outline-band" data-header-theme="light" aria-label={text}><div className="outline-track" aria-hidden="true">{[0, 1, 2, 3].map((i) => <div key={i}><span className="outline-word">{text}</span><span className="outline-star"><span><GraphicMark variant="arrow" /></span></span></div>)}</div></section>;
+  return localize(<section ref={ref} className="ui-marquee outline-band" data-header-theme="light" aria-label={text}><div className="outline-track" aria-hidden="true">{[0, 1, 2, 3].map((i) => <div key={i}><span className="outline-word">{text}</span><span className="outline-star"><span><GraphicMark variant="arrow" /></span></span></div>)}</div></section>);
 }

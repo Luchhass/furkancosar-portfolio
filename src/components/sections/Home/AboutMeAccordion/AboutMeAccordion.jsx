@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 import { MOTION } from "@/lib/motionPresets";
 import { useRef, useState } from "react";
 import { Code2, Sparkles, Workflow } from "lucide-react";
@@ -35,6 +36,7 @@ const accordionItems = [
 ];
 
 export default function AboutMeAccordion() {
+  const localize = useLocalizedContent();
   const [openId, setOpenId] = useState(accordionItems[0].id);
   const accordionRef = useRef(null);
   useSectionScene(accordionRef, "accordion");
@@ -53,7 +55,7 @@ export default function AboutMeAccordion() {
   }
 
   return (
-    <section
+    localize(<section
       ref={accordionRef}
       data-header-theme="light"
       data-scroll-reveal="sequence"
@@ -165,6 +167,6 @@ export default function AboutMeAccordion() {
       </div>
       </div>
       </div>
-    </section>
+    </section>)
   );
 }

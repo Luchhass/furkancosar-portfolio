@@ -1,4 +1,5 @@
 "use client";
+import { useLocalizedContent } from "@/lib/localizeContent";
 
 import { useRef } from "react";
 import gsap from "gsap";
@@ -16,6 +17,7 @@ export default function GradientActionButton({
   target,
   showDot = true,
 }) {
+  const localize = useLocalizedContent();
   const ref = useRef(null);
   const { contextSafe } = useGSAP({ scope: ref });
   const updateFillOrigin = contextSafe((event) => {
@@ -37,7 +39,7 @@ export default function GradientActionButton({
   });
 
   return (
-    <a
+    localize(<a
       ref={ref}
       id={id}
       href={href}
@@ -66,6 +68,6 @@ export default function GradientActionButton({
       />}
 
       <span className="button-label-window relative z-10"><span className="button-label-track"><span>{label}</span><span aria-hidden="true">{label}</span></span></span>
-    </a>
+    </a>)
   );
 }

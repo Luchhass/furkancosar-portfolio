@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import { baseKeywords, siteConfig } from "@/lib/seo";
+import { siteConfig, createPageMetadata } from "@/lib/seo";
 import "./globals.css";
 import "lenis/dist/lenis.css";
 import "./motion.css";
@@ -13,6 +13,7 @@ import BackToTop from "@/components/ui/BackToTop/BackToTop";
 import SeoStructuredData from "@/components/layout/SeoStructuredData/SeoStructuredData";
 import GoogleAnalytics from "@/components/layout/GoogleAnalytics/GoogleAnalytics";
 import MotionExperience from "@/components/layout/MotionExperience";
+import RouteSeoSync from "@/components/layout/RouteSeoSync";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,56 +27,12 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: {
-    default: siteConfig.title,
-    template: "%s",
-  },
-  description: siteConfig.description,
   applicationName: siteConfig.name,
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.creator,
   publisher: siteConfig.name,
-  keywords: baseKeywords,
   category: "portfolio",
   classification: "Frontend Developer Portfolio",
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: siteConfig.title,
-    description: siteConfig.description,
-    url: "/",
-    siteName: siteConfig.name,
-    locale: "en_US",
-    type: "website",
-    images: [
-      {
-        url: siteConfig.ogImage,
-        width: 1200,
-        height: 630,
-        type: "image/png",
-        alt: "Furkan Cosar frontend developer portfolio preview",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.title,
-    description: siteConfig.description,
-    creator: "@luchhass",
-    images: [siteConfig.ogImage],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
   formatDetection: {
     email: false,
     address: false,
@@ -108,6 +65,7 @@ export const metadata = {
     title: siteConfig.brand,
     statusBarStyle: "black-translucent",
   },
+  ...createPageMetadata("home"),
 };
 
 export const viewport = {
@@ -133,6 +91,7 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
       >
         <SeoStructuredData />
+        <RouteSeoSync />
         <GoogleAnalytics />
         <PageIntroPrepaintMask />
         <PageIntroAnimation />
