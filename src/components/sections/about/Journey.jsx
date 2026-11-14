@@ -4,6 +4,7 @@ import ReadingText from "@/components/ui/ReadingText";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION, detailFrom, detailTo, titleSlideFrom, titleSlideTo } from "@/lib/motionPresets";
 import { observeReveal, repeatReveal, reverseReveal } from "@/lib/repeatReveal";
+import { sequenceReveal } from "@/lib/revealSequence";
 
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
@@ -43,22 +44,25 @@ export default function Journey() {
       gsap.set(panels[0], { autoAlpha: 1 });
       const titleEntrances = panels.map(panel => gsap.fromTo(panel.querySelectorAll(".journey-line"),
         titleSlideFrom(), { ...titleSlideTo(), paused: true }));
+      const titleSequences = titleEntrances.map((animation, index) => sequenceReveal(animation, panels[index], { stage: 2 }));
       const stopObservingTitles = observeReveal(root,
-        () => titleEntrances[current].timeScale(1).restart(true),
-        () => titleEntrances.forEach(reverseReveal));
+        () => titleSequences[current].enter(),
+        () => { titleSequences.forEach(sequence => sequence.exit()); titleEntrances.forEach(reverseReveal); });
 
       function show(index) {
         if (index === current) return;
         const previous = panels[current];
         const next = panels[index];
         const direction = index > current ? 1 : -1;
+        titleSequences[current].exit();
+        reverseReveal(titleEntrances[current]);
         transition?.kill();
         gsap.set(panels.filter((panel) => panel !== previous), { autoAlpha: 0 });
         transition = gsap.timeline({ defaults: { ease: "power3.out" } })
           .to(previous, { autoAlpha: 0, y: -direction * 18, duration: 0.18 })
           .set(next, { autoAlpha: 1, y: 0 })
           .call(() => {
-            titleEntrances[index].timeScale(1).restart(true);
+            titleSequences[index].enter();
             next.querySelector("[data-reading-reveal]")?.dispatchEvent(new Event("reading-reveal:play"));
           });
         current = index;
@@ -83,6 +87,7 @@ export default function Journey() {
       return () => {
         transition?.revert();
         stopObservingTitles();
+        titleSequences.forEach(sequence => sequence.dispose());
         titleEntrances.forEach(animation => animation.kill());
         navigationTweenRef.current?.kill();
         gsap.set(root.querySelectorAll(".journey-slide, .journey-line, .journey-slide-index, .journey-slide-label, .journey-slide-copy"), { clearProps: "transform,opacity,visibility" });

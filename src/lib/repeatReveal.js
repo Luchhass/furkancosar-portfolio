@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import { MOTION } from "./motionPresets";
+import { sequenceReveal } from "./revealSequence";
 
 // Observe stationary layout anchors, never the transformed reveal target.
 // One observer serves cards, headings, details and decorative entrances.
@@ -10,10 +11,11 @@ let observer;
 export function repeatReveal(animation, anchor) {
   if (!anchor) return animation;
   animation.delay(0).pause(0);
+  const sequence = sequenceReveal(animation, anchor);
   const release = observeReveal(anchor,
-    () => animation.timeScale(1).restart(true),
-    () => reverseReveal(animation));
-  gsap.context()?.add(() => release);
+    () => sequence.enter(),
+    () => { sequence.exit(); reverseReveal(animation); });
+  gsap.context()?.add(() => () => { release(); sequence.dispose(); });
   return animation;
 }
 

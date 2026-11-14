@@ -3,6 +3,7 @@ import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION } from "@/lib/motionPresets";
 import { bindTilt } from "@/lib/pointerMotion";
 import { observeReveal, reverseReveal } from "@/lib/repeatReveal";
+import { sequenceReveal } from "@/lib/revealSequence";
 
 import { useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -135,6 +136,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         paused: true,
       });
       const contentTimeline = gsap.timeline({ paused: true });
+      const auxiliaryTimeline = gsap.timeline({ paused: true });
 
       if (headerItems.length) {
         timeline.to(
@@ -151,9 +153,9 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       }
 
       if (statItems.length) {
-        contentTimeline.call(
+        auxiliaryTimeline.call(
           () => {
-            if (!contentTimeline.reversed()) playRevealCounters(heroRef.current);
+            if (!auxiliaryTimeline.reversed()) playRevealCounters(heroRef.current);
           },
           [],
           statStart + 0.06,
@@ -161,7 +163,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       }
 
       if (auxiliaryItems.length) {
-        contentTimeline.to(
+        auxiliaryTimeline.to(
           auxiliaryItems,
           {
             yPercent: 0,
@@ -190,7 +192,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       });
 
       if (buttonFillItems.length) {
-        contentTimeline.to(
+        auxiliaryTimeline.to(
           buttonFillItems,
           {
             opacity: 0,
@@ -204,14 +206,19 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       }
 
       let heroVisible = false;
+      const canPlay = () => window.__pageIntroDoneForPath === pathname;
+      const titleSequence = sequenceReveal(contentTimeline, heroRef.current, { stage: 2, canPlay });
+      const auxiliarySequence = sequenceReveal(auxiliaryTimeline, heroRef.current, { stage: 4, canPlay });
       const playContent = () => {
-        if (heroVisible && window.__pageIntroDoneForPath === pathname) contentTimeline.timeScale(1).restart(true);
+        if (heroVisible) { titleSequence.refresh(); auxiliarySequence.refresh(); }
       };
       const stopObserving = observeReveal(heroRef.current,
-        () => { heroVisible = true; playContent(); },
+        () => { heroVisible = true; titleSequence.enter(); auxiliarySequence.enter(); },
         () => {
           heroVisible = false;
+          titleSequence.exit(); auxiliarySequence.exit();
           reverseReveal(contentTimeline);
+          reverseReveal(auxiliaryTimeline);
           heroRef.current.querySelectorAll("[data-reveal-counter]").forEach(counter => counter.dispatchEvent(new CustomEvent("reveal-counter:reverse")));
         });
       const playHeroIntro = () => {
@@ -240,7 +247,9 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
         );
         timeline.kill();
         stopObserving();
+        titleSequence.dispose(); auxiliarySequence.dispose();
         contentTimeline.kill();
+        auxiliaryTimeline.kill();
       };
     },
     { dependencies: [pathname], scope: heroRef, revertOnUpdate: true },
@@ -391,7 +400,7 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
 
               <p className="m-0 text-[13px] leading-tight font-medium text-white/90 md:text-sm lg:text-sm">
                 {stat.labelLines.map((line) => (
-                  <span key={line} className="block">
+                  <span key={line} className={line === "with modern interfaces" ? "hidden md:block" : "block"}>
                     {line}
                   </span>
                 ))}

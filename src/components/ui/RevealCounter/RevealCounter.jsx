@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import gsap from "gsap";
 import { MOTION } from "@/lib/motionPresets";
 import { observeReveal, reverseReveal } from "@/lib/repeatReveal";
+import { sequenceReveal } from "@/lib/revealSequence";
 
 export const REVEAL_COUNTER_EVENT = "reveal-counter:play";
 
@@ -206,13 +207,19 @@ export default function RevealCounter({
     else setZero();
     const reverse = () => { if (tweenRef.current) reverseReveal(tweenRef.current); };
     const isHero = Boolean(root.closest(".portfolio-hero"));
-    const stopObserving = !isHero && !prefersReducedMotion.matches ? observeReveal(root, play, reverse) : () => {};
+    const gate = !isHero && !prefersReducedMotion.matches ? gsap.timeline({ paused: true }).call(play) : null;
+    const sequence = gate ? sequenceReveal(gate, root, { stage: 4 }) : null;
+    const stopObserving = sequence ? observeReveal(root,
+      () => sequence.enter(),
+      () => { sequence.exit(); gate.pause(0, true); reverse(); }) : () => {};
     if (isHero) root.addEventListener(REVEAL_COUNTER_EVENT, play);
     root.addEventListener("reveal-counter:reverse", reverse);
 
     return () => {
       root.removeEventListener(REVEAL_COUNTER_EVENT, play);
       stopObserving();
+      sequence?.dispose();
+      gate?.kill();
       root.removeEventListener("reveal-counter:reverse", reverse);
       tweenRef.current?.kill();
       gsap.killTweensOf(tracks);

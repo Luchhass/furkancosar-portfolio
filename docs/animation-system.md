@@ -4,6 +4,8 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 
 ## Ortak kaynaklar
 
+- Sıralı girişler özgün hızında oynatılır. Grubun bütün tween'leri görsel olarak yerleştiğinde (eased ratio ≥ 0.995) sonraki grup başlar; son easing kuyruğu kendi süresinde tamamlanır. Ek delay yoktur; süre, hareket, ease ve stagger korunur.
+- `src/lib/revealSequence.js`: bütün bölümlerde mevcut reveal'ları mini başlık → ana başlık → açıklama → içerik/aksiyon sırasına bağlar. Aynı gruptaki animasyonlar beraber çalışır; önceki grup tamamen bittiğinde `onComplete` üzerinden sonraki grup hemen başlar. Gruplar örtüşmez ve araya ek bekleme konmaz. Contact formu dört adım grubunun tamamlanmasının hemen ardından açılır. Gizli veya ekran dışındaki gruplar sırayı bekletmez; her bölüm bağımsızdır. Hareket/süre/ease/stagger değişmez. Hero header ve scroll/parallax timeline'ları içerik sıralamasından bağımsız kalır.
 - `src/lib/motionPresets.js`: ailelerin kuvvet, mesafe, süre, ease, stagger ve scrub değerleri.
 - `src/lib/repeatReveal.js`: sabit kapsayıcıları izleyen tek IntersectionObserver. İlk görünürlükte beklemeden baştan giriş; tamamen ekran dışında en fazla 0,26 sn içinde reverse; hızlı dönüşte dahi yeniden baştan giriş. `rootMargin: 0px`, `threshold: 0`; ekran dışında bekleme, giriş yüzdesi veya kart batch gecikmesi yok. Son kullanıcı ayrılınca gözlemci kaldırılır.
 - `src/lib/pointerMotion.js`: magnet ve üç boyutlu eğim hesapları, ortak pointer easing'i ve temizleme davranışı.

@@ -6,6 +6,7 @@ import { SplitText } from "gsap/SplitText";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION } from "@/lib/motionPresets";
 import { observeReveal, reverseReveal } from "@/lib/repeatReveal";
+import { sequenceReveal } from "@/lib/revealSequence";
 
 gsap.registerPlugin(useGSAP, SplitText);
 
@@ -18,12 +19,14 @@ export default function ReadingText({ as: Tag = "p", children, active = true, wa
     media.add("(prefers-reduced-motion: no-preference)", () => {
       let release;
       let animation;
+      let sequence;
       let visible = false;
       const play = () => {
         if (visible && (!waitForIntro || window.__pageIntroDoneForPath === location.pathname)) {
-          animation?.timeScale(1).restart(true);
+          sequence?.refresh();
         }
       };
+      const replay = () => { if (visible) sequence?.replay(); };
       const originalLabel = root.getAttribute("aria-label");
       let accessibleLabel = originalLabel;
       if (originalLabel === null) {
@@ -38,6 +41,7 @@ export default function ReadingText({ as: Tag = "p", children, active = true, wa
         onSplit(self) {
           root.setAttribute("aria-label", accessibleLabel);
           release?.();
+          sequence?.dispose();
           animation?.kill();
           if (!self.words.length) return;
           // A masked word paints its own text; keep highlighted words colored
@@ -51,16 +55,20 @@ export default function ReadingText({ as: Tag = "p", children, active = true, wa
             y: 0, rotationX: 0, duration: MOTION.reading.duration, ease: MOTION.reading.ease,
             stagger: { amount: spread, from: "start" },
           });
-          release = observeReveal(root, () => { visible = true; play(); }, () => { visible = false; reverseReveal(animation); });
+          sequence = sequenceReveal(animation, root, {
+            canPlay: () => !waitForIntro || window.__pageIntroDoneForPath === location.pathname,
+          });
+          release = observeReveal(root, () => { visible = true; sequence.enter(); }, () => { visible = false; sequence.exit(); reverseReveal(animation); });
           return animation;
         },
       });
       window.addEventListener("page-intro:complete", play);
-      root.addEventListener("reading-reveal:play", play);
+      root.addEventListener("reading-reveal:play", replay);
       return () => {
         window.removeEventListener("page-intro:complete", play);
-        root.removeEventListener("reading-reveal:play", play);
+        root.removeEventListener("reading-reveal:play", replay);
         release?.();
+        sequence?.dispose();
         animation?.kill();
         split.revert();
         if (originalLabel === null) root.removeAttribute("aria-label");
