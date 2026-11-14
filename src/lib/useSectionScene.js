@@ -4,7 +4,7 @@ import { createMotionMedia } from "@/lib/motionMedia";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { MOTION, detailFrom, detailTo } from "./motionPresets";
+import { MOTION, detailFrom, detailTo, titleSlideFrom, titleSlideTo } from "./motionPresets";
 import { repeatReveal } from "./repeatReveal";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -22,7 +22,10 @@ export default function useSectionScene(scope) {
       q("[data-scene-row]").forEach((row) => {
         const icon = row.querySelector("[data-scene-icon]");
         const contents = [...row.children].filter(child => child !== icon);
-        if (contents.length) repeatReveal(gsap.from(contents, { ...detailFrom(), ...detailTo() }), row);
+        if (row.hasAttribute("data-scene-horizontal")) {
+          repeatReveal(gsap.fromTo(row.querySelectorAll("[data-scene-slide-inner]"),
+            titleSlideFrom(), { ...titleSlideTo(), stagger: MOTION.line.stagger }), row);
+        } else if (contents.length && !row.hasAttribute("data-scene-content-owned")) repeatReveal(gsap.from(contents, { ...detailFrom(), ...detailTo() }), row);
         if (icon) repeatReveal(gsap.from(icon, { rotation: MOTION.pop.rotation, scale: MOTION.pop.scale, duration: MOTION.pop.duration, ease: MOTION.pop.ease }), row);
         if (conditions.desktop) {
           const shift = gsap.quickTo(row, "x", MOTION.pointer);

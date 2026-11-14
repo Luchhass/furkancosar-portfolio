@@ -1,6 +1,19 @@
 .section:global(.ui-fit-panel.ui-screen-about) .layout { grid-template-rows: auto minmax(0, 1fr); }
 .section:global(.ui-fit-panel) .layout :global(.ui-accordion) { grid-row: 2; align-self: start; }
 .row + .row { border-top: 1px solid #0000001a; }
+@media (min-width: 768px) {
+  .row + .row { border-top-color: transparent; }
+  .row + .row::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: calc(-1 * (var(--ui-rail) + var(--ui-column-gap)));
+    right: 0;
+    height: 1px;
+    background: #0000001a;
+    pointer-events: none;
+  }
+}
 @media (max-width: 767px) {
   .section:global(.ui-fit-panel.ui-screen-about) .layout { grid-template-rows: auto minmax(0, 1fr); gap: 20px; }
 }

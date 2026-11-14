@@ -45,15 +45,16 @@ export default async function GitHubStats() {
               <div
                 key={stat.label}
                 data-scene-row
+                data-scene-horizontal
                 className="ui-stat-cell border-b border-white/10"
               >
-                <p className="ui-stat-value m-0 leading-none font-black tracking-[-0.04em] text-white uppercase">
+                <div className="overflow-hidden"><p data-scene-slide-inner className="ui-stat-value m-0 leading-none font-black tracking-[-0.04em] text-white uppercase">
                   <RevealCounter value={stat.value} />
-                </p>
+                </p></div>
 
-                <p className="m-0 mt-2 text-xs leading-none font-black tracking-[0.12em] text-white/45 uppercase">
+                <div className="mt-2 overflow-hidden"><p data-scene-slide-inner className="m-0 text-xs leading-none font-black tracking-[0.12em] text-white/45 uppercase">
                   {stat.label}
-                </p>
+                </p></div>
               </div>
             ))}
           </div>

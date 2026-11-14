@@ -8,14 +8,16 @@ import { titleSlideFrom, titleSlideTo } from "@/lib/motionPresets";
 
 gsap.registerPlugin(useGSAP);
 
-export default function TitleLine({ children, className = "", fromRight = false, ...attributes }) {
+export default function TitleLine({ children, className = "", fromRight = false, staggerChildren = 0, ...attributes }) {
   const ref = useRef(null);
   useGSAP(() => {
     const media = createMotionMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
-      repeatReveal(gsap.fromTo(ref.current.firstElementChild, titleSlideFrom(fromRight), titleSlideTo()), ref.current);
+      const inner = ref.current.firstElementChild;
+      const targets = staggerChildren ? [...inner.children] : inner;
+      repeatReveal(gsap.fromTo(targets, titleSlideFrom(fromRight), { ...titleSlideTo(), stagger: staggerChildren }), ref.current);
     });
     return () => media.revert();
-  }, { scope: ref, dependencies: [fromRight], revertOnUpdate: true });
+  }, { scope: ref, dependencies: [fromRight, staggerChildren], revertOnUpdate: true });
   return <span ref={ref} className="title-reveal-mask"><span data-title-reveal {...attributes} className={className}>{children}</span></span>;
 }

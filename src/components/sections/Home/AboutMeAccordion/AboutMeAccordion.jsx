@@ -42,7 +42,7 @@ export default function AboutMeAccordion() {
 
   function updateTitleFillOrigin(event) {
     const button = event.currentTarget;
-    const text = button.firstElementChild;
+    const text = button.querySelector(".gradient-title-text");
     const rect = text.getBoundingClientRect();
 
     const x = Math.min(Math.max(event.clientX - rect.left, 0), rect.width);
@@ -109,6 +109,8 @@ export default function AboutMeAccordion() {
               <div
                 key={item.id}
                 data-scene-row
+                data-scene-content-owned
+                data-reveal-order="4"
                 className={`ui-accordion-row ${styles.row}`}
               >
                 <Icon
@@ -130,7 +132,7 @@ export default function AboutMeAccordion() {
                     onPointerEnter={updateTitleFillOrigin}
                     onPointerLeave={updateTitleFillOrigin}
                   >
-                    <span className="gradient-title-text ui-accordion-title text-black/90">
+                    <TitleLine><span className="gradient-title-text ui-accordion-title text-black/90">
                       <span>{item.title}</span>
 
                       <span
@@ -139,7 +141,7 @@ export default function AboutMeAccordion() {
                       >
                         {item.title}
                       </span>
-                    </span>
+                    </span></TitleLine>
                   </button>
 
                   <div
@@ -152,7 +154,7 @@ export default function AboutMeAccordion() {
                     }`}
                   >
                     <div className="min-h-0">
-                      <ReadingText active={isOpen} className="ui-section-copy relative text-black/75">{item.description}</ReadingText>
+                      <ReadingText active={isOpen} data-reveal-order="5" className="ui-section-copy relative text-black/75">{item.description}</ReadingText>
                     </div>
                   </div>
                 </div>

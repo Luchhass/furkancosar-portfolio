@@ -21,9 +21,23 @@ export default function ProjectsHighlights() {
   const viewportRef = useRef(null);
   const drag = useRef(null);
   const suppressClick = useRef(false);
-  const scrollMotion = useRef({ base: 0, offset: 0 });
+  const scrollMotion = useRef({ base: 0, offset: 0, left: 0 });
   const [selected, setSelected] = useState(null);
   useShelfCardReveal(sectionRef, projects.length);
+
+  function transformScroll() { return matchMedia("(hover: hover) and (pointer: fine)").matches; }
+  function maxScroll() {
+    const viewport = viewportRef.current;
+    const last = viewport.querySelector(".highlights-track").lastElementChild;
+    return Math.max(0, last.offsetLeft + last.offsetWidth - viewport.clientWidth);
+  }
+  function readScroll() { return transformScroll() ? scrollMotion.current.left : viewportRef.current.scrollLeft; }
+  function writeScroll(left) {
+    const viewport = viewportRef.current;
+    scrollMotion.current.left = gsap.utils.clamp(0, maxScroll(), left);
+    if (transformScroll()) gsap.set(viewport.querySelector(".highlights-track"), { x: -scrollMotion.current.left });
+    else viewport.scrollLeft = scrollMotion.current.left;
+  }
 
   useGSAP(() => {
     const root = sectionRef.current;
@@ -31,7 +45,10 @@ export default function ProjectsHighlights() {
     const media = createMotionMedia();
     media.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
       const cleanups = [...root.querySelectorAll(".shelf-card")].map(bindProjectCardHover);
-      return () => cleanups.forEach(cleanup => cleanup());
+      return () => {
+        cleanups.forEach(cleanup => cleanup());
+        gsap.set(viewport.querySelector(".highlights-track"), { clearProps: "transform" });
+      };
     });
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const motion = { progress: 0 };
@@ -40,11 +57,11 @@ export default function ProjectsHighlights() {
         endTrigger: root, end: "bottom top", scrub: MOTION.scrub, invalidateOnRefresh: true,
       }, onUpdate: () => {
         const state = scrollMotion.current;
-        const max = viewport.scrollWidth - viewport.clientWidth;
+        const max = maxScroll();
         // Reveal starts at 15% visibility; travel follows once a third is visible.
         state.base = max * motion.progress;
         if (drag.current?.moved) return;
-        viewport.scrollLeft = gsap.utils.clamp(0, max, state.base + state.offset);
+        writeScroll(state.base + state.offset);
       } });
     });
     return () => media.revert();
@@ -52,10 +69,10 @@ export default function ProjectsHighlights() {
 
   function startDrag(event) {
     suppressClick.current = false;
-    scrollMotion.current.offset = event.currentTarget.scrollLeft - scrollMotion.current.base;
+    scrollMotion.current.offset = readScroll() - scrollMotion.current.base;
     if (event.pointerType !== "mouse") { drag.current = { id: event.pointerId, native: true, moved: true }; return; }
     if (event.button !== 0) return;
-    drag.current = { id: event.pointerId, x: event.clientX, left: event.currentTarget.scrollLeft, moved: false };
+    drag.current = { id: event.pointerId, x: event.clientX, left: readScroll(), moved: false };
   }
   function moveDrag(event) {
     const state = drag.current;
@@ -68,12 +85,12 @@ export default function ProjectsHighlights() {
     }
     if (state.moved) {
       event.preventDefault();
-      event.currentTarget.scrollLeft = state.left - dx;
-      scrollMotion.current.offset = event.currentTarget.scrollLeft - scrollMotion.current.base;
+      writeScroll(state.left - dx);
+      scrollMotion.current.offset = readScroll() - scrollMotion.current.base;
     }
   }
   function endDrag(event) {
-    scrollMotion.current.offset = event.currentTarget.scrollLeft - scrollMotion.current.base;
+    scrollMotion.current.offset = readScroll() - scrollMotion.current.base;
     drag.current = null;
     delete event.currentTarget.dataset.dragging;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
@@ -88,9 +105,9 @@ export default function ProjectsHighlights() {
         <div className="ui-section-content">
           <div ref={viewportRef} className="shelf-viewport highlights-viewport" role="region" aria-roledescription="carousel" aria-label="Latest six projects" tabIndex={0}
             onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag} onLostPointerCapture={() => { drag.current = null; }}
-            onTouchMove={() => { scrollMotion.current.offset = viewportRef.current.scrollLeft - scrollMotion.current.base; }}
+            onTouchMove={() => { scrollMotion.current.offset = readScroll() - scrollMotion.current.base; }}
             onClickCapture={event => { if (suppressClick.current && event.detail !== 0) { event.preventDefault(); event.stopPropagation(); } }}
-            onKeyDown={event => { if (event.target !== event.currentTarget) return; const direction = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0; if (direction) { event.preventDefault(); event.currentTarget.scrollLeft += direction * event.currentTarget.clientWidth; scrollMotion.current.offset = event.currentTarget.scrollLeft - scrollMotion.current.base; } }}>
+            onKeyDown={event => { if (event.target !== event.currentTarget) return; const direction = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0; if (direction) { event.preventDefault(); writeScroll(readScroll() + direction * event.currentTarget.clientWidth); scrollMotion.current.offset = readScroll() - scrollMotion.current.base; } }}>
             <div className="highlights-track">{projects.map((project, index) => <ProjectShelfCard key={project.id} project={project}
               number={String(latestProjects.length - index).padStart(2, "0")} onOpen={setSelected} />)}</div>
           </div>

@@ -1,8 +1,9 @@
 "use client";
 
 import { MOTION } from "@/lib/motionPresets";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { useGSAP } from "@gsap/react";
 import { contactItems, navigationItems, siteConfig, socialItems } from "@/data/site";
 import gsap from "gsap";
@@ -19,12 +20,14 @@ export default function Header() {
   const [showHeroFullscreenControl, setShowHeroFullscreenControl] =
     useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const menuRef = useRef(null);
   const menuNavRef = useRef(null);
   const menuAddressRef = useRef(null);
   const menuSocialsRef = useRef(null);
   const menuTimelineRef = useRef(null);
+  const pendingNavigationRef = useRef(null);
   const headerThemeRef = useRef("dark");
   const heroFullscreenRef = useRef(false);
   const heroFullscreenHeaderSyncStartedRef = useRef(false);
@@ -34,6 +37,26 @@ export default function Header() {
   const heroFullscreenBodyStylesRef = useRef(null);
   const heroFullscreenHtmlOverflowRef = useRef("");
   const fullscreenIconGradientId = `header-hero-fullscreen-icon-gradient-${useId().replaceAll(":", "")}`;
+
+  function finishMenuClose() {
+    menuTimelineRef.current = null;
+    pendingNavigationRef.current = null;
+    setIsMenuOpen(false);
+  }
+
+  useEffect(() => {
+    const covered = event => {
+      const href = pendingNavigationRef.current;
+      if (!href || event.detail.pathname !== href) return;
+      pendingNavigationRef.current = null;
+      menuTimelineRef.current?.kill();
+      menuTimelineRef.current = null;
+      setIsMenuOpen(false);
+      router.push(href);
+    };
+    window.addEventListener("page-navigation:covered", covered);
+    return () => window.removeEventListener("page-navigation:covered", covered);
+  }, [router]);
 
   useEffect(() => {
     let frame = null;
@@ -341,8 +364,7 @@ export default function Header() {
           menuTimelineRef.current = timeline;
         },
         onReverseComplete: () => {
-          menuTimelineRef.current = null;
-          setIsMenuOpen(false);
+          finishMenuClose();
         },
       });
 
@@ -402,14 +424,15 @@ export default function Header() {
   );
 
   function openMenu() {
+    navigationItems.forEach(item => { if (item.href !== pathname) router.prefetch(item.href); });
     setIsMenuOpen(true);
   }
 
   function closeMenu() {
     const timeline = menuTimelineRef.current;
 
-    if (!timeline) {
-      setIsMenuOpen(false);
+    if (!timeline || timeline.time() === 0) {
+      finishMenuClose();
       return;
     }
 
@@ -419,12 +442,31 @@ export default function Header() {
   }
 
   function closeMenuImmediately() {
+    pendingNavigationRef.current = null;
     menuTimelineRef.current?.kill();
     menuTimelineRef.current = null;
     setIsMenuOpen(false);
   }
 
+  function navigateFromMenu(event, href) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    if (pendingNavigationRef.current) return;
+    if (href === pathname) { closeMenu(); return; }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      closeMenuImmediately(); router.push(href); return;
+    }
+    pendingNavigationRef.current = href;
+    router.prefetch(href);
+    const text = event.currentTarget.querySelector(".gradient-title-text");
+    const rect = text.getBoundingClientRect();
+    flushSync(() => window.dispatchEvent(new CustomEvent("page-navigation:start", {
+      detail: { pathname: href, origin: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } },
+    })));
+  }
+
   function toggleMenu() {
+    if (pendingNavigationRef.current) return;
     if (isMenuOpen) {
       closeMenu();
       return;
@@ -681,7 +723,7 @@ export default function Header() {
                       aria-current={isActive ? "page" : undefined}
                       data-active={isActive ? "true" : undefined}
                       data-menu-nav-item
-                      onClick={closeMenuImmediately}
+                      onClick={event => navigateFromMenu(event, item.href)}
                       onPointerEnter={updateTitleFillOrigin}
                       onPointerLeave={updateTitleFillOrigin}
                       className="ui-navigation-link gradient-title-button inline-flex w-fit max-w-full text-[44px] leading-[0.9] font-black tracking-[-0.04em] text-black uppercase no-underline md:text-[80px] lg:text-[120px]"

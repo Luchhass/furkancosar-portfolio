@@ -34,7 +34,8 @@ export default function Footer() {
 
   useGSAP(() => {
     const media = createMotionMedia();
-    media.add("(prefers-reduced-motion: no-preference)", () => {
+    media.add({ motion: "(prefers-reduced-motion: no-preference)", desktop: "(min-width: 1024px)" }, ({ conditions }) => {
+      if (!conditions.motion) return;
       const footer = footerRef.current;
       const primary = footer.querySelectorAll("h2 [data-footer-primary]");
       const navigation = footer.querySelectorAll("nav [data-footer-primary]");
@@ -45,8 +46,8 @@ export default function Footer() {
       });
       repeatReveal(gsap.fromTo(navigation, {
         autoAlpha: 1,
-        xPercent: -MOTION.maskedSlidePercent,
-        transformOrigin: "0% 50%",
+        xPercent: conditions.desktop ? MOTION.maskedSlidePercent : -MOTION.maskedSlidePercent,
+        transformOrigin: conditions.desktop ? "100% 50%" : "0% 50%",
       }, {
         xPercent: 0,
         duration: MOTION.slide.duration,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 
@@ -83,17 +83,27 @@ function Word({
 
 export default function PageIntroAnimation() {
   const pathname = usePathname();
+  const [pendingPath, setPendingPath] = useState(null);
+  useEffect(() => {
+    const begin = event => setPendingPath(event.detail);
+    window.addEventListener("page-navigation:start", begin);
+    return () => window.removeEventListener("page-navigation:start", begin);
+  }, []);
+  if (pendingPath !== null && pendingPath.pathname === pathname) setPendingPath(null);
+  const targetPath = pendingPath?.pathname || pathname;
 
-  return <PageIntroForRoute key={pathname} pathname={pathname} />;
+  return <PageIntroForRoute key={targetPath} pathname={targetPath} routeReady={targetPath === pathname} origin={pendingPath?.origin} />;
 }
 
-function PageIntroForRoute({ pathname }) {
+function PageIntroForRoute({ pathname, routeReady, origin }) {
   const [mounted, setMounted] = useState(true);
+  const [entryOrigin] = useState(origin);
+  const finish = useCallback(() => setMounted(false), []);
 
-  return mounted ? <PageIntroStage pathname={pathname} onFinished={() => setMounted(false)} /> : null;
+  return mounted ? <PageIntroStage pathname={pathname} routeReady={routeReady} origin={entryOrigin} onFinished={finish} /> : null;
 }
 
-function PageIntroStage({ pathname, onFinished }) {
+function PageIntroStage({ pathname, routeReady, origin, onFinished }) {
 
   const overlayRef = useRef(null);
   const whiteLeftRef = useRef(null);
@@ -105,6 +115,15 @@ function PageIntroStage({ pathname, onFinished }) {
   const brandTextRef = useRef(null);
   const regRef = useRef(null);
   const tlRef = useRef(null);
+  const readyRef = useRef(routeReady);
+  const waitingRef = useRef(false);
+  useEffect(() => {
+    readyRef.current = routeReady;
+    if (routeReady && waitingRef.current) {
+      waitingRef.current = false;
+      tlRef.current?.play();
+    }
+  }, [routeReady]);
 
   useEffect(() => {
     const overlay = overlayRef.current;
@@ -133,6 +152,7 @@ function PageIntroStage({ pathname, onFinished }) {
     tlRef.current = null;
 
     const isHome = pathname === "/";
+    if (origin) gsap.set(overlay, { clipPath: `circle(0px at ${origin.x}px ${origin.y}px)` });
     const headerBrand = document.querySelector(HEADER_BRAND_SELECTOR);
 
     const done = () => {
@@ -304,6 +324,14 @@ function PageIntroStage({ pathname, onFinished }) {
       },
     });
 
+    if (origin) {
+      const radius = Math.hypot(Math.max(origin.x, innerWidth - origin.x), Math.max(origin.y, innerHeight - origin.y)) + 2;
+      tl.to(overlay, {
+        clipPath: `circle(${radius}px at ${origin.x}px ${origin.y}px)`,
+        duration: .75, ease: "power3.inOut",
+      }).call(() => window.dispatchEvent(new CustomEvent("page-navigation:covered", { detail: { pathname } })));
+    }
+
     if (isHome) {
       tl.to({}, { duration: 0.15 });
 
@@ -371,10 +399,16 @@ function PageIntroStage({ pathname, onFinished }) {
         duration: 0.92,
         ease: "expo.inOut",
       });
-    } else {
+    } else if (!origin) {
       tl.to({}, { duration: 0.25 });
     }
 
+    tl.call(() => {
+      if (!readyRef.current) {
+        waitingRef.current = true;
+        tl.pause();
+      }
+    });
     tl.add("whiteReveal");
 
     tl.to(
@@ -467,7 +501,7 @@ function PageIntroStage({ pathname, onFinished }) {
         window.__pageIntroActivePath = null;
       }
     };
-  }, [pathname, onFinished]);
+  }, [pathname, onFinished, origin]);
 
   return (
     <div

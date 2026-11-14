@@ -19,7 +19,7 @@ export default function AboutMeIntro() {
           </div>
         </div>
       </div>
-      <span className="about-curious-badge" aria-hidden="true"><span>Stay</span><span>curious</span></span>
+      <span className="about-curious-badge" data-reveal-order="4" aria-hidden="true"><TitleLine fromRight staggerChildren={.12} className="text-right"><span className="block">Stay</span><span className="block">curious</span></TitleLine></span>
     </section>
   );
 }

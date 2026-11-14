@@ -126,7 +126,7 @@
 .shelf-viewport {
   /* Allow hover paint outside the grid without adding layout/scroll space. */
   min-width: 0; min-height: 0; overflow: clip;
-  overflow-clip-margin: 32px;
+  overflow-clip-margin: 64px 0;
   scrollbar-width: none;
   touch-action: pan-y pinch-zoom; cursor: grab;
 }
@@ -154,6 +154,7 @@
 .shelf-card-image img { object-fit: cover; transition: scale .65s ease; }
 .shelf-card-number { position: absolute; z-index: 1; bottom: 12px; left: 14px; font-size: calc(var(--shelf-card-title-size) * 1.5); line-height: .88; font-weight: 900; letter-spacing: -.04em; }
 .shelf-card-mask[data-reveal-mask-active="true"] { overflow: hidden; contain: paint; }
+.shelf-card-mask[data-reveal-mask-active="false"] { overflow: visible; }
 .shelf-card-copy { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 6px; padding: 12px; min-width: 0; min-height: 0; height: 100%; }
 .shelf-card-copy h3 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; font-size: var(--shelf-card-title-size); line-height: 1; font-weight: 900; letter-spacing: -.03em; text-transform: uppercase; }
 .shelf-card-description { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; align-self: start; margin: 0; font-size: 12px; line-height: 1.4; color: #ffffff8c; }
@@ -198,7 +199,7 @@
 .ui-screen-scroll > .ui-section-grid { min-height: min-content; }
 .ui-screen.ui-cta { grid-template-rows: minmax(0, 1fr); }
 .ui-screen.ui-cta .cta-center { min-height: 0; }
-.ui-journey.journey-deck { height: 400dvh; }
+.ui-journey.journey-deck { height: calc(var(--journey-chapters, 4) * 100dvh); }
 .ui-journey.journey-deck .journey-frame { height: 100dvh; }
 .ui-screen-about .ui-section-split { gap: 24px; }
 .ui-screen-about .interface-sculpture { min-height: 0; height: clamp(140px, 22dvh, 220px); max-height: none; aspect-ratio: auto; }
@@ -268,7 +269,10 @@
 .highlights-scene .ui-section-body { height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .highlights-scene .ui-section-content { min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
 .highlights-scene .highlights-viewport { overflow-x: auto; overflow-y: hidden; touch-action: pan-x pan-y pinch-zoom; }
-.highlights-track { display: grid; grid-auto-flow: column; grid-auto-columns: 88%; gap: 16px; height: 100%; min-height: 0; }
+.highlights-track { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 88%; gap: 16px; height: 100%; min-height: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .highlights-scene .highlights-viewport { overflow: clip; overflow-clip-margin: 64px; }
+}
 .highlights-scene .gallery-progress { margin-top: 16px; margin-bottom: 0; }
 @media (min-width: 768px) {
   .highlights-scene > .ui-section-grid { grid-template-rows: minmax(0, 1fr); }
@@ -348,6 +352,11 @@
 .ui-project-card-body { padding: 24px; }
 .ui-project-card-title { font-size: clamp(28px, 2.3vw, 32px); line-height: .95; }
 .ui-project-card-copy { font-size: 14px; line-height: 1.4; }
+[data-letter-reel] .gradient-text-flow {
+  animation: none;
+  background-size: var(--reel-gradient-size, 260% 100%);
+  background-position: calc(var(--reel-gradient-shift, 0em) - var(--reel-letter-x, 0em)) 50%;
+}
 .ui-stat-cell { min-width: 0; container-type: inline-size; padding-block: 24px; }
 .ui-stat-value { font-size: clamp(28px, 15cqw, 52px); }
 @media (max-width: 1279px) {

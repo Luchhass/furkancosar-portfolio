@@ -1,6 +1,7 @@
 "use client";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION } from "@/lib/motionPresets";
+import { heroTitleExit, heroDetailExit } from "@/lib/heroScrollExit";
 import { bindTilt } from "@/lib/pointerMotion";
 import { observeReveal, reverseReveal } from "@/lib/repeatReveal";
 import { sequenceReveal } from "@/lib/revealSequence";
@@ -262,15 +263,9 @@ export default function Hero({ titleLines, copyLines, stat, action, copyClassNam
       const heading = hero.querySelector("h1");
       const lines = hero.querySelectorAll("[data-hero-line-mask]");
       const exit = gsap.timeline({ scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: MOTION.scrub } });
-      exit.to(lines, { xPercent: (i) => i % 2 ? 18 : -18, y: -70, opacity: 0, stagger: 0.06, ease: "none" }, 0)
+      exit.to(lines, heroTitleExit(), 0)
         .to(hero.querySelector("[data-hero-background]"), { scale: 1.12, opacity: 0.2, ease: "none" }, 0)
-        .to(hero.querySelectorAll("[data-hero-exit]"), {
-          autoAlpha: 0,
-          y: -32,
-          x: (_index, target) => target.dataset.heroExit === "stat" ? -18 : target.dataset.heroExit === "action" ? 18 : 0,
-          scale: 0.98,
-          ease: "none",
-        }, 0);
+        .to(hero.querySelectorAll("[data-hero-exit]"), heroDetailExit(), 0);
       const cue = hero.querySelector(".hero-scroll-arrow");
       if (cue) gsap.to(cue, { "--arrow-length": "180px", ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "top -50%", scrub: MOTION.progressScrub } });
       gsap.set(heading, { transformPerspective: 1000 });

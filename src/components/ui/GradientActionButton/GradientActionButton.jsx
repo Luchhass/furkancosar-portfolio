@@ -14,6 +14,7 @@ export default function GradientActionButton({
   onClick,
   rel,
   target,
+  showDot = true,
 }) {
   const ref = useRef(null);
   const { contextSafe } = useGSAP({ scope: ref });
@@ -59,10 +60,10 @@ export default function GradientActionButton({
         aria-hidden="true"
       />
 
-      <span
+      {showDot && <span
         className="gradient-action-dot relative z-10 h-2 w-2 rounded-full"
         aria-hidden="true"
-      />
+      />}
 
       <span className="button-label-window relative z-10"><span className="button-label-track"><span>{label}</span><span aria-hidden="true">{label}</span></span></span>
     </a>

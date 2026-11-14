@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { createMotionMedia } from "@/lib/motionMedia";
-import { MOTION } from "@/lib/motionPresets";
+import { heroTitleExit, heroDetailExit } from "@/lib/heroScrollExit";
 import TitleLine from "@/components/ui/TitleLine";
 import ReadingText from "@/components/ui/ReadingText";
 import styles from "./Toolkit.module.css";
@@ -72,7 +72,6 @@ const techGroups = [
 
 const labels = ["Foundation", "Interface", "Workflow", "Collaboration"];
 const phase = (progress, start, end) => gsap.utils.clamp(0, 1, (progress - start) / (end - start));
-const smooth = (value) => value * value * (3 - 2 * value);
 
 export default function TechStackAccordion() {
   const root = useRef(null);
@@ -82,15 +81,19 @@ export default function TechStackAccordion() {
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const section = root.current;
       const frame = section.querySelector("[data-toolkit-frame]");
-      const intro = section.querySelector("[data-toolkit-intro]");
       const names = Array.from(section.querySelectorAll("[data-toolkit-label]"));
       const tracks = Array.from(section.querySelectorAll("[data-toolkit-track]"));
 
-      const setIntroOpacity = gsap.quickSetter(intro, "opacity");
-      const setIntroY = gsap.quickSetter(intro, "y", "px");
-      const nameSetters = names.map(node => ({
-        opacity: gsap.quickSetter(node, "opacity"), y: gsap.quickSetter(node, "y", "px"),
-      }));
+      const introExit = gsap.timeline({ paused: true })
+        .to(section.querySelectorAll("#toolkit-heading > .title-reveal-mask"), heroTitleExit(), 0)
+        .to(section.querySelector("[data-toolkit-copy]"), heroDetailExit(), 0);
+      gsap.set(names, { scale: 0 });
+      const nameSetters = names.map(node => {
+        const setX = gsap.quickSetter(node, "scaleX");
+        const setY = gsap.quickSetter(node, "scaleY");
+        return value => { setX(value); setY(value); };
+      });
+      const popEase = gsap.parseEase("back.out(1.4)");
       const trackSetters = tracks.map(node => gsap.quickSetter(node, "x", "px"));
       let widths = [];
       let viewportWidth = 0;
@@ -105,18 +108,16 @@ export default function TechStackAccordion() {
       const state = { progress: 0 };
       const draw = () => {
         const p = state.progress;
-        const exit = smooth(phase(p, .04, .2));
-        setIntroOpacity(1 - exit);
-        setIntroY(-24 * exit);
+        introExit.progress(phase(p, .04, .2));
         nameSetters.forEach((setter, index) => {
           const offset = index * .025;
-          const labelIn = gsap.parseEase(MOTION.ease)(phase(p, .23 + offset, .30 + offset));
-          const labelOut = smooth(phase(p, .43 + offset, .50 + offset));
-          setter.opacity(labelIn * (1 - labelOut));
-          setter.y(44 * (1 - labelIn) - 44 * labelOut);
+          const reverseOffset = (names.length - 1 - index) * .025;
+          const labelIn = popEase(phase(p, .23 + offset, .30 + offset));
+          const labelOut = popEase(1 - phase(p, .43 + reverseOffset, .50 + reverseOffset));
+          setter(labelIn * labelOut);
         });
         tracks.forEach((track, index) => {
-          const distance = Math.min(widths[index] + viewportWidth, phase(p, .60, .98) * travelDistance);
+          const distance = phase(p, .60, .98) * (widths[index] + viewportWidth);
           const from = index % 2 === 0 ? -widths[index] : viewportWidth;
           trackSetters[index](from + (index % 2 === 0 ? distance : -distance));
         });
@@ -128,7 +129,7 @@ export default function TechStackAccordion() {
         scrollTrigger: {
           id: "toolkit-strips", trigger: section, start: "top top",
           // Keep the same stages with a shorter, more responsive scroll journey.
-          // Each row travels 3.5 pixels per scroll pixel during the strip phase.
+          // The longest row sets scroll length; every row shares its start/end.
           end: () => { measure(); return `+=${travelDistance / (.38 * 3.5)}`; },
           pin: frame, scrub: .3, invalidateOnRefresh: true,
           onRefresh: () => { measure(); draw(); },
@@ -141,6 +142,7 @@ export default function TechStackAccordion() {
         resize.disconnect();
         animation.scrollTrigger?.kill();
         animation.kill();
+        introExit.revert();
       };
     });
     return () => media.revert();
@@ -152,7 +154,7 @@ export default function TechStackAccordion() {
         <div className={styles.center}>
           <h2 id="toolkit-heading" className="ui-section-title">
             <TitleLine data-toolkit-title>TOOLS</TitleLine>
-            <TitleLine data-toolkit-title className="gradient-text-flow">I USE</TitleLine>
+            <TitleLine data-toolkit-title fromRight className="gradient-text-flow">I USE</TitleLine>
           </h2>
           <ReadingText data-toolkit-copy className="ui-section-copy">The technologies behind the interfaces I build. From the first line of code to the final interaction, these are the tools I use to turn ideas into thoughtful digital experiences.</ReadingText>
         </div>
