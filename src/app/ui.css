@@ -115,7 +115,13 @@
 .ui-project-filters button { min-height: 44px; }
 .ui-project-search input { min-height: 44px; }
 
-/* Project shelf: two rows per page, with 1 / 2 / 3 responsive columns. */
+.projects-archive { --shelf-card-title-size: clamp(18px, 1.5vw, 22px); position: relative; }
+.projects-archive-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px 16px; }
+.projects-archive-grid > .shelf-card-slot { height: clamp(340px, 32vw, 440px); }
+@media (min-width: 768px) { .projects-archive-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .projects-archive-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Shared project shelf cards and horizontal Highlights viewport. */
 .ui-screen.projects-shelf { --shelf-card-title-size: clamp(18px, 1.5vw, 22px); align-content: stretch; grid-template-rows: minmax(420px, 1fr); overflow: hidden; }
 .projects-shelf > .ui-section-grid {
   height: 100%;
@@ -126,14 +132,16 @@
 .shelf-viewport {
   /* Allow hover paint outside the grid without adding layout/scroll space. */
   min-width: 0; min-height: 0; overflow: clip;
-  overflow-clip-margin: 64px 0;
+  overflow-clip-margin: 64px;
+  /* Keep the horizontal viewport exact while allowing vertical hover paint. */
+  clip-path: inset(-64px 0);
   scrollbar-width: none;
   touch-action: pan-y pinch-zoom; cursor: grab;
 }
 .shelf-viewport::-webkit-scrollbar { display: none; }
 .shelf-viewport[data-dragging] { cursor: grabbing; user-select: none; }
 .shelf-track { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: 24px; height: 100%; }
-.shelf-page { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 16px; min-height: 0; scroll-snap-align: start; }
+.shelf-page { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 16px; min-height: 0; scroll-snap-align: start; }
 .shelf-card-slot, .shelf-card-mask, .shelf-card-inner { min-width: 0; min-height: 0; height: 100%; }
 .shelf-card-slot:hover, .shelf-card-slot:focus-within { position: relative; z-index: 5; }
 .shelf-card-mask { overflow: hidden; }
