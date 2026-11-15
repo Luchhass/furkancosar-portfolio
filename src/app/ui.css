@@ -15,11 +15,11 @@
   --ui-hero-frame: calc((var(--ui-header-height) - var(--ui-header-cell-height)) / 2);
   --ui-control-height: 56px;
 }
-.ui-language-toggle { pointer-events: auto; display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; margin-right: 8px; border: 0; padding: 0; background: transparent; color: inherit; font-size: 13px; line-height: 1; font-weight: 800; cursor: pointer; transition: opacity .2s, transform .2s; }
+.ui-language-toggle { pointer-events: auto; display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; margin-right: 8px; border: 0; padding: 0; background: transparent; color: inherit; font-size: 20px; line-height: 1; font-weight: 700; cursor: pointer; transition: opacity .2s, transform .2s; }
 .ui-language-toggle:hover { opacity: .7; transform: scale(1.04); }
 .ui-language-toggle:active { transform: scale(.96); }
 .ui-language-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: -6px; }
-@media (max-width: 767px) { .ui-language-toggle { width: 32px; margin-right: 2px; font-size: 11px; } }
+@media (max-width: 767px) { .ui-language-toggle { width: 32px; margin-right: 2px; } }
 @media (min-width: 768px) {
   :root { --ui-title-size: clamp(64px, 8.5vw, 96px); --ui-gutter: 40px; --ui-section-space: 96px; --ui-stack: 32px; --ui-body-size: 16px; --ui-chrome-space: 32px; --ui-header-height: 96px; }
 }

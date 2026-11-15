@@ -24,9 +24,8 @@ export function localizeContent(node, locale, path = "root") {
     else if (key === "href" && typeof value === "string" && value.startsWith("/")) props.href = localizedPath(value, locale);
     else if (textProps.has(key) || contentProps.has(key)) props[key] = values(value, locale);
   }
-  // SplitText/reel nodes own their DOM. Remount those leaves when language changes.
-  const name = typeof node.type === "function" ? node.type.name : "";
-  if (["ReadingText", "LetterReel", "ResponsiveTextLines", "Hero"].includes(name)) props.key = `${node.key || path}:${locale}`;
+  // DOM-owning animation components manage their own locale boundaries.
+  // Function names are minified in production and cannot identify components.
   return cloneElement(node, props);
 }
 export function useLocalizedContent() {

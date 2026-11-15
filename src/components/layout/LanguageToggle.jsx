@@ -11,12 +11,17 @@ export default function LanguageToggle() {
   const pathname = usePathname();
   const switching = useRef(false);
   async function change() {
-    if (switching.current) return;
+    if (switching.current || window.__pageIntroActivePath || document.body.dataset.languageSwitching === "true") return;
     switching.current = true;
+    document.body.dataset.languageSwitching = "true";
+    const entryPath = window.location.pathname;
     const scopes = [...document.querySelectorAll("main, footer")];
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     try {
       if (!reduced) await gsap.to(scopes, { autoAlpha: 0, duration: .18, ease: "power2.in" });
+      // A route transition can start while the fade is playing. Never apply
+      // the old button's pathname over that navigation.
+      if (window.location.pathname !== entryPath || window.__pageIntroActivePath) return;
       flushSync(() => {
         const nextPath = localizedPath(pathname, nextLocale);
         window.__pageIntroDoneForPath = nextPath;
@@ -30,6 +35,7 @@ export default function LanguageToggle() {
     } finally {
       gsap.set(scopes.filter(node => node.isConnected), { clearProps: "opacity,visibility" });
       switching.current = false;
+      delete document.body.dataset.languageSwitching;
     }
   }
   return <button type="button" className="ui-language-toggle" onClick={change}

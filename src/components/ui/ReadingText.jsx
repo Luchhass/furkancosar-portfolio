@@ -8,10 +8,16 @@ import { createMotionMedia } from "@/lib/motionMedia";
 import { MOTION } from "@/lib/motionPresets";
 import { observeReveal, reverseReveal } from "@/lib/repeatReveal";
 import { sequenceReveal } from "@/lib/revealSequence";
+import { useLanguage } from "@/hooks/useLanguage";
 
 gsap.registerPlugin(useGSAP, SplitText);
 
-export default function ReadingText({ as: Tag = "p", children, active = true, waitForIntro = false, ...attributes }) {
+export default function ReadingText(props) {
+  const { locale } = useLanguage();
+  return <ReadingTextContent key={locale} {...props} />;
+}
+
+function ReadingTextContent({ as: Tag = "p", children, active = true, waitForIntro = false, ...attributes }) {
   const localize = useLocalizedContent();
   const ref = useRef(null);
   useGSAP(() => {

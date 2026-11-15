@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 function tokenizeText(text) {
   return String(text || "").match(/\S+\s*/g) || [];
@@ -14,7 +15,12 @@ function areLinesEqual(previousLines, nextLines) {
   return previousLines.every((line, index) => line === nextLines[index]);
 }
 
-export default function ResponsiveTextLines({
+export default function ResponsiveTextLines(props) {
+  const { locale } = useLanguage();
+  return <ResponsiveTextLinesContent key={locale} {...props} />;
+}
+
+function ResponsiveTextLinesContent({
   text,
   lineAttribute,
   onLinesChange,

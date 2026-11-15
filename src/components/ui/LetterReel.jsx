@@ -4,10 +4,16 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { createMotionMedia } from "@/lib/motionMedia";
 import { loopWhileVisible } from "@/lib/repeatReveal";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-export default function LetterReel({ words }) {
+export default function LetterReel(props) {
+  const { locale } = useLanguage();
+  return <LetterReelContent key={locale} {...props} />;
+}
+
+function LetterReelContent({ words }) {
   const ref = useRef(null);
   const count = Math.max(...words.map(word => word.length));
   useGSAP(() => {

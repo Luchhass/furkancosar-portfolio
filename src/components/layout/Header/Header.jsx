@@ -456,6 +456,7 @@ export default function Header() {
     href = localizedPath(href, routeLocale(pathname));
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
+    if (document.body.dataset.languageSwitching === "true") return;
     if (pendingNavigationRef.current) return;
     if (href === pathname) { closeMenu(); return; }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -593,7 +594,7 @@ export default function Header() {
                 style={{
                   "--hero-fullscreen-icon-gradient": `url(#${fullscreenIconGradientId})`,
                 }}
-                strokeWidth={2.75}
+                strokeWidth={2.25}
                 aria-hidden="true"
               >
                 <defs>

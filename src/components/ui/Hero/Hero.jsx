@@ -18,6 +18,7 @@ import { GeometricPentagonBackground } from "../Backgrounds/GeometricPentagonBac
 import ReadingText from "@/components/ui/ReadingText";
 import HeroDetails from "./HeroDetails";
 import { basePath } from "@/lib/localizedRoutes";
+import { useLanguage } from "@/hooks/useLanguage";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -32,7 +33,12 @@ function normalizeCopyLines(copyLines) {
     .filter(Boolean);
 }
 
-export default function Hero({ titleLines, copyLines, stat, action, copyClassName = "", detailVariant }) {
+export default function Hero(props) {
+  const { locale } = useLanguage();
+  return <HeroContent key={locale} {...props} />;
+}
+
+function HeroContent({ titleLines, copyLines, stat, action, copyClassName = "", detailVariant }) {
   const localize = useLocalizedContent();
   const heroRef = useRef(null);
   const pathname = usePathname();
