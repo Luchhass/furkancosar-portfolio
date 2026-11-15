@@ -403,17 +403,17 @@ function HeroContent({ titleLines, copyLines, stat, action, copyClassName = "", 
             className="pointer-events-auto col-start-1 row-start-2 min-w-0 overflow-hidden pr-3 md:pr-0"
             aria-label={stat.ariaLabel}
           >
-            <div data-hero-stat className="flex items-center gap-3">
-              <span className="text-[28px] leading-[0.82] font-black md:text-[30px] lg:text-[32px]">
+            <div data-hero-stat className="flex h-[var(--ui-control-height)] items-center gap-3">
+              <span className="text-[40px] leading-[0.82] font-black md:text-[44px] lg:text-[48px]">
                 <RevealCounter
                   value={stat.value}
                   textClassName="gradient-text-flow"
                 />
               </span>
 
-              <p className="m-0 text-[13px] leading-tight font-medium text-white/90 md:text-sm lg:text-sm">
-                {stat.labelLines.map((line) => (
-                  <span key={line} className={line === "with modern interfaces" ? "hidden md:block" : "block"}>
+              <p className="m-0 text-[14px] leading-tight font-medium text-white/90 md:text-[16px] lg:text-[18px]">
+                {stat.labelLines.map((line, index) => (
+                  <span key={line} className={index > 0 ? "hidden md:block" : "block"}>
                     {line}
                   </span>
                 ))}

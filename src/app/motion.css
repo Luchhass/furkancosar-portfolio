@@ -222,8 +222,6 @@ body[data-journey-active="true"] [data-back-to-top] { opacity: 0 !important; poi
 
 .collaboration-scene { position: relative; isolation: isolate; overflow: hidden; background: black; color: white; min-height: 100svh; display: grid; grid-template-rows: minmax(400px, 1fr); }
 .cta-liquid-backdrop { position: absolute; z-index: 0; inset: 0; background-position: center; background-repeat: no-repeat; background-size: cover; opacity: .42; mix-blend-mode: screen; filter: saturate(.88) brightness(.72); pointer-events: none; }
-.cta-surface-light { position: absolute; inset: 0; opacity: 0; background: url('/images/cta-liquid-sculpture-lit.png') center / cover no-repeat; mask-image: radial-gradient(ellipse 65% 85% at var(--light-x) var(--light-y), #000 0%, #000a 35%, transparent 78%); -webkit-mask-image: radial-gradient(ellipse 65% 85% at var(--light-x) var(--light-y), #000 0%, #000a 35%, transparent 78%); }
-.cta-surface-light { filter: saturate(2.3) brightness(2.1); mix-blend-mode: screen; }
 .cta-center { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px; padding-block: 50px; text-align: center; }
 .cta-center h2 > span { display: block; }.cta-center [data-cta-title] { display: inline-block; }
 .cta-center p { font-size: 13px; line-height: 1.4; margin: 0; max-width: 62ch; color: #fffa; }
@@ -286,6 +284,7 @@ body[data-journey-active="true"] [data-back-to-top] { opacity: 0 !important; poi
 .footer-ring-seven { width: clamp(260px, 33vw, 490px); left: -4%; bottom: -2%; background: #252528; --ring-hole: 61%; }
 .footer-ring-eight { width: clamp(130px, 17vw, 245px); left: 17%; bottom: 37%; background: #1f1f22; --ring-hole: 42%; }
 .footer-ring-nine { width: clamp(170px, 21vw, 310px); right: 5%; bottom: 10%; background: #242427; --ring-hole: 59%; }
+.portfolio-footer > div:nth-last-child(2) { padding-top: var(--ui-header-height); }
 .portfolio-footer > div:nth-last-child(1) { padding-top: 40px; }
 .menu-footer-backdrop { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .menu-footer-backdrop .footer-ring { background: #e5e5e1; opacity: .58; }

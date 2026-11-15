@@ -564,7 +564,7 @@ export default function Header() {
   return (
     localize(<>
       <header
-        className={`ui-header pointer-events-none fixed top-0 left-0 z-50 grid w-full grid-cols-[48px_minmax(0,1fr)_48px] items-center py-0 transition-[color,opacity] duration-300 md:grid-cols-3 ${headerColorClass}`}
+        className={`ui-header pointer-events-none fixed top-0 left-0 z-50 grid w-full grid-cols-[48px_minmax(0,1fr)_88px] items-center py-0 transition-[color,opacity] duration-300 md:grid-cols-3 ${headerColorClass}`}
         aria-label="Primary navigation"
       >
         <div className="ui-header-cell col-start-1 flex h-11 items-center justify-self-start overflow-hidden">
@@ -636,13 +636,13 @@ export default function Header() {
           </div>
         </div>
 
-        <div className="ui-header-cell col-start-2 flex h-11 min-w-0 items-center justify-self-center overflow-hidden">
+        <div className="ui-header-brand-cell ui-header-cell col-start-2 flex h-11 min-w-0 items-center justify-self-center overflow-visible">
           <Link
             href="/"
             aria-label={`${siteConfig.name} home`}
             onClick={closeMenuImmediately}
             data-hero-intro="brand"
-            className="pointer-events-auto inline-flex h-11 items-center text-lg leading-none font-black text-current no-underline md:text-2xl lg:text-3xl"
+            className="ui-header-brand pointer-events-auto inline-flex h-11 items-center leading-none font-black text-current no-underline"
           >
             <span>{siteConfig.brand}</span>
 
@@ -668,7 +668,7 @@ export default function Header() {
           >
             <span
               className={`absolute top-1/2 right-0 h-0.75 w-7 rounded-full bg-current transition-[transform,opacity,background,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:bg-[linear-gradient(90deg,#6768ff,#a53cdd,#ee4b67)] ${
-                isMenuOpen ? "translate-y-0 rotate-45" : "-translate-y-2"
+                isMenuOpen ? "translate-y-0 rotate-45" : "-translate-y-[var(--ui-menu-line-offset)]"
               }`}
               aria-hidden="true"
             />
@@ -684,7 +684,7 @@ export default function Header() {
 
             <span
               className={`absolute top-1/2 right-0 h-0.75 w-7 rounded-full bg-current transition-[transform,opacity,background,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:bg-[linear-gradient(90deg,#6768ff,#a53cdd,#ee4b67)] ${
-                isMenuOpen ? "translate-y-0 -rotate-45" : "translate-y-2"
+                isMenuOpen ? "translate-y-0 -rotate-45" : "translate-y-[var(--ui-menu-line-offset)]"
               }`}
               aria-hidden="true"
             />

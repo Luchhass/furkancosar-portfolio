@@ -12,8 +12,8 @@ export default function ContactHero() {
         { text: "Next Build", gradient: true },
       ]}
       copyLines={[
-        "Share the idea, goal or interface you want to build. I'll help",
-        "turn it into a clean, responsive and polished frontend experience.",
+        "Have an idea or interface in mind? Let's shape it into a clear, polished experience.",
+        "Tell me what you're building and let's find the right frontend path together.",
       ]}
       copyClassName="justify-self-center"
     />)
