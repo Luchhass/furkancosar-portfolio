@@ -80,7 +80,7 @@ export function createSectionScroll() {
     const y = window.scrollY;
     const triggers = ScrollTrigger.getAll().filter(trigger => trigger.pin);
     ranges = triggers.map(trigger => [trigger.start, trigger.end]);
-    const nodes = document.querySelectorAll("main .ui-hero, main .ui-screen, main .journey-story, footer");
+    const nodes = document.querySelectorAll("main .ui-screen, main .journey-story");
     targets = [...nodes].flatMap(node => {
       const pin = triggers.find(trigger => trigger.pin === node);
       const top = pin ? pin.start : y + node.getBoundingClientRect().top;
@@ -124,6 +124,11 @@ export function createSectionScroll() {
     armed = false;
     const target = restingSection(lenis.targetScroll, targets, ranges, window.innerHeight, lenis.limit);
     if (target === null || Math.abs(target - lenis.actualScroll) < 2) return;
+    // Freeze wheel momentum at the settled position before starting the short
+    // section alignment tween. Otherwise the pending Lenis target keeps moving
+    // underneath the snap and carries the page past the section start.
+    const settledPosition = lenis.actualScroll;
+    lenis.scrollTo(settledPosition, { immediate: true });
     aligning = true;
     lenis.scrollTo(target, {
       duration: SECTION_SCROLL.duration,

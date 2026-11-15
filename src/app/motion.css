@@ -272,7 +272,7 @@ body[data-journey-active="true"] [data-back-to-top] { opacity: 0 !important; poi
 .envelope-progress i { position: absolute; inset: 0; background: linear-gradient(90deg, #ee4b67, #884cff); transform: scaleX(0); transform-origin: left; }
 .contact-envelope > p { font-size: 7px; letter-spacing: .12em; font-weight: 800; color: #0006; margin: 12px 0 0; }
 
-.portfolio-footer { position: relative; isolation: isolate; overflow: hidden; min-height: 100svh; height: auto; background: #151517; }
+.portfolio-footer { position: relative; isolation: isolate; overflow: hidden; background: #151517; }
 .footer-backdrop { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .footer-ring { position: absolute; aspect-ratio: 1; border-radius: 50%; background: #212124; mask-image: radial-gradient(circle, transparent var(--ring-hole, 53%), #000 calc(var(--ring-hole, 53%) + 1px)); }
 .footer-ring-one { width: clamp(500px, 70vw, 1050px); right: -24%; top: -22%; }

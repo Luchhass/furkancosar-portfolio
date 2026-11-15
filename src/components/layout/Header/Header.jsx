@@ -564,10 +564,10 @@ export default function Header() {
   return (
     localize(<>
       <header
-        className={`ui-header pointer-events-none fixed top-0 left-0 z-50 grid w-full grid-cols-[48px_minmax(0,1fr)_88px] items-center py-0 transition-[color,opacity] duration-300 md:grid-cols-3 ${headerColorClass}`}
+        className={`ui-header pointer-events-none fixed inset-x-0 top-0 z-50 transition-[color,opacity] duration-300 ${headerColorClass}`}
         aria-label="Primary navigation"
       >
-        <div className="ui-header-cell col-start-1 flex h-11 items-center justify-self-start overflow-hidden">
+        <div className="ui-header-slot ui-header-left">
           <button
             type="button"
             data-hero-fullscreen-toggle
@@ -579,7 +579,7 @@ export default function Header() {
             aria-pressed={isHeroFullscreen}
             title={isHeroFullscreen ? "Exit full screen" : "Full screen"}
             onClick={toggleHeroFullscreen}
-            className={`group ui-header-control relative h-11 w-12 cursor-pointer border-0 bg-transparent p-0 text-current transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current md:hidden ${
+            className={`group ui-header-control ui-header-fullscreen-control relative h-11 w-12 cursor-pointer border-0 bg-transparent p-0 text-current transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current md:hidden ${
               showHeroFullscreenControl || isHeroFullscreen
                 ? "pointer-events-auto opacity-100"
                 : "pointer-events-none opacity-0"
@@ -636,31 +636,23 @@ export default function Header() {
           </div>
         </div>
 
-        <div className="ui-header-brand-cell ui-header-cell col-start-2 flex h-11 min-w-0 items-center justify-self-center overflow-visible">
-          <Link
-            href="/"
-            aria-label={`${siteConfig.name} home`}
-            onClick={closeMenuImmediately}
-            data-hero-intro="brand"
-            className="ui-header-brand pointer-events-auto inline-flex h-11 items-center leading-none font-black text-current no-underline"
-          >
-            <span>{siteConfig.brand}</span>
+        <Link
+          href="/"
+          aria-label={`${siteConfig.name} home`}
+          onClick={closeMenuImmediately}
+          data-hero-intro="brand"
+          className="ui-header-brand pointer-events-auto inline-flex items-center leading-none font-black text-current no-underline"
+        >
+          <span>{siteConfig.brand}</span>
+          <span className="ui-header-brand-reg" aria-hidden="true">&reg;</span>
+        </Link>
 
-            <span
-              className="relative -top-1.5 ml-1 text-[10px] leading-none md:text-xs"
-              aria-hidden="true"
-            >
-              &reg;
-            </span>
-          </Link>
-        </div>
-
-        <div className="ui-header-cell col-start-3 flex h-11 items-center justify-self-end overflow-hidden">
+        <div className="ui-header-slot ui-header-right">
           <LanguageToggle />
           <button
             type="button"
             data-hero-intro="menu-button"
-            className="group pointer-events-auto ui-header-control relative h-11 w-12 cursor-pointer border-0 bg-transparent p-0"
+            className="group pointer-events-auto ui-header-control ui-header-menu-button relative h-11 w-12 cursor-pointer border-0 bg-transparent p-0"
             aria-label={isMenuOpen ? "Close navigation" : "Open navigation"}
             aria-expanded={isMenuOpen}
             aria-controls="site-menu"

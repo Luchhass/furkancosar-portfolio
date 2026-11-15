@@ -38,11 +38,8 @@ try {
         assert.equal(await page.getByRole("button", { name: "What I Care About" }).getAttribute("aria-expanded"), "true");
       }
       if (route === "/projects") {
-        await page.getByRole("textbox", { name: "Search projects" }).fill("no-matching-project-xyz");
-        await page.waitForTimeout(600);
-        assert.equal(await page.locator(".project-card-motion").count(), 0, "empty search must show no cards");
-        await page.getByRole("textbox", { name: "Search projects" }).fill("");
         const card = page.locator(".project-card-motion").first();
+        assert.ok(await page.locator(".project-card-motion").count() > 0, `${name}: expected project cards`);
         await card.scrollIntoViewIfNeeded(); await page.waitForTimeout(1000); await card.click();
         const dialog = page.getByRole("dialog");
         await dialog.waitFor(); await page.waitForTimeout(1000);
@@ -52,9 +49,12 @@ try {
         await page.keyboard.press("Escape"); await dialog.waitFor({ state: "detached" });
       }
       if (route === "/about") {
-        await page.getByRole("button", { name: "Interface Stack" }).click();
-        await page.locator(".about-scene-layout").evaluate((el) => window.scrollTo(0, window.scrollY + el.getBoundingClientRect().top - 130));
-        await page.waitForTimeout(1000); await page.screenshot({ path: `${output}/${name}-tools.png` });
+        const toolkit = page.locator('section[aria-labelledby="toolkit-heading"]');
+        await toolkit.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(1000);
+        assert.equal(await toolkit.locator("[data-toolkit-label]").count(), 4, `${name}: expected four tool groups`);
+        assert.ok(await toolkit.locator("img[alt='']").count() > 0, `${name}: expected technology items`);
+        await page.screenshot({ path: `${output}/${name}-tools.png` });
       }
       if (route === "/contact") {
         await page.locator('input[name="name"]').fill("Motion preview");

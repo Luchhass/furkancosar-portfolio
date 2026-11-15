@@ -101,7 +101,7 @@ export default function Footer() {
     localize(<footer
       ref={footerRef}
       data-header-theme="dark"
-      className="ui-chrome portfolio-footer grid grid-rows-[minmax(0,1fr)_auto] text-white"
+      className="ui-chrome ui-screen portfolio-footer grid grid-rows-[minmax(0,1fr)_auto] text-white"
     >
       <div className="footer-backdrop" aria-hidden="true">
         <span className="footer-ring footer-ring-one" />

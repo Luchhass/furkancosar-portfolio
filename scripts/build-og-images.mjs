@@ -38,23 +38,13 @@ const html = `<!doctype html><html lang="en"><meta charset="utf-8"><title>Furkan
 @font-face{font-family:Geist;src:url(data:font/woff2;base64,${font.toString("base64")}) format('woff2');font-weight:100 900;font-style:normal}
 *{box-sizing:border-box}html,body{margin:0;width:1732px;height:908px;overflow:hidden;background:#030303;color:white}
 body{font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-.texture{position:absolute;inset:0}.shade{position:absolute;inset:0;background:linear-gradient(#0001,#0001)}
-header{position:absolute;left:64px;right:64px;top:38px;height:44px;display:flex;align-items:center;justify-content:space-between}
-.tag{font-size:12px;font-weight:900}.tag:before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:linear-gradient(110deg,#ee4b67,#8b45ff);margin-right:8px}
-.brand{position:absolute;left:50%;transform:translateX(-50%);font-size:30px;font-weight:900;letter-spacing:-.9px}.brand sup{font-size:10px;vertical-align:top;position:relative;top:5px;margin-left:4px}
-.controls{display:flex;align-items:center;gap:28px;font-size:13px;font-weight:900}
-.menu{width:28px;height:20px;border-top:3px solid white;border-bottom:3px solid white}.menu:after{content:'';display:block;margin-top:6px;border-top:3px solid white}
-main{position:absolute;left:64px;right:64px;top:274px;text-align:center}h1{margin:0;font-size:120px;font-weight:900;line-height:1;letter-spacing:-4.8px}h1 span{display:block;width:max-content;margin:auto}.gradient{background:linear-gradient(90deg,#6768ff,#884cff,#a53cdd,#cf3d9f,#ee4b67,#cf3d9f,#884cff,#6768ff);background-size:260% 100%;background-position:50% 50%;background-clip:text;-webkit-background-clip:text;color:transparent}
-.cue{position:absolute;right:64px;top:43%;display:flex;align-items:center;gap:20px;writing-mode:vertical-rl;font-size:10px;font-weight:900;letter-spacing:.12em}.cue svg{width:15px;height:68px}
-footer{position:absolute;left:64px;right:64px;bottom:38px;display:flex;align-items:end;justify-content:space-between;font-size:14px;line-height:1.25;color:#eee}
-.stat{display:flex;align-items:center;gap:12px;min-width:196px}.stat strong{font-size:32px;font-weight:900;line-height:.82}.stat p{margin:0;font-size:14px;font-weight:500}
-.copy{position:absolute;bottom:0;left:50%;transform:translateX(-50%);margin:0;width:448px;text-align:center;font-size:14px;line-height:1.45;font-weight:500}
-.button{height:56px;width:167px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid transparent;background:linear-gradient(#080808,#080808) padding-box,linear-gradient(110deg,#884cff,#ee4b67) border-box;font-size:12px;font-weight:900;color:white}.dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(110deg,#884cff,#ee4b67)}
+.texture{position:absolute;inset:0}.shade{position:absolute;inset:0;background:radial-gradient(ellipse at center,#0000 20%,#0005 100%)}
+main{position:absolute;inset:0;display:grid;place-items:center;padding:0 96px;text-align:center}
+h1{display:grid;justify-items:center;gap:0;margin:0;font-size:clamp(116px,10.5vw,182px);font-weight:900;line-height:.94;letter-spacing:-.04em;white-space:nowrap;color:#fff}
+h1 span{display:block}
+h1 .gradient{background:linear-gradient(100deg,#ee4b67 0%,#cf3d9f 42%,#884cff 100%);background-clip:text;-webkit-background-clip:text;color:transparent}
 </style><body><svg class="texture" width="1732" height="908" viewBox="0 0 1732 908" aria-hidden="true"><defs>${gradients}</defs>${hexagons}</svg><div class="shade"></div>
-<header><span class="tag">SEE MY PROJECTS</span><span class="brand">FURKANCOSAR<sup>®</sup></span><span class="controls">EN<span class="menu"></span></span></header>
-<main><h1><span>CREATIVE</span><span>FRONTEND</span><span class="gradient">DEVELOPER</span></h1></main>
-<div class="cue">SCROLL TO EXPLORE<svg viewBox="0 0 15 68" fill="none"><path d="M7.5 0v65M1 59l6.5 7 6.5-7" stroke="white" stroke-width="1.5"/></svg></div>
-<footer><div class="stat"><strong class="gradient">20</strong><p>completed projects<br>with modern interfaces</p></div><p class="copy">I build responsive, animated and user-focused web interfaces with React, Next.js, GSAP and Tailwind CSS. I turn ideas into clean, modern digital experiences across every screen.</p><div class="button"><span class="dot"></span>CONTACT ME</div></footer></body></html>`;
+<main><h1><span>FURKAN</span><span>FRONTEND</span><span class="gradient">DEVELOPER</span></h1></main></body></html>`;
 const htmlPath = join(preview, "og-home.html");
 await writeFile(htmlPath, html);
 const screenshot = join(preview, "og-home.png");

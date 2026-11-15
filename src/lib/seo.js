@@ -50,7 +50,7 @@ export function createPageMetadata(route = "home", options = {}) {
   const url = absoluteUrl(localizedPath(definition.path, locale));
   const images = route === "home" ? [{
     url: SITE_IMAGE_URL, width: SITE_IMAGE_WIDTH, height: SITE_IMAGE_HEIGHT,
-    alt: "Furkan Cosar — Creative Frontend Developer", type: "image/png",
+    alt: "Furkan Frontend Developer", type: "image/png",
   }] : [];
   return {
     title: { absolute: seo.title }, description: seo.description,
