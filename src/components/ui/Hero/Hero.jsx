@@ -395,23 +395,23 @@ function HeroContent({ titleLines, copyLines, stat, action, copyClassName = "", 
 
       <div
         data-hero-fullscreen-hide
-        className="relative z-10 row-start-3 grid w-full grid-cols-2 items-end gap-x-4 gap-y-5 self-end md:flex md:items-end md:justify-between md:gap-6"
+        className="relative z-10 row-start-3 grid w-full grid-cols-2 items-end gap-x-4 gap-y-5 self-end xl:grid-cols-[minmax(0,1fr)_minmax(0,auto)_minmax(0,1fr)] xl:items-center xl:gap-6"
       >
         {stat ? (
           <div
             data-hero-exit="stat"
-            className="pointer-events-auto col-start-1 row-start-2 min-w-0 overflow-hidden pr-3 md:pr-0"
+            className="pointer-events-auto col-start-1 row-start-2 min-w-0 overflow-hidden pr-3 xl:row-start-1 xl:pr-0"
             aria-label={stat.ariaLabel}
           >
-            <div data-hero-stat className="flex h-[var(--ui-control-height)] items-center gap-3">
-              <span className="text-[40px] leading-[0.82] font-black md:text-[44px] lg:text-[48px]">
+            <div data-hero-stat className="flex h-[var(--ui-control-height)] items-center gap-1 md:gap-2 xl:gap-3">
+              <span className="text-[56px] leading-[0.82] font-black">
                 <RevealCounter
                   value={stat.value}
                   textClassName="gradient-text-flow"
                 />
               </span>
 
-              <p className="m-0 text-[14px] leading-tight font-medium text-white/90 md:text-[16px] lg:text-[18px]">
+              <p className="m-0 min-w-0 text-[16px] leading-tight font-medium text-white/90 md:text-[18px] xl:text-[20px]">
                 {stat.labelLines.map((line, index) => (
                   <span key={line} className={index > 0 ? "hidden md:block" : "block"}>
                     {line}
@@ -426,7 +426,7 @@ function HeroContent({ titleLines, copyLines, stat, action, copyClassName = "", 
 
         <p
           data-hero-exit="copy"
-          className={`ui-hero-copy col-span-2 row-start-1 m-0 w-full max-w-[46ch] justify-self-center text-center text-[13px] leading-tight font-medium text-white/90 md:max-w-md md:text-sm lg:text-sm ${copyClassName}`}
+          className={`ui-hero-copy col-span-2 row-start-1 m-0 flex h-[var(--ui-control-height)] w-full max-w-[46ch] flex-col justify-center self-center text-center text-[13px] leading-tight font-medium text-white/90 xl:col-span-1 xl:col-start-2 xl:max-w-md md:text-sm lg:text-sm ${copyClassName}`}
         >
           <ReadingText as="span" waitForIntro className="block text-wrap md:hidden">{heroCopyText}</ReadingText>
           <ReadingText as="span" waitForIntro className="hidden md:block">
@@ -435,7 +435,7 @@ function HeroContent({ titleLines, copyLines, stat, action, copyClassName = "", 
         </p>
 
         {action ? (
-          <div data-hero-exit="action" className="col-start-2 row-start-2 flex justify-end overflow-hidden">
+          <div data-hero-exit="action" className="col-start-2 row-start-2 flex h-[var(--ui-control-height)] items-center justify-end overflow-hidden xl:col-start-3 xl:row-start-1">
             <div data-hero-button>
               <GradientActionButton
                 href={action.href}
@@ -447,7 +447,7 @@ function HeroContent({ titleLines, copyLines, stat, action, copyClassName = "", 
             </div>
           </div>
         ) : (
-          <span className="col-start-2 row-start-2" aria-hidden="true" />
+          <span className="col-start-2 row-start-2 h-[var(--ui-control-height)] xl:col-start-3 xl:row-start-1" aria-hidden="true" />
         )}
       </div>
     </section>)
