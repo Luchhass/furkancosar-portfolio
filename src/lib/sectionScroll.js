@@ -14,11 +14,17 @@ export const SECTION_SCROLL = Object.freeze({
 
 // Choose only a nearby resting frame, never a point inside a pinned story.
 export function restingSection(position, targets, ranges, viewport, limit) {
-  if (ranges.some(([start, end]) => position > start + 3 && position < end - 3)) return null;
   const radius = Math.min(SECTION_SCROLL.captureMax, viewport * SECTION_SCROLL.captureRatio);
+  // Pinned sections own their activation/release zones, and must never become
+  // alignment destinations. Otherwise a nearby frame can pull the scroll into
+  // a pin even when the gesture settled just outside its boundary.
+  const isPinnedZone = value => ranges.some(([start, end]) =>
+    value >= start - radius && value <= end + radius);
+  if (isPinnedZone(position)) return null;
   // The same radius and nearest-frame rule apply in both directions.
   // Returning to the frame where a gesture began is valid too.
   const nearby = targets.filter(target => target >= 0 && target <= limit &&
+    !isPinnedZone(target) &&
     Math.abs(target - position) <= radius);
   return nearby.reduce((best, value) => best === null || Math.abs(value - position) < Math.abs(best - position) ? value : best, null);
 }
