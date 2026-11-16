@@ -23,7 +23,7 @@ function Letter({ char, index, dataKey }) {
       style={{
         display: "inline-block",
         overflow: "hidden",
-        height: "0.92em",
+        height: "1em",
         verticalAlign: "top",
       }}
     >
@@ -32,8 +32,8 @@ function Letter({ char, index, dataKey }) {
         data-from-y={fromY}
         style={{
           display: "block",
-          height: "0.92em",
-          lineHeight: 0.92,
+          height: "1em",
+          lineHeight: 1,
         }}
       >
         {char === " " ? "\u00A0" : char}
@@ -48,6 +48,7 @@ function Word({
   lettersRef,
   dataKey,
   letterSpacing = "-0.04em",
+  fontWeight = 900,
   children,
 }) {
   const { t } = useLanguage();
@@ -62,7 +63,7 @@ function Word({
         display: "inline-flex",
         alignItems: "flex-start",
         fontSize: "clamp(44px, 8.5vw, 120px)",
-        fontWeight: 900,
+        fontWeight,
         letterSpacing,
         textTransform: "uppercase",
         whiteSpace: "nowrap",
@@ -199,18 +200,17 @@ function PageIntroStage({ pathname, routeReady, origin, onFinished }) {
     const getBrandDockState = () => {
       if (brandDockState) return brandDockState;
 
-      const sourceRect = (
-        brandTextRef.current || brand
-      ).getBoundingClientRect();
+      const sourceRect = (brandTextRef.current || brand).getBoundingClientRect();
       const brandRect = brand.getBoundingClientRect();
-      const targetText = headerBrand?.querySelector("span");
+      const targetText = headerBrand?.querySelector(":scope > span");
       const targetRect = (targetText || headerBrand)?.getBoundingClientRect();
 
-      if (!targetRect?.width || !sourceRect.width) {
+      if (!targetRect?.width || !targetRect.height || !sourceRect.width || !sourceRect.height) {
         brandDockState = {
           x: 0,
           y: -window.innerHeight * 0.42,
-          scale: 0.28,
+          scaleX: 0.28,
+          scaleY: 0.28,
           originX: brandRect.width / 2,
           originY: brandRect.height / 2,
         };
@@ -224,7 +224,8 @@ function PageIntroStage({ pathname, routeReady, origin, onFinished }) {
       brandDockState = {
         x: targetRect.left + targetRect.width / 2 - sourceCenterX,
         y: targetRect.top + targetRect.height / 2 - sourceCenterY,
-        scale: targetRect.width / sourceRect.width,
+        scaleX: targetRect.width / sourceRect.width,
+        scaleY: targetRect.height / sourceRect.height,
         originX: sourceCenterX - brandRect.left,
         originY: sourceCenterY - brandRect.top,
       };
@@ -398,7 +399,8 @@ function PageIntroStage({ pathname, routeReady, origin, onFinished }) {
       tl.to(brand, {
         x: () => getBrandDockState().x,
         y: () => getBrandDockState().y,
-        scale: () => getBrandDockState().scale,
+        scaleX: () => getBrandDockState().scaleX,
+        scaleY: () => getBrandDockState().scaleY,
         duration: 0.92,
         ease: "expo.inOut",
       });
@@ -557,16 +559,17 @@ function PageIntroStage({ pathname, routeReady, origin, onFinished }) {
           lettersRef={brandTextRef}
           dataKey="data-bl"
           letterSpacing="0"
+          fontWeight={700}
         >
           <span
             ref={regRef}
             aria-hidden="true"
             style={{
               position: "relative",
-              top: "0.22em",
+              top: "0.25em",
               alignSelf: "flex-start",
               marginLeft: "0.05em",
-              fontSize: "0.28em",
+              fontSize: "0.31em",
               fontWeight: 700,
               letterSpacing: "normal",
               lineHeight: 1,

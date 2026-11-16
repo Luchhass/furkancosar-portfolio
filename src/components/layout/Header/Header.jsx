@@ -10,7 +10,6 @@ import { contactItems, navigationItems, siteConfig, socialItems } from "@/data/s
 import gsap from "gsap";
 import { Lock, LockOpen } from "lucide-react";
 import Link from "next/link";
-import LanguageToggle from "@/components/layout/LanguageToggle";
 import { basePath, localizedPath, routeLocale } from "@/lib/localizedRoutes";
 import SocialMediaButtons from "../../ui/SocialMediaButtons/SocialMediaButtons";
 
@@ -641,14 +640,13 @@ export default function Header() {
           aria-label={`${siteConfig.name} home`}
           onClick={closeMenuImmediately}
           data-hero-intro="brand"
-          className="ui-header-brand pointer-events-auto inline-flex items-center leading-none font-black text-current no-underline"
+          className="ui-header-brand pointer-events-auto inline-flex items-center leading-none font-bold text-current no-underline"
         >
           <span>{siteConfig.brand}</span>
           <span className="ui-header-brand-reg" aria-hidden="true">&reg;</span>
         </Link>
 
         <div className="ui-header-slot ui-header-right">
-          <LanguageToggle />
           <button
             type="button"
             data-hero-intro="menu-button"
