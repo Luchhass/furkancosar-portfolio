@@ -4,11 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
-    "build:og": "node scripts/build-og-images.mjs",
+    "build:og": "node scripts/build-brand-assets.mjs",
+    "build:pwa-screens": "node scripts/build-pwa-screens.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:motion": "node scripts/verify-motion.mjs"
+    "test:motion": "node scripts/verify-motion.mjs",
+    "test:seo": "node scripts/verify-seo.mjs",
+    "seo:indexnow": "node --env-file-if-exists=.env.local scripts/submit-indexnow.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

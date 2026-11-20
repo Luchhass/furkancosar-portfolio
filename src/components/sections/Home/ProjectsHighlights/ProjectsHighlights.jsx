@@ -16,7 +16,7 @@ export default function ProjectsHighlights() {
   const sectionRef = useRef(null);
   const [selected, setSelected] = useState(null);
   const { trackRef, viewportProps } = useHighlightsCarousel(sectionRef);
-  useShelfCardReveal(sectionRef, projects.length, viewportProps.ref);
+  useShelfCardReveal(sectionRef, projects.length, { groupRef: viewportProps.ref });
 
   return localize(<section ref={sectionRef} data-header-theme="dark" data-scroll-reveal="sequence"
     className="ui-screen ui-fit-panel highlights-scene ui-section bg-[#141414] text-white" aria-labelledby="highlights-title">

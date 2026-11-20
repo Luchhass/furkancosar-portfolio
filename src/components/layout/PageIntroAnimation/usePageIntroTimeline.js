@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { basePath } from "@/lib/localizedRoutes";
+import { circleCover, circleMask } from "@/lib/circleReveal";
 
 const brandSelector = "[data-hero-intro='brand']";
 
@@ -98,7 +99,7 @@ export default function usePageIntroTimeline({ pathname, routeReady, origin, onF
     }
 
     gsap.set(overlay, { display: "block" });
-    if (origin) gsap.set(overlay, { clipPath: `circle(0px at ${origin.x}px ${origin.y}px)` });
+    if (origin) gsap.set(overlay, { clipPath: circleMask(origin) });
     gsap.set([whiteLeft, whiteRight, bg], { willChange: "transform" });
     gsap.set(stage, { autoAlpha: brand ? 1 : 0 });
     gsap.set(welcomeLetters, { yPercent: (_, letter) => Number(letter.dataset.fromY), willChange: "transform" });
@@ -114,12 +115,8 @@ export default function usePageIntroTimeline({ pathname, routeReady, origin, onF
     tlRef.current = tl;
 
     if (origin) {
-      const radius = Math.hypot(Math.max(origin.x, innerWidth - origin.x), Math.max(origin.y, innerHeight - origin.y)) + 2;
-      tl.to(overlay, {
-        clipPath: `circle(${radius}px at ${origin.x}px ${origin.y}px)`,
-        duration: .75,
-        ease: "power3.inOut",
-      }).call(() => window.dispatchEvent(new CustomEvent("page-navigation:covered", { detail: { pathname } })));
+      tl.to(overlay, circleCover(origin))
+        .call(() => window.dispatchEvent(new CustomEvent("page-navigation:covered", { detail: { pathname } })));
     }
 
     if (brand) {

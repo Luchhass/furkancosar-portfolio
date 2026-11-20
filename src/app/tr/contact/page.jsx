@@ -1,3 +1,3 @@
 import { createPageMetadata } from "@/lib/seo";
-export { default } from "../../contact/page";
+export { default } from "../../(en)/contact/page";
 export const metadata = createPageMetadata("contact", { locale: "tr" });

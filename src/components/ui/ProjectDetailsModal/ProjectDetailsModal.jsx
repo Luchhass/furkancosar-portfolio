@@ -82,7 +82,7 @@ export default function ProjectDetailsModal({ project, projectNumber, origin, on
       <div className="project-modal-layout">
         <div className="project-modal-preview">
           <div className="project-preview-placeholder" aria-hidden="true"><span>PROJECT / {number}</span><strong>{project.name}</strong></div>
-          {project.screenshot && <Image src={project.screenshot} alt={`${project.name} preview`} fill sizes="(min-width: 900px) 55vw, 100vw" priority className="project-preview-image" onError={(event) => { event.currentTarget.style.opacity = "0"; }} />}
+          {project.screenshot && <Image src={project.screenshot} alt="" fill sizes="(min-width: 900px) 55vw, 100vw" priority className="project-preview-image" onError={(event) => { event.currentTarget.style.opacity = "0"; }} />}
           <span className="project-preview-index" aria-hidden="true">{number}</span>
         </div>
         <div className="project-modal-copy">
@@ -91,10 +91,10 @@ export default function ProjectDetailsModal({ project, projectNumber, origin, on
           <ReadingText className="project-detail-description">{project.description}</ReadingText>
           <dl className="project-detail-facts" data-project-detail>{[["Type", project.type], ["Released", formatDate(project.date, locale)], ["Category", project.category], ["Status", project.status]].filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
           <div className="project-detail-stack" data-project-detail><p>BUILT WITH</p><div>{project.technologies?.map((technology) => <span key={technology}>{technology}</span>)}</div></div>
-          <div className="project-detail-actions" data-project-detail>
+          {(project.liveUrl || project.sourceUrl) && <div className="project-detail-actions" data-project-detail>
             {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noreferrer" className="ui-button ui-button--compact project-detail-primary">Visit live site <ArrowUpRight size={21} /></a>}
             {project.sourceUrl && <a href={project.sourceUrl} target="_blank" rel="noreferrer" className="ui-button ui-button--compact project-detail-source">Source code <ArrowUpRight size={17} /></a>}
-          </div>
+          </div>}
         </div>
       </div>
     </div>

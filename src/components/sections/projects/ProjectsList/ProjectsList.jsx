@@ -11,7 +11,7 @@ export default function ProjectsList({ projects = latestProjects }) {
   const localize = useLocalizedContent();
   const sectionRef = useRef(null);
   const [selected, setSelected] = useState(null);
-  useShelfCardReveal(sectionRef, projects.map(project => project.id).join("|"));
+  useShelfCardReveal(sectionRef, projects.map(project => project.id).join("|"), { direction: "right" });
 
   return localize(<section id="project-archive" ref={sectionRef} data-header-theme="dark"
     className="projects-archive ui-section bg-[#141414] text-white" aria-labelledby="projects-list-title">

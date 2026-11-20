@@ -10,6 +10,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ChromeContact, ChromeNavigation, ChromeRings, ChromeSocials } from "../SiteChrome";
+import PortfolioCaseStudy from "./PortfolioCaseStudy";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -114,7 +115,13 @@ export default function Footer() {
       </div>
 
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <ChromeContact />
+        <div className="flex flex-col items-start gap-3 lg:flex-row lg:items-center lg:gap-4">
+          <ChromeContact />
+          <span aria-hidden="true" className="hidden overflow-hidden lg:inline-block">
+            <span data-footer-address-item className="ui-chrome-contact-text block text-white/60">|</span>
+          </span>
+          <PortfolioCaseStudy />
+        </div>
 
         <ChromeSocials />
       </div>

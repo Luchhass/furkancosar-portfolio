@@ -6,7 +6,7 @@ import { bindProjectCardHover } from "./pointerMotion";
 import { reverseReveal } from "./repeatReveal";
 import { sequenceReveal } from "./revealSequence";
 
-export default function useShelfCardReveal(scope, renderKey, groupRef) {
+export default function useShelfCardReveal(scope, renderKey, { groupRef, direction = "down" } = {}) {
   useGSAP(() => {
     const media = createMotionMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
@@ -26,6 +26,7 @@ export default function useShelfCardReveal(scope, renderKey, groupRef) {
           }
         });
       }, { threshold: [0, 0.15] });
+      const offset = direction === "right" ? "xPercent" : "yPercent";
       function observeCards(anchor, cardMasks) {
         const setMaskActive = active => {
           const value = String(active);
@@ -36,8 +37,8 @@ export default function useShelfCardReveal(scope, renderKey, groupRef) {
         cardMasks.forEach(mask => { mask.dataset.revealReady = "true"; });
         const targets = cardMasks.map(mask => mask.querySelector("[data-project-card-reveal-inner]"));
         const animation = gsap.fromTo(targets,
-          { yPercent: -105 },
-          { yPercent: 0, duration: .7, ease: "power3.out", force3D: false, paused: true,
+          { [offset]: -105 },
+          { [offset]: 0, duration: .7, ease: "power3.out", force3D: false, paused: true,
             onUpdate: function () {
               setMaskActive(this.progress() !== 1);
             },
@@ -64,5 +65,5 @@ export default function useShelfCardReveal(scope, renderKey, groupRef) {
       return () => cleanups.forEach(cleanup => cleanup());
     });
     return () => media.revert();
-  }, { scope, dependencies: [renderKey, groupRef], revertOnUpdate: true });
+  }, { scope, dependencies: [renderKey, groupRef, direction], revertOnUpdate: true });
 }

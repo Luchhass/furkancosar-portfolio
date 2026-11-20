@@ -26,6 +26,7 @@ export default function PageIntroPrepaintMask() {
 
   return (
     <div
+      data-intro-prepaint
       className="gradient-bg-flow"
       aria-hidden="true"
       style={{

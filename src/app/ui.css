@@ -389,8 +389,9 @@
 .ui-header-control, .ui-header-right > .ui-language-toggle { box-sizing: border-box; height: var(--ui-header-cell-height); min-height: var(--ui-header-cell-height); }
 .ui-header-control { min-width: 44px; }
 .ui-header, .ui-hero, .ui-chrome { padding: var(--ui-frame-inset); }
-.site-menu-frame { grid-template-rows: minmax(var(--ui-frame-header-clearance), 1fr) auto minmax(24px, 2fr) auto; }
+.site-menu-frame { grid-template-rows: minmax(var(--ui-frame-header-clearance), 1fr) auto minmax(44px, 2fr) auto; }
 .site-menu-links { grid-row: 2; }
+.site-menu-language { grid-row: 3; place-self: center start; }
 .site-menu-meta { grid-row: 4; }
 .ui-footer-content { padding-block-start: var(--ui-frame-header-clearance); }
 .ui-chrome-contact { font-size: 14px; line-height: 1.3; font-weight: 500; letter-spacing: .02em; }

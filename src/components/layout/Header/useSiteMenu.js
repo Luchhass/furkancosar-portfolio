@@ -156,7 +156,7 @@ export default function useSiteMenu(pathname) {
           stagger: MOTION.line.stagger,
           clearProps: "transform,willChange",
         },
-        0.62,
+        0.8,
       );
 
       timeline.to(
@@ -168,7 +168,7 @@ export default function useSiteMenu(pathname) {
           stagger: MOTION.line.stagger,
           clearProps: "transform,willChange",
         },
-        0.82,
+        0.94,
       );
     },
     { dependencies: [isMenuOpen], scope: menuRef, revertOnUpdate: true },

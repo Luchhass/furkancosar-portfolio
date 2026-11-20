@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img" aria-labelledby="title">
+  <title id="title">Designing with purpose</title>
+  <rect width="1200" height="420" fill="#151517"/>
+
+  <g fill="none">
+    <circle cx="924" cy="30" r="356" stroke="#212124" stroke-width="80"/>
+    <circle cx="1126" cy="177" r="255" stroke="#252528" stroke-width="31"/>
+    <circle cx="237" cy="142" r="122" stroke="#1e1e21" stroke-width="42"/>
+    <circle cx="238" cy="142" r="62" stroke="#1f1f22" stroke-width="26"/>
+    <circle cx="694" cy="217" r="77" stroke="#262629" stroke-width="15"/>
+    <circle cx="944" cy="361" r="106" stroke="#242427" stroke-width="19"/>
+    <circle cx="680" cy="443" r="139" stroke="#1f1f22" stroke-width="51"/>
+    <circle cx="54" cy="448" r="238" stroke="#252528" stroke-width="22"/>
+    <circle cx="-64" cy="489" r="222" stroke="#222225" stroke-width="46"/>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="100" letter-spacing="-4" fill="#fff">
+    <text x="45" y="140">DESIGNING</text>
+    <text x="45" y="232">WITH</text>
+    <text x="45" y="324" fill="#eb5e28">PURPOSE</text>
+  </g>
+</svg>
