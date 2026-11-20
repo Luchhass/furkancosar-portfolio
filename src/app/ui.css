@@ -266,6 +266,14 @@
   }
 }
 @media (max-width: 639px) {
+  @container (width < 270px) {
+    .ui-hero-counter:lang(en) {
+      font-size: clamp(28px, calc((100cqi - 4.7 * var(--hero-label-size) - 4px) / 1.34), 76px);
+    }
+    .ui-hero-counter:lang(tr) {
+      font-size: clamp(28px, calc((100cqi - 5.55 * var(--hero-label-size) - 4px) / 1.34), 76px);
+    }
+  }
   .ui-hero-copy { container-type: inline-size; }
   .ui-hero-copy-lines { font-size: clamp(11px, 4.05cqi, 14px); }
 }
