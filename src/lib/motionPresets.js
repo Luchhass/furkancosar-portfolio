@@ -26,7 +26,6 @@ export const MOTION = Object.freeze({
   marqueeMaxBoost: 4,
   orbitDuration: 80,
   idle: { duration: 3, stagger: .5, ease: "sine.inOut" },
-  gradientSeconds: 22,
   rings: { travelRatio: .62, travelMax: 540, sidewaysRatio: .28, sidewaysMax: 360, duration: .78, ease: "power3.inOut" },
   ringPaths: [[.45, 1, -1, -1], [-1, -.6, .5, .7], [-.4, .55, .6, -.6], [-.7, .65, .35, -.65], [.6, -.3, -.45, .4], [-.3, .3, .8, -.25], [.3, -.6, -.4, .55], [-.7, .25, .3, -.4], [.5, .6, -.5, -.2]],
 });

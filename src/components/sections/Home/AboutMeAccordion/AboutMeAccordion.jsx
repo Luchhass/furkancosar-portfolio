@@ -1,6 +1,6 @@
 "use client";
 import { useLocalizedContent } from "@/lib/localizeContent";
-import { MOTION } from "@/lib/motionPresets";
+import { updateTitleFillOrigin } from "@/lib/pointerOrigin";
 import { useRef, useState } from "react";
 import { Code2, Sparkles, Workflow } from "lucide-react";
 import OutlineCirclesBackground from "@/components/ui/Backgrounds/OutlineCirclesBackground";
@@ -39,20 +39,9 @@ export default function AboutMeAccordion() {
   const localize = useLocalizedContent();
   const [openId, setOpenId] = useState(accordionItems[0].id);
   const accordionRef = useRef(null);
-  useSectionScene(accordionRef, "accordion");
+  useSectionScene(accordionRef);
 
 
-  function updateTitleFillOrigin(event) {
-    const button = event.currentTarget;
-    const text = button.querySelector(".gradient-title-text");
-    const rect = text.getBoundingClientRect();
-
-    const x = Math.min(Math.max(event.clientX - rect.left, 0), rect.width);
-    const y = Math.min(Math.max(event.clientY - rect.top, 0), rect.height);
-
-    button.style.setProperty("--gradient-title-fill-x", `${x}px`);
-    button.style.setProperty("--gradient-title-fill-y", `${y}px`);
-  }
 
   return (
     localize(<section
@@ -62,31 +51,6 @@ export default function AboutMeAccordion() {
       className={`ui-screen ui-fit-panel ui-screen-about relative isolate overflow-hidden bg-white ui-section text-black ${styles.section}`}
     >
       <OutlineCirclesBackground />
-      
-      <svg className="absolute h-0 w-0" aria-hidden="true">
-        <defs>
-          <linearGradient
-            id="accordion-icon-gradient"
-            x1="-1"
-            y1="0"
-            x2="2"
-            y2="1"
-          >
-            <stop stopColor="#6768ff" />
-            <stop offset=".35" stopColor="#884cff" />
-            <stop offset=".6" stopColor="#cf3d9f" />
-            <stop offset="1" stopColor="#ee4b67" />
-
-            <animateTransform
-              attributeName="gradientTransform"
-              type="translate"
-              values="-1 0; 1 0; -1 0"
-              dur={`${MOTION.gradientSeconds}s`}
-              repeatCount="indefinite"
-            />
-          </linearGradient>
-        </defs>
-      </svg>
 
       <div className="ui-section-grid relative z-10">
         <p data-reveal-part="kicker" className="ui-section-label text-black/55"><MiniTitleText>About</MiniTitleText></p>
@@ -117,7 +81,7 @@ export default function AboutMeAccordion() {
               >
                 <Icon
                   data-scene-icon
-                  color="url(#accordion-icon-gradient)"
+                  color="var(--color-primary)"
                   strokeWidth={2.3}
                   className="gradient-icon-flow mt-1 h-5 w-5 md:h-6 md:w-6"
                   aria-hidden="true"

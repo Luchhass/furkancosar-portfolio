@@ -8,12 +8,9 @@ import { basePath } from "@/lib/localizedRoutes";
 // History-based language switches preserve forms. Keep their head tags in sync too.
 export default function RouteSeoSync() {
   const pathname = usePathname();
-  const { locale, setLanguage } = useLanguage();
+  const { locale } = useLanguage();
   const previousPath = useRef(pathname);
   useEffect(() => {
-    setLanguage(locale);
-    document.documentElement.lang = locale;
-    document.documentElement.dataset.locale = locale;
     const before = previousPath.current;
     previousPath.current = pathname;
     // Next owns head elements during route navigation. Only update attributes
@@ -41,6 +38,6 @@ export default function RouteSeoSync() {
       const link = document.head.querySelector(`link[rel="alternate"][hreflang="${language}"]`);
       if (link) link.href = href;
     }
-  }, [pathname, locale, setLanguage]);
+  }, [pathname]);
   return <script data-route-jsonld type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(createJsonLd(routeKey(pathname), locale)).replace(/</g, "\\u003c") }} />;
 }

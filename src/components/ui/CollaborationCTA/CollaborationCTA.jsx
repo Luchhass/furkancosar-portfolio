@@ -46,7 +46,7 @@ export default function CollaborationCTA() {
     <div className="cta-center">
       <h2 id="collaboration-title" aria-label="Let’s build together"><span className="cta-title-first"><span className="title-reveal-mask"><span data-cta-title data-title-reveal>LET&apos;S BUILD</span></span></span><span className="cta-title-second" aria-hidden="true"><span className="title-reveal-mask"><span data-cta-title data-title-reveal><span className="relative block overflow-hidden"><span className="invisible whitespace-nowrap">SOMETHING</span><LetterReel words={rotatingWords} /></span></span></span></span></h2>
       <p className="cta-description"><ReadingText as="span" className="block">Have an idea, project or interface that needs a clean frontend touch? Let&apos;s turn it into a polished web experience.</ReadingText></p>
-      <div data-cta-detail><div data-cta-follow><div data-cta-reveal><GradientActionButton showDot={false} className="w-fit! px-8" href="/contact" id="collaboration-contact" label="LET’S MAKE IT HAPPEN" /></div></div></div>
+      <div data-cta-detail><div data-cta-follow><div data-cta-reveal><GradientActionButton className="w-fit! px-8" href="/contact" id="collaboration-contact" label="LET’S MAKE IT HAPPEN" /></div></div></div>
     </div>
   </section>);
 }

@@ -111,14 +111,15 @@ export default function IdentityBand() {
     }
 
     let frame = null;
+    let attached = true;
     let lastWidth = 0;
 
     function fitTitle(force = false) {
-      if (frame !== null) {
-        window.cancelAnimationFrame(frame);
-      }
+      if (!attached) return;
+      if (frame !== null) window.cancelAnimationFrame(frame);
 
       frame = window.requestAnimationFrame(() => {
+        frame = null;
         const availableWidth = title.getBoundingClientRect().width;
 
         if (!force && Math.abs(availableWidth - lastWidth) < 0.5) {
@@ -148,6 +149,7 @@ export default function IdentityBand() {
     document.fonts?.ready.then(() => fitTitle(true));
 
     return () => {
+      attached = false;
       if (frame !== null) {
         window.cancelAnimationFrame(frame);
       }

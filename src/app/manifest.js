@@ -1,3 +1,4 @@
+import { PRIMARY_COLOR } from "@/data/brand";
 import { siteConfig } from "@/lib/seo";
 
 export default function manifest() {
@@ -10,7 +11,7 @@ export default function manifest() {
     scope: "/",
     display: "standalone",
     background_color: "#000000",
-    theme_color: "#000000",
+    theme_color: PRIMARY_COLOR,
     orientation: "portrait-primary",
     lang: "en",
     categories: ["portfolio", "business", "productivity"],
@@ -37,7 +38,7 @@ export default function manifest() {
     screenshots: [
       {
         src: siteConfig.ogImage,
-        sizes: "1200x630",
+        sizes: "1732x908",
         type: "image/png",
         form_factor: "wide",
         label: `${siteConfig.name} frontend developer portfolio preview`,

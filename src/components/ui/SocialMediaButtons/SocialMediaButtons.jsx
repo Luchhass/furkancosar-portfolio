@@ -1,5 +1,7 @@
 "use client";
 
+import { updateActionFillOrigin } from "@/lib/pointerOrigin";
+
 function SocialIcon({ icon }) {
   if (icon === "instagram") {
     return (
@@ -47,20 +49,6 @@ export default function SocialMediaButtons({
 }) {
   const colorClassName = className || "text-white";
 
-  function updateActionFillOrigin(event) {
-    const link = event.currentTarget;
-    const rect = link.getBoundingClientRect();
-
-    link.style.setProperty(
-      "--gradient-fill-x",
-      `${event.clientX - rect.left}px`,
-    );
-    link.style.setProperty(
-      "--gradient-fill-y",
-      `${event.clientY - rect.top}px`,
-    );
-  }
-
   return (
     <a
       href={item.href}
@@ -70,16 +58,11 @@ export default function SocialMediaButtons({
       {...(animationAttribute ? { [animationAttribute]: "" } : {})}
       onPointerEnter={updateActionFillOrigin}
       onPointerLeave={updateActionFillOrigin}
-      className={`gradient-action-button group/social relative isolate inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full no-underline ${colorClassName}`}
+      className={`gradient-action-button gradient-action-paint group/social relative isolate inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full no-underline ${colorClassName}`}
     >
       <span
-        className="gradient-action-fill pointer-events-none z-0 rounded-full"
-        aria-hidden="true"
-      />
-
-      <span
         className="gradient-action-border pointer-events-none z-20 rounded-full"
-        style={{ padding: "1.5px" }}
+        style={{ borderWidth: "1.5px" }}
         aria-hidden="true"
       />
 

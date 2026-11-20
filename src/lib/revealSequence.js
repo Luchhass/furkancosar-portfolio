@@ -1,6 +1,6 @@
 // Coordinate existing animations by their role, without adding timed delays.
 const scenes = new Map();
-let queued = false;
+const pendingScenes = new Set();
 
 function stageFor(anchor) {
   const explicit = anchor.closest("[data-reveal-order]");
@@ -13,12 +13,14 @@ function stageFor(anchor) {
   return 4;
 }
 
-function schedule() {
-  if (queued) return;
-  queued = true;
+function schedule(records) {
+  const alreadyQueued = pendingScenes.size > 0;
+  pendingScenes.add(records);
+  if (alreadyQueued) return;
   queueMicrotask(() => {
-    queued = false;
-    scenes.forEach(records => {
+    const pending = [...pendingScenes];
+    pendingScenes.clear();
+    pending.forEach(records => {
       const visible = [...records].filter(record => record.visible && record.anchor.getClientRects().length);
       visible.forEach(record => {
         if (record.started || !record.canPlay()) return;
@@ -32,9 +34,8 @@ function schedule() {
 
 export function sequenceReveal(animation, anchor, { canPlay = () => true, stage = stageFor(anchor) } = {}) {
   const scene = anchor.closest("section, footer") || anchor;
-  const key = scene;
-  let records = scenes.get(key);
-  if (!records) { records = new Set(); scenes.set(key, records); }
+  let records = scenes.get(scene);
+  if (!records) { records = new Set(); scenes.set(scene, records); }
   const record = { animation, anchor, stage, canPlay, visible: false, started: false, ready: false };
   records.add(record);
   const complete = animation.eventCallback("onComplete");
@@ -49,25 +50,25 @@ export function sequenceReveal(animation, anchor, { canPlay = () => true, stage 
     if (record.started && !record.ready && !this.reversed() && tweens.length &&
         tweens.every(tween => tween.progress() === 1 || tween.ratio >= .995)) {
       record.ready = true;
-      schedule();
+      schedule(records);
     }
   });
   animation.eventCallback("onComplete", function () {
     complete?.apply(this, params);
     record.ready = true;
-    schedule();
+    schedule(records);
   });
   return {
-    enter() { record.visible = true; schedule(); },
-    exit() { record.visible = false; record.started = false; record.ready = false; schedule(); },
-    refresh() { schedule(); },
-    replay() { record.started = false; record.ready = false; schedule(); },
+    enter() { record.visible = true; schedule(records); },
+    exit() { record.visible = false; record.started = false; record.ready = false; schedule(records); },
+    refresh() { schedule(records); },
+    replay() { record.started = false; record.ready = false; schedule(records); },
     dispose() {
       records.delete(record);
-      if (!records.size) scenes.delete(key);
+      if (!records.size) scenes.delete(scene);
       animation.eventCallback("onComplete", complete, params);
       animation.eventCallback("onUpdate", update, updateParams);
-      schedule();
+      if (records.size) schedule(records);
     },
   };
 }

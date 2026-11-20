@@ -109,7 +109,6 @@ export default function RevealCounter({
   const tracksRef = useRef([]);
   const tweenRef = useRef(null);
   const parsedValue = useMemo(() => parseCounterValue(value), [value]);
-  const hasGradientText = textClassName.includes("gradient-text-flow");
   const digitColumns = useMemo(() => {
     if (!parsedValue.hasNumber) return [];
 
@@ -229,13 +228,6 @@ export default function RevealCounter({
   const initialValue = parsedValue.hasNumber
     ? formatCounterValue(parsedValue, 0)
     : parsedValue.rawValue;
-  const getDigitTextStyle = (columnIndex) =>
-    hasGradientText
-      ? {
-          "--gradient-flow-offset": `-${columnIndex}ch`,
-          "--gradient-flow-size": `calc(${digitColumns.length}ch * 2.6) 100%`,
-        }
-      : undefined;
 
   return (
     <span
@@ -259,7 +251,7 @@ export default function RevealCounter({
             >
               <span
                 className={`invisible block ${textClassName}`}
-                style={getDigitTextStyle(columnIndex)}
+
               >
                 0
               </span>
@@ -274,7 +266,7 @@ export default function RevealCounter({
                   <span
                     key={`${column.id}-${step}`}
                     className={`block ${textClassName}`}
-                    style={getDigitTextStyle(columnIndex)}
+
                   >
                     {step % 10}
                   </span>

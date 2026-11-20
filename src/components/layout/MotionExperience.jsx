@@ -37,52 +37,8 @@ export default function MotionExperience() {
   }, [pathname]);
 
   useEffect(() => {
-    const selector = ".gradient-focus-flow, .gradient-text-flow, .gradient-bg-flow, .gradient-action-fill, .gradient-action-border, .gradient-action-dot, .gradient-icon-flow, .orbital-ring, .orbital-core, .journey-rail-fill, .sculpture-bottom i, .gallery-progress-fill, .envelope-front, .envelope-progress i, .contact-scene-grid form label";
-    const tracked = new Set();
-    const visible = new Map();
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        visible.set(entry.target, entry.isIntersecting);
-        entry.target.dataset.gradientVisible = entry.isIntersecting && !document.hidden ? "true" : "false";
-      }
-    }, { threshold: 0 });
-    const register = (root) => {
-      const elements = root.matches?.(selector) ? [root, ...root.querySelectorAll(selector)] : root.querySelectorAll(selector);
-      for (const element of elements) {
-        if (tracked.has(element)) continue;
-        tracked.add(element);
-        element.dataset.gradientVisible = "false";
-        observer.observe(element);
-      }
-    };
-    document.documentElement.style.setProperty("--gradient-flow-duration", `${MOTION.gradientSeconds}s`);
     document.documentElement.style.setProperty("--motion-orbit-duration", `${MOTION.orbitDuration}s`);
-    register(document.body);
-    const mutations = new MutationObserver((records) => {
-      for (const record of records) {
-        for (const node of record.removedNodes) {
-          if (node.nodeType !== 1) continue;
-          const elements = node.matches?.(selector) ? [node, ...node.querySelectorAll(selector)] : node.querySelectorAll(selector);
-          for (const element of elements) {
-            observer.unobserve(element);
-            tracked.delete(element);
-            visible.delete(element);
-          }
-        }
-        for (const node of record.addedNodes) if (node.nodeType === 1) register(node);
-      }
-    });
-    mutations.observe(document.body, { childList: true, subtree: true });
-    const onVisibility = () => {
-      for (const element of tracked) element.dataset.gradientVisible = visible.get(element) && !document.hidden ? "true" : "false";
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      mutations.disconnect(); observer.disconnect();
-      document.removeEventListener("visibilitychange", onVisibility);
-      for (const element of tracked) delete element.dataset.gradientVisible;
-    };
-  }, [pathname]);
+  }, []);
 
   return null;
 }

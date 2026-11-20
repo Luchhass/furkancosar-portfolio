@@ -52,9 +52,6 @@ function ReadingTextContent({ as: Tag = "p", children, active = true, waitForInt
           sequence?.dispose();
           animation?.kill();
           if (!self.words.length) return;
-          // A masked word paints its own text; keep highlighted words colored
-          // without the old duplicate overlay text.
-          root.querySelectorAll(".gradient-text-flow .reading-word").forEach(word => word.classList.add("gradient-text-flow"));
           const spread = Math.min(MOTION.reading.maxSpread, MOTION.reading.wordStagger * Math.max(0, self.words.length - 1));
           animation = gsap.timeline({ paused: true }).fromTo(self.words, {
             y: (_index, word) => -(word.parentElement.getBoundingClientRect().height + MOTION.reading.hiddenOffset),

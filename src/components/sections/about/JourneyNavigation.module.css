@@ -1,5 +1,5 @@
 .controls :global(.journey-rail) { position: relative; display: block; height: 3px; background: #ffffff16; }
-.controls :global(.journey-rail-fill) { background-image: linear-gradient(90deg, #ee4b67, #cf3d9f, #884cff, #6768ff); }
+.controls :global(.journey-rail-fill) { background-color: var(--color-primary); }
 .controls :global(.journey-chapter-links) { gap: 12px; margin-top: 14px; }
 .controls :global(.journey-chapter-links button) { display: block; min-width: 0; padding: 0; border: 0; background: none; color: #ffffff55; overflow: hidden; transition: color .3s; }
 .track { position: absolute; inset: 0 auto 0 0; display: flex; width: 200%; column-gap: 6px; transform: translateX(-50%); }

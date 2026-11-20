@@ -13,21 +13,21 @@ Open http://localhost:3000. Copy `.env.example` to `.env.local` for optional mai
 
 ## Motion architecture
 
-- `Hero`: page-intro coordination, alternating masked horizontal title entrances, pointer perspective and scroll-driven line separation.
+- `Hero` renders the heading, cue and footer. `useHeroMotion` coordinates their entrances, perspective and scroll exit. The background mounts a canvas controller with separate drawing and deformation modules.
 - `TitleLine`: whole-line 2D horizontal entrance inside a stable mask. Section titles enter from the left; hero/CTA title lines alternate sides. Pointer and scroll effects remain on separate layers.
 - `ReadingText`: masked words enter downward in reading order using the original About paragraph's .86s power3.out motion. Stagger is bounded for long copy; there are no character masks or duplicate blur layers. Reduced motion renders ordinary text. Shared by hero/body/CTA, accordion, Journey and project descriptions.
 - `ScrollReveal` / `repeatReveal`: typography and details enter at first visibility, reverse offscreen within .26s, and restart immediately on re-entry. Stable masks are observed separately rather than delaying all text behind a section timeline.
 - `useSectionScene`: scoped rules, staggered rows, reading opacity and depth layers.
-- `useShelfCardReveal`: whole-card horizontal wipe using the same observer as text; no separate copy stagger or card batch delay. `useProjectCardMotion` is a compatibility export of this hook.
-- `ProjectsHighlights`: scroll-pinned horizontal archive on desktop; native swiping and dragging on smaller screens.
+- `ProjectShelfCard` serves Highlights and the archive. `useShelfCardReveal` coordinates each card's vertical reveal and desktop tilt.
+- `ProjectsHighlights` uses a scroll-linked horizontal track on desktop and supports touch swiping, pointer dragging and arrow keys.
 - `ProjectDetailsModal`: opaque fullscreen body portal, card-origin preview entrance, animated close, readable scrollable content and keyboard focus containment.
-- `AboutMeAccordion` / `InterfaceSculpture`: accordion selection changes the depth of a three-layer interface illustration.
+- `AboutMeAccordion` uses a shared section reveal and animates each panel independently.
 - `Journey`: CSS-sticky chapter presentation across viewport sizes. Scroll switches one chapter at a time; a continuous progress rail and clickable chapter controls expose the current position. Reduced motion uses normal document flow.
-- `TechStackAccordion` / `TechConstellation`: staggered logo entrances and a counter-rotating tool orbit.
+- The toolkit reads its groups from `src/data/toolkit.js`. Its scroll hook coordinates the pinned intro and alternating logo strips.
 - `MarqueeText` / `ScrollMarqueeText`: velocity-sensitive looping type and scroll-filled outline type.
-- `ContactForm` / `ContactEnvelope`: individual field entrances, animated focus rules, completion-driven letter movement and result dialogs.
+- `ContactForm` composes its field list, submission state and feedback. The client form and API share the same field normalization.
 - `CollaborationCTA`, `IdentityBand`, navigation and footer: distinct typographic and geometric scenes.
-- `MotionExperience`: only shared progress, contextual cursor and magnetic links. Component animations stay in their own scopes.
+- `MotionExperience` manages section scrolling and pauses offscreen decorative animations. `useLanguage` derives the locale from the current pathname, and `LanguageEffects` synchronizes the document language and cross-tab changes.
 
 Shared `motionMedia` subscriptions revert local GSAP contexts when media conditions change and release native media-query listeners after their final subscriber unmounts. Highlights pinning requires 1024px width and 720px height. Journey uses a responsive sticky frame without those size limits. Reduced motion leaves all content accessible without pinning. Decorative animation pauses outside the viewport. Avoid transforming modal ancestors; use a portal for overlays.
 

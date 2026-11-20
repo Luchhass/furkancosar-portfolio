@@ -1,13 +1,32 @@
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
 
+const baseURL = process.env.TEST_URL || "http://localhost:3000";
 const browser = await chromium.launch({ channel: "chrome" });
 try {
+  const contact = await browser.newPage({ viewport: { width: 1919, height: 879 } });
+  const hoverErrors = [];
+  contact.on("pageerror", error => hoverErrors.push(error.message));
+  await contact.goto(baseURL + "/contact", { waitUntil: "domcontentloaded" });
+  await contact.waitForFunction(() => window.__pageIntroDoneForPath === "/contact");
+  const cells = contact.locator(".ui-hero canvas").last();
+  const readPixels = () => cells.evaluate(canvas => canvas.toDataURL());
+  const idle = await readPixels();
+  await contact.mouse.move(450, 240);
+  await contact.mouse.move(1380, 440, { steps: 32 });
+  assert.notEqual(await readPixels(), idle, "Pointer movement must deform the contact hero cells");
+  await contact.evaluate(() => window.dispatchEvent(new Event("blur")));
+  await contact.waitForFunction(pixels =>
+    document.querySelector(".ui-hero canvas:last-of-type").toDataURL() === pixels, idle, { polling: 100 });
+  assert.deepEqual(hoverErrors, []);
+  await contact.close();
+  console.log("Contact hero: pointer deformation and pixel-exact recovery passed");
+
   for (const width of [1440, 390]) {
     const page = await browser.newPage({ viewport: { width, height: 900 }, hasTouch: width === 390 });
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
-    await page.goto("http://localhost:3000");
+    await page.goto(baseURL);
     await page.waitForFunction(() => window.__pageIntroDoneForPath === location.pathname);
     await page.waitForTimeout(600);
     for (const gesture of ["tap", "drag", "return-drag", "cancel", "hold", "scroll"]) {

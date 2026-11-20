@@ -1,26 +1,13 @@
 "use client";
 import { useLocalizedContent } from "@/lib/localizeContent";
-import { createMotionMedia } from "@/lib/motionMedia";
-import { MOTION } from "@/lib/motionPresets";
-import { heroTitleExit, heroDetailExit } from "@/lib/heroScrollExit";
-import { bindTilt } from "@/lib/pointerMotion";
-import { observeReveal, reverseReveal } from "@/lib/repeatReveal";
-import { sequenceReveal } from "@/lib/revealSequence";
-
 import { useRef } from "react";
 import { usePathname } from "next/navigation";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import GradientActionButton from "@/components/ui/GradientActionButton/GradientActionButton";
-import RevealCounter, { playRevealCounters } from "@/components/ui/RevealCounter/RevealCounter";
+import useHeroMotion from "./useHeroMotion";
+import HeroFooter from "./HeroFooter";
+import HeroScrollCue from "./HeroScrollCue";
 import { GeometricPentagonBackground } from "../Backgrounds/GeometricPentagonBackground";
-import ReadingText from "@/components/ui/ReadingText";
 import HeroDetails from "./HeroDetails";
-import { basePath } from "@/lib/localizedRoutes";
 import { useLanguage } from "@/hooks/useLanguage";
-
-gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 function normalizeCopyLines(copyLines) {
   if (Array.isArray(copyLines)) {
@@ -43,319 +30,7 @@ function HeroContent({ titleLines, copyLines, stat, action, copyClassName = "", 
   const heroRef = useRef(null);
   const pathname = usePathname();
   const heroCopyLines = normalizeCopyLines(copyLines);
-  const heroCopyText = heroCopyLines.join(" ");
-
-  useGSAP(
-    () => {
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      );
-
-      if (prefersReducedMotion.matches) return;
-
-      const q = gsap.utils.selector(heroRef);
-
-      const isVisibleElement = (element) => {
-        if (!(element instanceof HTMLElement)) return false;
-
-        const rect = element.getBoundingClientRect();
-
-        return rect.width > 0 && rect.height > 0;
-      };
-
-      const headerProjectsLink = document.querySelector(
-        "[data-hero-intro='projects-link']",
-      );
-      const headerFullscreenButton = document.querySelector(
-        "[data-hero-intro='fullscreen-button']",
-      );
-      const headerBrand = document.querySelector("[data-hero-intro='brand']");
-      const headerMenuButton = document.querySelector(
-        "[data-hero-intro='menu-button']",
-      );
-
-
-      const headerLeftItems = [
-        headerProjectsLink,
-        headerFullscreenButton,
-      ].filter(isVisibleElement);
-      const headerCenterItems = (basePath(pathname) === "/" ? [] : [headerBrand]).filter(
-        isVisibleElement,
-      );
-      const headerRightItems = [headerMenuButton].filter(isVisibleElement);
-
-      const headerItems = [
-        ...headerLeftItems,
-        ...headerCenterItems,
-        ...headerRightItems,
-      ];
-
-      const titleItems = [...q("[data-hero-title]")].filter(isVisibleElement);
-      const statItems = [...q("[data-hero-stat]")].filter(isVisibleElement);
-      const buttonItems = [...q("[data-hero-button]")].filter(isVisibleElement);
-      const cueItems = [...q("[data-hero-cue]")].filter(isVisibleElement);
-      const auxiliaryItems = [...statItems, ...buttonItems, ...cueItems];
-      const buttonFillItems = [
-        ...q("[data-hero-button] .gradient-action-fill"),
-      ].filter(isVisibleElement);
-
-      const detailDuration = MOTION.line.duration;
-      const titleDuration = MOTION.titleSlide.duration;
-      const titleLineGap = MOTION.heading.lineGap;
-
-      const statStart = 0;
-      const titleStart = 0;
-
-      const lastTitleStart =
-        titleStart + Math.max(titleItems.length - 1, 0) * titleLineGap;
-
-      const buttonReleaseStart = lastTitleStart + 0.9;
-
-      gsap.set(headerItems, {
-        autoAlpha: 1,
-        y: -34,
-        force3D: false,
-        willChange: "transform",
-      });
-
-      if (auxiliaryItems.length) {
-        gsap.set(auxiliaryItems, {
-          yPercent: 118,
-          force3D: false,
-          willChange: "transform",
-        });
-      }
-
-
-      titleItems.forEach((item, index) => {
-        const comesFromLeft = index % 2 === 0;
-
-        gsap.set(item, {
-          xPercent: comesFromLeft ? -MOTION.maskedSlidePercent : MOTION.maskedSlidePercent,
-          force3D: false,
-          willChange: "transform",
-        });
-      });
-
-      gsap.set(buttonFillItems, {
-        opacity: 1,
-        clipPath: "circle(145% at 50% 50%)",
-        willChange: "clip-path, opacity",
-      });
-
-      const timeline = gsap.timeline({
-        paused: true,
-      });
-      const contentTimeline = gsap.timeline({ paused: true });
-      const auxiliaryTimeline = gsap.timeline({ paused: true });
-
-      const projectPreviews = q("[data-preview-selected]");
-      if (projectPreviews.length) {
-        contentTimeline.fromTo(projectPreviews, { scale: 0 }, {
-          scale: 1, duration: .85, stagger: .09, ease: "back.out(1.25)",
-        }, titleStart);
-      }
-
-      if (headerItems.length) {
-        timeline.to(
-          headerItems,
-          {
-            y: 0,
-            force3D: false,
-            duration: detailDuration,
-            ease: "power4.out",
-            clearProps: "transform,willChange",
-          },
-          0,
-        );
-      }
-
-      if (statItems.length) {
-        auxiliaryTimeline.call(
-          () => {
-            if (!auxiliaryTimeline.reversed()) playRevealCounters(heroRef.current);
-          },
-          [],
-          statStart + 0.06,
-        );
-      }
-
-      if (auxiliaryItems.length) {
-        auxiliaryTimeline.to(
-          auxiliaryItems,
-          {
-            yPercent: 0,
-            force3D: false,
-            duration: detailDuration,
-            ease: "power4.out",
-            clearProps: "transform,transformOrigin,willChange",
-          },
-          0,
-        );
-      }
-
-
-      titleItems.forEach((item, index) => {
-        contentTimeline.to(
-          item,
-          {
-            xPercent: 0,
-            duration: titleDuration,
-            ease: MOTION.titleSlide.ease,
-            force3D: false,
-            clearProps: "transform,transformOrigin,willChange",
-          },
-          titleStart + index * titleLineGap,
-        );
-      });
-
-      if (buttonFillItems.length) {
-        auxiliaryTimeline.to(
-          buttonFillItems,
-          {
-            opacity: 0,
-            clipPath: "circle(0% at 50% 50%)",
-            duration: 0.46,
-            ease: "power3.out",
-            clearProps: "opacity,clipPath,willChange",
-          },
-          buttonReleaseStart,
-        );
-      }
-
-      let heroVisible = false;
-      const canPlay = () => window.__pageIntroDoneForPath === pathname;
-      const titleSequence = sequenceReveal(contentTimeline, heroRef.current, { stage: 2, canPlay });
-      const auxiliarySequence = sequenceReveal(auxiliaryTimeline, heroRef.current, { stage: 4, canPlay });
-      const playContent = () => {
-        if (heroVisible) { titleSequence.refresh(); auxiliarySequence.refresh(); }
-      };
-      const stopObserving = observeReveal(heroRef.current,
-        () => { heroVisible = true; titleSequence.enter(); auxiliarySequence.enter(); },
-        () => {
-          heroVisible = false;
-          titleSequence.exit(); auxiliarySequence.exit();
-          reverseReveal(contentTimeline);
-          reverseReveal(auxiliaryTimeline);
-          heroRef.current.querySelectorAll("[data-reveal-counter]").forEach(counter => counter.dispatchEvent(new CustomEvent("reveal-counter:reverse")));
-        });
-      const playHeroIntro = () => {
-        if (timeline.progress() === 0 && !timeline.isActive()) {
-          timeline.play();
-        }
-        playContent();
-      };
-
-      const handlePageIntroComplete = (event) => {
-        if (!event.detail?.pathname || event.detail.pathname === pathname) {
-          playHeroIntro();
-        }
-      };
-
-      if (window.__pageIntroDoneForPath === pathname) {
-        playHeroIntro();
-      } else {
-        window.addEventListener("page-intro:complete", handlePageIntroComplete);
-      }
-
-      return () => {
-        window.removeEventListener(
-          "page-intro:complete",
-          handlePageIntroComplete,
-        );
-        timeline.kill();
-        stopObserving();
-        titleSequence.dispose(); auxiliarySequence.dispose();
-        contentTimeline.kill();
-        auxiliaryTimeline.kill();
-      };
-    },
-    { dependencies: [pathname], scope: heroRef, revertOnUpdate: true },
-  );
-
-  useGSAP(() => {
-    const media = createMotionMedia();
-    media.add("(prefers-reduced-motion: no-preference)", () => {
-      const hero = heroRef.current;
-      const heading = hero.querySelector("h1");
-      const lines = hero.querySelectorAll("[data-hero-line-mask]");
-      const exit = gsap.timeline({ scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: MOTION.scrub } });
-      exit.to(lines, heroTitleExit(), 0)
-        .to(hero.querySelector("[data-hero-background]"), { scale: 1.12, opacity: 0.2, ease: "none" }, 0)
-        .to(hero.querySelectorAll("[data-hero-exit]"), heroDetailExit(), 0);
-      const cue = hero.querySelector(".hero-scroll-arrow");
-      if (cue) gsap.to(cue, { "--arrow-length": "180px", ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "top -50%", scrub: MOTION.progressScrub } });
-      gsap.set(heading, { transformPerspective: 1000 });
-      return bindTilt(hero, heading);
-    });
-    return () => media.revert();
-  }, { scope: heroRef, dependencies: [pathname], revertOnUpdate: true });
-
-  useGSAP(
-    () => {
-      const hero = heroRef.current;
-
-      if (!hero) return undefined;
-
-      const hideTargets = gsap.utils.toArray(
-        hero.querySelectorAll("[data-hero-fullscreen-hide]"),
-      );
-
-      if (!hideTargets.length) return undefined;
-
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      let hasSyncedFullscreenState = false;
-
-      function syncFullscreenState() {
-        const isFullscreen = document.body.dataset.heroFullscreen === "true";
-
-        if (!hasSyncedFullscreenState && !isFullscreen) {
-          hasSyncedFullscreenState = true;
-          return;
-        }
-
-        hasSyncedFullscreenState = true;
-        gsap.killTweensOf(hideTargets);
-
-        if (prefersReducedMotion) {
-          gsap.set(hideTargets, {
-            autoAlpha: isFullscreen ? 0 : 1,
-            pointerEvents: isFullscreen ? "none" : "auto",
-          });
-
-          return;
-        }
-
-        gsap.to(hideTargets, {
-          autoAlpha: isFullscreen ? 0 : 1,
-          duration: isFullscreen ? 0.36 : 0.44,
-          ease: isFullscreen ? "power2.out" : "power3.out",
-          overwrite: true,
-          pointerEvents: isFullscreen ? "none" : "auto",
-        });
-      }
-
-      syncFullscreenState();
-
-      const observer = new MutationObserver(syncFullscreenState);
-
-      observer.observe(document.body, {
-        attributes: true,
-        attributeFilter: ["data-hero-fullscreen"],
-      });
-
-      return () => {
-        observer.disconnect();
-        gsap.killTweensOf(hideTargets);
-        gsap.set(hideTargets, {
-          clearProps: "opacity,visibility,transform,pointerEvents",
-        });
-      };
-    },
-    { dependencies: [pathname], scope: heroRef },
-  );
+  useHeroMotion(heroRef, pathname);
 
   return (
     localize(<section
@@ -367,89 +42,23 @@ function HeroContent({ titleLines, copyLines, stat, action, copyClassName = "", 
     >
       <div data-hero-background className="absolute inset-0 -z-10"><GeometricPentagonBackground /></div>
       {detailVariant && <HeroDetails variant={detailVariant} />}
-      <div className="hero-scroll-cue overflow-hidden" data-hero-exit="cue" aria-hidden="true">
-        <div data-hero-cue className="flex items-center gap-3">
-          <span>SCROLL TO EXPLORE</span>
-          <span className="hero-scroll-arrow">
-            <span className="hero-scroll-arrow-shaft" />
-            <svg className="hero-scroll-arrow-head" width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="m3 2 6 6 6-6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </span>
-        </div>
-      </div>
+      <HeroScrollCue />
 
-      <div className="relative z-10 row-start-2 flex items-center justify-center">
-        <h1 className="ui-hero-title m-0 flex flex-col items-center text-center text-white">
-          {titleLines.map((line) => (
-            <span key={line.text} data-hero-line-mask className="block overflow-hidden">
-              <span
-                data-hero-title
-                data-title-reveal
-                className={`${line.gradient ? "gradient-text-flow " : ""}block`}
-              >
-                {line.text}
-              </span>
+      <h1 className="ui-hero-title relative z-10 row-start-2 m-0 flex flex-col items-center justify-self-center text-center text-white">
+        {titleLines.map((line) => (
+          <span key={line.text} data-hero-line-mask className="block overflow-hidden">
+            <span
+              data-hero-title
+              data-title-reveal
+              className={`${line.gradient ? "gradient-text-flow " : ""}block`}
+            >
+              {line.text}
             </span>
-          ))}
-        </h1>
-      </div>
+          </span>
+        ))}
+      </h1>
 
-      <div
-        data-hero-fullscreen-hide
-        className="relative z-10 row-start-3 grid w-full grid-cols-2 items-end gap-x-4 gap-y-5 self-end xl:grid-cols-[minmax(0,1fr)_minmax(0,auto)_minmax(0,1fr)] xl:items-center xl:gap-6"
-      >
-        {stat ? (
-          <div
-            data-hero-exit="stat"
-            className="pointer-events-auto col-start-1 row-start-2 min-w-0 overflow-hidden pr-3 xl:row-start-1 xl:pr-0"
-            aria-label={stat.ariaLabel}
-          >
-            <div data-hero-stat className="flex h-[var(--ui-control-height)] items-center gap-1 md:gap-2 xl:gap-3">
-              <span className="text-[56px] leading-[0.82] font-black">
-                <RevealCounter
-                  value={stat.value}
-                  textClassName="gradient-text-flow"
-                />
-              </span>
-
-              <p className="m-0 min-w-0 text-[16px] leading-tight font-medium text-white/90 md:text-[18px] xl:text-[20px]">
-                {stat.labelLines.map((line, index) => (
-                  <span key={line} className={index > 0 ? "hidden md:block" : "block"}>
-                    {line}
-                  </span>
-                ))}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <span className="col-start-1 row-start-2" aria-hidden="true" />
-        )}
-
-        <p
-          data-hero-exit="copy"
-          className={`ui-hero-copy col-span-2 row-start-1 m-0 flex h-[var(--ui-control-height)] w-full max-w-[46ch] flex-col justify-center self-center text-center text-[13px] leading-tight font-medium text-white/90 xl:col-span-1 xl:col-start-2 xl:max-w-md md:text-sm lg:text-sm ${copyClassName}`}
-        >
-          <ReadingText as="span" waitForIntro className="block text-wrap md:hidden">{heroCopyText}</ReadingText>
-          <ReadingText as="span" waitForIntro className="hidden md:block">
-            {heroCopyLines.map(line => <span key={line} className="block text-wrap">{line}</span>)}
-          </ReadingText>
-        </p>
-
-        {action ? (
-          <div data-hero-exit="action" className="col-start-2 row-start-2 flex h-[var(--ui-control-height)] items-center justify-end overflow-hidden xl:col-start-3 xl:row-start-1">
-            <div data-hero-button>
-              <GradientActionButton
-                href={action.href}
-                id={action.id}
-                label={action.label}
-                rel={action.rel}
-                target={action.target}
-              />
-            </div>
-          </div>
-        ) : (
-          <span className="col-start-2 row-start-2 h-[var(--ui-control-height)] xl:col-start-3 xl:row-start-1" aria-hidden="true" />
-        )}
-      </div>
+      <HeroFooter stat={stat} action={action} copyLines={heroCopyLines} copyClassName={copyClassName} />
     </section>)
   );
 }

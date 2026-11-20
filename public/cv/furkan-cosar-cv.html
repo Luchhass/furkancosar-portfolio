@@ -21,15 +21,7 @@
         --main-section-gap: 8.2mm;
         --main-title-gap: 3mm;
         --rule-gap: 3.8mm;
-        --gradient: linear-gradient(
-          120deg,
-          #6768ff,
-          #884cff,
-          #a53cdd,
-          #cf3d9f,
-          #ee4b67,
-          #884cff
-        );
+        --primary: #EB5E28;
       }
 
       @page {
@@ -143,7 +135,7 @@
         width: max-content;
         max-width: 100%;
         margin-top: 3.4mm;
-        background: var(--gradient);
+        background: var(--primary);
         background-clip: text;
         -webkit-background-clip: text;
         color: transparent;
@@ -180,7 +172,7 @@
         height: 2.2mm;
         flex: 0 0 auto;
         border-radius: 50%;
-        background: var(--gradient);
+        background: var(--primary);
         box-shadow: 0 0 7mm rgba(207, 61, 159, 0.34);
       }
 
@@ -188,7 +180,7 @@
       .main-rule {
         height: 0.32mm;
         margin-bottom: var(--rule-gap);
-        background: var(--gradient);
+        background: var(--primary);
       }
 
       .contact-list,
@@ -275,7 +267,7 @@
         position: absolute;
         inset: 0 auto 0 0;
         width: var(--level);
-        background: var(--gradient);
+        background: var(--primary);
         box-shadow: 0 0 5mm rgba(207, 61, 159, 0.24);
       }
 
@@ -337,7 +329,7 @@
         height: 1.8mm;
         margin-right: 1.8mm;
         border-radius: 50%;
-        background: var(--gradient);
+        background: var(--primary);
       }
 
       .main-section {
@@ -402,7 +394,7 @@
         width: 2.1mm;
         height: 2.1mm;
         border-radius: 50%;
-        background: var(--gradient);
+        background: var(--primary);
       }
 
       .timeline .entry:last-child .entry-body::before {

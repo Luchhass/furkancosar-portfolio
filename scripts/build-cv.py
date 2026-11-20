@@ -13,8 +13,7 @@ PAGE_W, PAGE_H = A4
 INK = colors.HexColor("#17171A")
 MUTED = colors.HexColor("#66666D")
 FAINT = colors.HexColor("#8A8A91")
-PINK = colors.HexColor("#EE3F79")
-PURPLE = colors.HexColor("#7652FF")
+PRIMARY = colors.HexColor("#EB5E28")
 PALE = colors.HexColor("#E7E7EB")
 BLACK = colors.HexColor("#101012")
 WHITE = colors.white
@@ -34,17 +33,9 @@ def register_fonts():
 REGULAR, BOLD = register_fonts()
 
 
-def gradient_rule(pdf, x, y, width, height=1.4):
-    stops = [PINK, colors.HexColor("#CC39B6"), PURPLE]
-    segments = 72
-    for index in range(segments):
-        t = index / (segments - 1)
-        if t < 0.5:
-            color = colors.linearlyInterpolatedColor(stops[0], stops[1], 0, 1, t * 2)
-        else:
-            color = colors.linearlyInterpolatedColor(stops[1], stops[2], 0, 1, (t - 0.5) * 2)
-        pdf.setFillColor(color)
-        pdf.rect(x + width * index / segments, y, width / segments + 0.2, height, fill=1, stroke=0)
+def primary_rule(pdf, x, y, width, height=1.4):
+    pdf.setFillColor(PRIMARY)
+    pdf.rect(x, y, width, height, fill=1, stroke=0)
 
 
 def draw_hero_geometry(pdf, x, y, width, height):
@@ -122,12 +113,12 @@ def paragraph(pdf, text, x, y, width, size=8.6, leading=12.4, color=MUTED, font=
 
 
 def section_heading(pdf, title, x, y, width):
-    pdf.setFillColor(PINK)
+    pdf.setFillColor(PRIMARY)
     pdf.circle(x + 2.2, y + 2.8, 2.2, fill=1, stroke=0)
     pdf.setFillColor(INK)
     pdf.setFont(BOLD, 9.2)
     pdf.drawString(x + 11, y, title.upper())
-    gradient_rule(pdf, x, y - 8, width, 1.15)
+    primary_rule(pdf, x, y - 8, width, 1.15)
 
 
 def small_label(pdf, title, x, y):
@@ -149,12 +140,12 @@ def draw_cv(output_path):
     right_x = left + left_w + col_gap
     right_w = PAGE_W - 40 - right_x
 
-    # Header: a restrained nod to the portfolio's dark hero and gradient accents.
+    # Header: a restrained nod to the portfolio's dark hero and primary accents.
     header_h = 132
     pdf.setFillColor(BLACK)
     pdf.rect(0, PAGE_H - header_h, PAGE_W, header_h, fill=1, stroke=0)
     draw_hero_geometry(pdf, 0, PAGE_H - header_h, PAGE_W, header_h)
-    gradient_rule(pdf, 0, PAGE_H - header_h, PAGE_W, 3.2)
+    primary_rule(pdf, 0, PAGE_H - header_h, PAGE_W, 3.2)
 
     pdf.setFillColor(WHITE)
     pdf.setFont(BOLD, 27)
@@ -164,7 +155,7 @@ def draw_cv(output_path):
     pdf.drawString(42, 758, "FRONTEND DEVELOPER")
 
     contact_x = right_x
-    pdf.setFillColor(PURPLE)
+    pdf.setFillColor(PRIMARY)
     pdf.setFont(BOLD, 7.1)
     pdf.drawString(contact_x, 808, "CONTACT")
     contacts = [
@@ -198,7 +189,7 @@ def draw_cv(output_path):
     pdf.setFillColor(INK)
     pdf.setFont(BOLD, 9.25)
     pdf.drawString(left, 574, "CO-FOUNDER & FRONTEND DEVELOPER")
-    pdf.setFillColor(PURPLE)
+    pdf.setFillColor(PRIMARY)
     pdf.setFont(BOLD, 7.5)
     pdf.drawRightString(left + left_w, 574, "2025 - PRESENT")
     pdf.setFillColor(MUTED)
@@ -215,7 +206,7 @@ def draw_cv(output_path):
     pdf.setFillColor(INK)
     pdf.setFont(BOLD, 9.25)
     pdf.drawString(left, role_y, "FREELANCE FRONTEND DEVELOPER")
-    pdf.setFillColor(PURPLE)
+    pdf.setFillColor(PRIMARY)
     pdf.setFont(BOLD, 7.5)
     pdf.drawRightString(left + left_w, role_y, "2024 - PRESENT")
     pdf.setFillColor(MUTED)
@@ -265,7 +256,7 @@ def draw_cv(output_path):
     pdf.setFont(BOLD, 8.2)
     pdf.drawString(right_x, edu_top, "Istanbul University")
     paragraph(pdf, "Web Design and Programming", right_x, edu_top - 14, right_w, size=7.8, leading=10, color=MUTED)
-    pdf.setFillColor(PURPLE)
+    pdf.setFillColor(PRIMARY)
     pdf.setFont(BOLD, 7.3)
     pdf.drawString(right_x, edu_top - 38, "2023 - PRESENT")
 
@@ -274,7 +265,7 @@ def draw_cv(output_path):
     pdf.setFont(BOLD, 8.2)
     pdf.drawString(right_x, academy_y, "Acunmedya Akademi")
     paragraph(pdf, "One-year Frontend Program", right_x, academy_y - 14, right_w, size=7.8, leading=10, color=MUTED)
-    paragraph(pdf, "Nisantasi University | 2024", right_x, academy_y - 38, right_w, size=7.3, leading=9.5, color=PURPLE, font=BOLD)
+    paragraph(pdf, "Nisantasi University | 2024", right_x, academy_y - 38, right_w, size=7.3, leading=9.5, color=PRIMARY, font=BOLD)
 
     teamwork_y = academy_y - 67
     section_heading(pdf, "Team practice", right_x, teamwork_y, right_w)

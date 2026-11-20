@@ -1,6 +1,8 @@
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const expected = {
   name: "Contact preview",
@@ -19,7 +21,7 @@ try {
       submitted=route.request().postDataJSON();
       await route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({message:"Message sent successfully."})});
     });
-    await page.goto("http://localhost:3000/contact");
+    await page.goto((process.env.TEST_URL || "http://localhost:3000") + "/contact");
     const form=page.getByRole("form",{name:"Project contact form"});
     assert.equal(await form.locator("select").count(),0);
     assert.equal(await form.locator("[name=timeline], [name=projectType]").count(),0);
@@ -35,10 +37,13 @@ try {
 } finally {await browser.close();}
 
 // Exercise the real request validation and email templates with a fake transport.
-const source=(await readFile("src/app/api/contact/route.js","utf8")).replace(
-  'import nodemailer from "nodemailer";',
-  'const nodemailer = {createTransport: () => ({sendMail: async mail => {globalThis.contactTestMail = mail;}})};',
-);
+const source = (await readFile("src/app/api/contact/route.js", "utf8"))
+  .replace(
+    'import nodemailer from "nodemailer";',
+    'const nodemailer = {createTransport: () => ({sendMail: async mail => {globalThis.contactTestMail = mail;}})};',
+  )
+  .replace('"@/lib/contactFields"', JSON.stringify(pathToFileURL(resolve("src/lib/contactFields.js")).href))
+  .replace('"./contactMail"', JSON.stringify(pathToFileURL(resolve("src/app/api/contact/contactMail.js")).href));
 process.env.EMAIL_USER="test@example.com";
 process.env.EMAIL_PASS="test-password";
 const {POST}=await import("data:text/javascript;base64,"+Buffer.from(source).toString("base64"));

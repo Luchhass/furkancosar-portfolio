@@ -7,6 +7,7 @@ export const SECTION_SCROLL = Object.freeze({
   captureRatio: .24,
   captureMax: 240,
   idleDelay: 110,
+  nativeIdleDelay: 220,
   settleVelocity: 1.5,
   settleDistance: 10,
   duration: .28,
@@ -31,19 +32,23 @@ export function restingSection(position, targets, ranges, viewport, limit) {
 
 export function createSectionScroll() {
   let lastDeltaTime = 0;
-  let armed = false;
+  let input = null;
   let aligning = false;
   let targets = [];
   let ranges = [];
   let disposed = false;
   let direction = 0;
+  let touchDown = false;
+  let nativePosition = window.scrollY;
+  let lastNativeScrollAt = 0;
+  let nativeScrollEnded = false;
+  const hasNativeScrollEnd = "onscrollend" in document;
   const nested = ".ui-screen, .journey-slide-words, textarea, [data-lenis-prevent]";
 
   function nestedConsumes(target, delta) {
     const element = target instanceof Element ? target.closest(nested) : null;
     if (!element) return false;
     if (element.matches("[data-lenis-prevent]")) return true;
-    if (element.matches(".projects-shelf")) return false;
     // First bring the viewport frame into place; only then scroll its contents.
     if (element.matches(".ui-screen") && Math.abs(element.getBoundingClientRect().top) > 3) return false;
     return element.scrollHeight > element.clientHeight + 2 &&
@@ -58,9 +63,11 @@ export function createSectionScroll() {
     prevent: node => node instanceof Element && node.matches(nested) && nestedConsumes(node, direction),
     virtualScroll: data => {
       const { event } = data;
+      // Lenis forwards the last move's delta again on release.
+      if (event.type === "touchend") return true;
       cancelAlignment();
       if (Math.abs(data.deltaX) > Math.abs(data.deltaY) || event.ctrlKey) {
-        armed = false;
+        input = null;
         return false;
       }
       if (!data.deltaY) return true;
@@ -68,14 +75,14 @@ export function createSectionScroll() {
       const nextDirection = Math.sign(data.deltaY);
       direction = nextDirection;
       if (nestedConsumes(event.target, data.deltaY)) {
-        armed = false;
+        input = null;
         if (lenis.isScrolling === "smooth") lenis.scrollTo(lenis.actualScroll, { immediate: true });
         return true;
       }
       // Reverse from the current position instead of fighting queued momentum.
       if (event.type === "wheel" && previousDirection && previousDirection !== nextDirection) lenis.scrollTo(lenis.actualScroll, { immediate: true });
       lastDeltaTime = performance.now();
-      armed = !blocked();
+      input = blocked() ? null : event.type === "wheel" ? "wheel" : "touch";
       // Never reduce, trap or discard the user's scroll delta.
       return true;
     },
@@ -116,24 +123,59 @@ export function createSectionScroll() {
     lenis.scrollTo(lenis.actualScroll, { immediate: true });
   }
   function interrupt() {
-    armed = false;
+    input = null;
     cancelAlignment();
   }
-  const touchStart = () => { interrupt(); lastDeltaTime = 0; direction = 0; };
+  function touchStart() {
+    interrupt();
+    touchDown = true;
+    nativePosition = window.scrollY;
+    lastNativeScrollAt = 0;
+    nativeScrollEnded = false;
+    direction = 0;
+  }
+  function touchEnd(event) {
+    touchDown = event.touches.length > 0;
+    if (input === "touch") lastDeltaTime = performance.now();
+  }
+  function touchCancel() {
+    touchDown = false;
+    interrupt();
+  }
+  function trackNativeScroll() {
+    if (input !== "touch" || window.scrollY === nativePosition) return;
+    nativePosition = window.scrollY;
+    lastNativeScrollAt = performance.now();
+    nativeScrollEnded = false;
+  }
+  function finishNativeScroll(event) {
+    // Ignore Lenis's synthetic signal and scrollend from nested scrollers.
+    if (input === "touch" && event.isTrusted && event.target === document) {
+      nativeScrollEnded = true;
+    }
+  }
+  function readyToAlign(now) {
+    if (input === "touch") {
+      if (!lastNativeScrollAt) return false;
+      if (hasNativeScrollEnd) return nativeScrollEnded;
+      return now - Math.max(lastNativeScrollAt, lastDeltaTime) >= SECTION_SCROLL.nativeIdleDelay;
+    }
+    return now - lastDeltaTime >= SECTION_SCROLL.idleDelay &&
+      Math.abs(lenis.velocity) <= SECTION_SCROLL.settleVelocity &&
+      Math.abs(lenis.targetScroll - lenis.animatedScroll) <= SECTION_SCROLL.settleDistance;
+  }
   const tick = time => {
     if (document.hidden) return;
     lenis.raf(time * 1000);
-    if (!armed || aligning || lenis.isTouching || blocked() ||
-      performance.now() - lastDeltaTime < SECTION_SCROLL.idleDelay ||
-      Math.abs(lenis.velocity) > SECTION_SCROLL.settleVelocity ||
-      Math.abs(lenis.targetScroll - lenis.animatedScroll) > SECTION_SCROLL.settleDistance) return;
-    armed = false;
-    const target = restingSection(lenis.targetScroll, targets, ranges, window.innerHeight, lenis.limit);
-    if (target === null || Math.abs(target - lenis.actualScroll) < 2) return;
+    if (!input || aligning || touchDown || blocked() || !readyToAlign(performance.now())) return;
+    const settledPosition = lenis.actualScroll;
+    const position = input === "touch" ? settledPosition : lenis.targetScroll;
+    input = null;
+    const target = restingSection(position, targets, ranges, window.innerHeight, lenis.limit);
+    if (target === null || Math.abs(target - settledPosition) < 2) return;
     // Freeze wheel momentum at the settled position before starting the short
     // section alignment tween. Otherwise the pending Lenis target keeps moving
     // underneath the snap and carries the page past the section start.
-    const settledPosition = lenis.actualScroll;
     lenis.scrollTo(settledPosition, { immediate: true });
     aligning = true;
     lenis.scrollTo(target, {
@@ -156,6 +198,12 @@ export function createSectionScroll() {
   window.addEventListener("resize", measure);
   window.addEventListener("page-intro:complete", introDone);
   window.addEventListener("touchstart", touchStart, { passive: true });
+  window.addEventListener("touchend", touchEnd, { passive: true });
+  window.addEventListener("touchcancel", touchCancel, { passive: true });
+  window.addEventListener("scroll", trackNativeScroll, { passive: true });
+  // Lenis may stop native scrollend in capture. Listen on the same target
+  // so a browser completion remains observable even when its velocity is zero.
+  if (hasNativeScrollEnd) window.addEventListener("scrollend", finishNativeScroll, true);
   window.addEventListener("pointerdown", interrupt, { passive: true });
   window.addEventListener("keydown", interrupt);
   document.addEventListener("visibilitychange", syncLock);
@@ -170,6 +218,10 @@ export function createSectionScroll() {
     window.removeEventListener("resize", measure);
     window.removeEventListener("page-intro:complete", introDone);
     window.removeEventListener("touchstart", touchStart);
+    window.removeEventListener("touchend", touchEnd);
+    window.removeEventListener("touchcancel", touchCancel);
+    window.removeEventListener("scroll", trackNativeScroll);
+    if (hasNativeScrollEnd) window.removeEventListener("scrollend", finishNativeScroll, true);
     window.removeEventListener("pointerdown", interrupt);
     window.removeEventListener("keydown", interrupt);
     document.removeEventListener("visibilitychange", syncLock);

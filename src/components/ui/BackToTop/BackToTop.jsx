@@ -63,7 +63,7 @@ export default function BackToTop() {
       data-back-to-top
       aria-label="Back to top"
       onClick={scrollToTop}
-      className={`gradient-bg-flow group fixed right-5 bottom-5 z-70 flex h-12 w-12 cursor-pointer items-center justify-center overflow-hidden rounded-full text-white shadow-[0_18px_45px_rgba(0,0,0,.24)] hover:w-34 hover:brightness-110 focus-visible:w-34 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#cf3d9f] md:right-auto md:bottom-8 md:left-8 md:h-13 md:w-13 md:hover:w-36 md:focus-visible:w-36 ${
+      className={`gradient-bg-flow group fixed right-5 bottom-5 z-70 flex h-12 w-12 cursor-pointer items-center justify-center overflow-hidden rounded-full text-white shadow-[0_18px_45px_rgba(0,0,0,.24)] hover:w-34 focus-visible:w-34 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary md:right-auto md:bottom-8 md:left-8 md:h-13 md:w-13 md:hover:w-36 md:focus-visible:w-36 ${
         isVisible
           ? "pointer-events-auto backtop-visible"
           : "pointer-events-none backtop-hidden"

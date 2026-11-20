@@ -1,6 +1,6 @@
 "use client";
 import { useLocalizedContent } from "@/lib/localizeContent";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -12,7 +12,7 @@ import { MOTION } from "@/lib/motionPresets";
 const previews = latestProjects.filter(project => project.screenshot).slice(0, 10);
 const positions = [[30, 32], [69, 34], [29, 63], [72, 62], [51, 24]];
 
-function setupPreviews(root, reduced) {
+function setupPreviews(root, reduced, setSelectedPreviews) {
   const frames = [...root.querySelectorAll("[data-preview]")];
   const selected = gsap.utils.shuffle(frames).slice(0, gsap.utils.random(3, 5, 1));
   const slots = gsap.utils.shuffle([...positions]);
@@ -22,6 +22,7 @@ function setupPreviews(root, reduced) {
       top: `${slots[index][1] + gsap.utils.random(-4, 4)}%`,
       rotation: gsap.utils.random(-13, 13), opacity: 1, scale: reduced ? 1 : 0 });
   });
+  setSelectedPreviews(new Set(selected.map(node => node.dataset.preview)));
   const hero = root.closest("section");
   const movers = !reduced && matchMedia("(hover: hover) and (pointer: fine)").matches ? selected.map((node, index) => {
     const inner = node.firstElementChild;
@@ -51,11 +52,12 @@ function setupPreviews(root, reduced) {
 export default function HeroDetails({ variant }) {
   const localize = useLocalizedContent();
   const ref = useRef(null);
+  const [selectedPreviews, setSelectedPreviews] = useState(null);
   const pathname = usePathname();
   useGSAP(() => {
     const root = ref.current;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (variant === "projects") return setupPreviews(root, reduced);
+    if (variant === "projects") return setupPreviews(root, reduced, setSelectedPreviews);
     if (reduced) return;
     const marks = [...root.querySelectorAll("[data-detail-mark]")];
     const loop = gsap.timeline({ paused: true, repeat: -1 });
@@ -83,8 +85,12 @@ export default function HeroDetails({ variant }) {
   }, { scope: ref, dependencies: [variant, pathname], revertOnUpdate: true });
 
   return localize(<div ref={ref} className={`${styles.layer} ${styles[variant]}`} aria-hidden="true">
-    {variant === "projects" && previews.map(project => <div key={project.id} data-preview className={styles.preview}>
-      <div className={styles.previewTilt}><Image src={`/images/hero-projects/${project.slug}.webp`} alt="" fill loading="eager" sizes="(max-width: 767px) 23vw, 13vw" /></div>
+    {variant === "projects" && previews.map(project => <div key={project.id} data-preview={project.id} className={styles.preview}>
+      <div className={styles.previewTilt}>
+        {selectedPreviews?.has(project.id) && (
+          <Image src={`/images/hero-projects/${project.slug}.webp`} alt="" fill loading="eager" sizes="(max-width: 767px) 23vw, 13vw" />
+        )}
+      </div>
     </div>)}
     {variant === "about" && <div className={styles.journey}>
       <span className={styles.caption} data-detail-mark>HOW IT STARTED / STILL BUILDING</span>

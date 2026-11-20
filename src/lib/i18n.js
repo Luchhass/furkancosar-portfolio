@@ -8,6 +8,14 @@ export const DICTIONARIES = {
 };
 export function normalizeLocale(locale) { return LOCALES.includes(locale) ? locale : DEFAULT_LOCALE; }
 const normalized = new Map(Object.entries(TURKISH_MESSAGES).map(([key, value]) => [key.toLocaleLowerCase("en-US"), value]));
+const dynamicMessages = [
+  [/^Open details for (.+)$/, "$1 proje detaylarını aç"],
+  [/^Visit (.+) live site$/, "$1 sitesini ziyaret et"],
+  [/^Go to chapter (\d+): (.+)$/, "$1. adıma git: $2"],
+  [/^(.+) preview$/, "$1 önizlemesi"],
+  [/^(\d+) completed projects with modern interfaces$/, "Modern arayüzlerle tamamlanmış $1 proje"],
+];
+
 export function translate(locale, key, values = {}) {
   if (typeof key !== "string") return key;
   const clean = normalizeLocale(locale);
@@ -17,14 +25,8 @@ export function translate(locale, key, values = {}) {
     message = normalized.get(compact.toLocaleLowerCase("en-US"));
     if (message && compact === compact.toLocaleUpperCase("en-US")) message = message.toLocaleUpperCase("tr-TR");
     if (!message) {
-      const patterns = [
-        [/^Open details for (.+)$/, "$1 proje detaylarını aç"],
-        [/^Visit (.+) live site$/, "$1 sitesini ziyaret et"],
-        [/^Go to chapter (\d+): (.+)$/, "$1. adıma git: $2"],
-        [/^(.+) preview$/, "$1 önizlemesi"],
-        [/^(\d+) completed projects with modern interfaces$/, "Modern arayüzlerle tamamlanmış $1 proje"],
-      ];
-      for (const [pattern, replacement] of patterns) if (pattern.test(compact)) { message = compact.replace(pattern, replacement); break; }
+      const matching = dynamicMessages.find(([pattern]) => pattern.test(compact));
+      if (matching) message = compact.replace(...matching);
     }
   }
   if (message === undefined) return key;

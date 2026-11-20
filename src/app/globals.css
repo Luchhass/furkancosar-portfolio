@@ -1,25 +1,8 @@
 @import "tailwindcss";
 
-.motion-project-cursor{position:fixed;left:0;top:0;width:88px;height:88px;margin:-44px;z-index:85;pointer-events:none;visibility:hidden;opacity:0;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,#ee4b67e8,#884cffe8);color:white;box-shadow:0 0 35px #884cff35;font-size:9px;font-weight:900;letter-spacing:.08em;backdrop-filter:blur(6px)}
-@media(hover:none),(pointer:coarse),(prefers-reduced-motion:reduce){.motion-project-cursor{display:none}}
-.orbital-sculpture{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;perspective:1000px;z-index:-1;opacity:.6}
-.orbital-space{width:min(76vw,740px);aspect-ratio:1;position:relative;transform-style:preserve-3d}
-.orbital-ring{position:absolute;inset:calc(var(--ring-index) * 4%);border:1px solid #a15cff55;border-radius:50%;box-shadow:inset 0 0 24px #814cff12,0 0 18px #ee4b6712;transform:rotateX(calc(48deg + var(--ring-index) * 13deg)) rotateY(calc(var(--ring-index) * 28deg));background:linear-gradient(135deg,#884cff08,transparent 55%,#ee4b6710)}
-.orbital-ring::after{content:"";position:absolute;top:12%;left:12%;width:8px;height:8px;border-radius:50%;background:#f286ce;box-shadow:0 0 24px #d13d9f}
-.orbital-core{position:absolute;inset:25%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ee4b672b,#884cff18 45%,transparent 70%)}
-.journey-section{position:relative;isolation:isolate;overflow:hidden;background:#101010;color:white;padding:clamp(65px,9vw,130px) clamp(32px,8vw,150px);min-height:100svh;display:flex;flex-direction:column;justify-content:space-between;gap:50px}
-.journey-heading h2{font-size:clamp(44px,6vw,90px);font-weight:900;line-height:.95;letter-spacing:-.05em;margin:18px 0 0;text-transform:uppercase;max-width:12ch}
-.journey-eyebrow{font-size:10px;font-weight:800;letter-spacing:.18em;color:#ffffff70}
-.journey-stage{position:relative;min-height:300px}
-.journey-chapter{display:grid;grid-template-columns:1fr 2fr;gap:30px;align-items:center}
-.journey-number{font-size:clamp(90px,16vw,230px);font-weight:900;line-height:1;letter-spacing:-.08em}
-.journey-chapter h3{font-size:clamp(32px,4.5vw,65px);font-weight:900;line-height:.95;letter-spacing:-.04em;text-transform:uppercase;white-space:pre-line;margin:20px 0}
-.journey-copy{max-width:44ch;color:#ffffff80;font-size:clamp(14px,1.2vw,17px);line-height:1.5}
-.journey-track{position:relative;display:flex;justify-content:space-between;border-top:1px solid #ffffff25;padding-top:20px;font-size:11px;font-weight:800;color:#ffffff60}
-.journey-marker{position:absolute;top:-6px;left:0;width:11px;height:11px;transform:translateX(-50%);border-radius:50%;background:#dc46b4;box-shadow:0 0 25px #dc46b4}
-.journey-orbit{position:absolute;z-index:-1;width:65vw;height:65vw;right:-20%;top:5%;border:1px solid #ffffff0c;border-radius:42% 58% 65% 35%;box-shadow:0 0 0 70px #ffffff02,0 0 0 140px #ffffff02}
-@media(max-width:899px),(max-height:599px){.journey-stage{display:grid;gap:60px}.journey-chapter{grid-template-columns:65px 1fr;gap:20px}.journey-number{font-size:65px}.journey-track{display:none}.journey-heading h2{max-width:none}}
-@media(prefers-reduced-motion:reduce){.orbital-sculpture{opacity:.35}}
+@theme {
+  --color-primary: #EB5E28;
+}
 
 body {
   background: #ffffff;
@@ -46,7 +29,7 @@ body[data-site-menu-open="true"] [data-hero-fullscreen-toggle] {
 [data-hero-fullscreen-toggle]:hover
   .hero-fullscreen-icon
   :where(path, line, polyline, polygon, rect, circle) {
-  stroke: var(--hero-fullscreen-icon-gradient);
+  stroke: var(--color-primary);
 }
 
 html,
@@ -75,74 +58,19 @@ body::-webkit-scrollbar,
   }
 }
 
-/* Shared gradient animations */
-
-@keyframes hero-flow {
-  0% {
-    background-position: calc(var(--gradient-flow-offset, 0px) + 0%) 50%;
-  }
-
-  50% {
-    background-position: calc(var(--gradient-flow-offset, 0px) + 100%) 50%;
-  }
-
-  100% {
-    background-position: calc(var(--gradient-flow-offset, 0px) + 0%) 50%;
-  }
-}
-
 @keyframes hero-dot-glow {
   0% {
-    filter: saturate(1.05);
     transform: scale(0.94);
   }
 
   100% {
-    filter: saturate(1.5);
     transform: scale(1.14);
   }
 }
 
 @layer utilities {
-  /* Moving gradient text */
-
-  .gradient-text-flow {
-    background-image: linear-gradient(
-      90deg,
-      #6768ff,
-      #884cff,
-      #a53cdd,
-      #cf3d9f,
-      #ee4b67,
-      #cf3d9f,
-      #884cff,
-      #6768ff
-    );
-    background-size: var(--gradient-flow-size, 260% 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    animation: hero-flow var(--gradient-flow-duration, 22s) ease-in-out infinite;
-  }
-
-  /* Moving gradient background */
-
-  .gradient-bg-flow {
-    background-image: linear-gradient(
-      120deg,
-      #6768ff,
-      #884cff,
-      #a53cdd,
-      #cf3d9f,
-      #ee4b67,
-      #cf3d9f,
-      #884cff,
-      #6768ff
-    );
-    background-size: 260% 260%;
-    animation: hero-flow var(--gradient-flow-duration, 22s) ease-in-out infinite;
-  }
+  .gradient-text-flow { color: var(--color-primary); }
+  .gradient-bg-flow { background-color: var(--color-primary); }
 
   /* Contact / action button hover fill */
 
@@ -154,27 +82,18 @@ body::-webkit-scrollbar,
     transform: translateZ(0);
   }
 
-  .gradient-action-fill {
+  .gradient-action-paint::before { content: ""; pointer-events: none; z-index: 0; border-radius: inherit; }
+
+  .gradient-action-fill,
+  .gradient-action-paint::before {
     position: absolute;
     inset: 0;
     opacity: 0;
-    background-image: linear-gradient(
-      120deg,
-      #6768ff,
-      #884cff,
-      #a53cdd,
-      #cf3d9f,
-      #ee4b67,
-      #cf3d9f,
-      #884cff,
-      #6768ff
-    );
-    background-size: 260% 260%;
+    background-color: var(--color-primary);
     backface-visibility: hidden;
     clip-path: circle(0 at var(--gradient-fill-x) var(--gradient-fill-y));
     contain: paint;
     transform: translateZ(0);
-    animation: hero-flow var(--gradient-flow-duration, 22s) ease-in-out infinite;
     transition:
       clip-path 0.42s cubic-bezier(0.44, 0, 0.2, 1),
       opacity 0.16s ease 0.16s;
@@ -182,7 +101,9 @@ body::-webkit-scrollbar,
   }
 
   .gradient-action-button:hover .gradient-action-fill,
-  .gradient-action-button:focus-visible .gradient-action-fill {
+  .gradient-action-button:focus-visible .gradient-action-fill,
+  .gradient-action-paint:hover::before,
+  .gradient-action-paint:focus-visible::before {
     opacity: 1;
     clip-path: circle(145% at var(--gradient-fill-x) var(--gradient-fill-y));
     transition:
@@ -193,49 +114,8 @@ body::-webkit-scrollbar,
   .gradient-action-border {
     position: absolute;
     inset: 0;
-    padding: 1px;
-    background-image: linear-gradient(
-      120deg,
-      #6768ff,
-      #884cff,
-      #a53cdd,
-      #cf3d9f,
-      #ee4b67,
-      #cf3d9f,
-      #884cff,
-      #6768ff
-    );
-    background-size: 260% 260%;
-    animation: hero-flow var(--gradient-flow-duration, 22s) ease-in-out infinite;
-
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    mask-composite: exclude;
-  }
-
-  .gradient-action-dot {
-    background-image: linear-gradient(
-      135deg,
-      #6768ff,
-      #884cff,
-      #a53cdd,
-      #cf3d9f,
-      #ee4b67,
-      #884cff,
-      #6768ff
-    );
-    background-size: 260% 260%;
-    animation:
-      hero-flow var(--gradient-flow-duration, 22s) ease-in-out infinite,
-      hero-dot-glow 4.8s ease-in-out infinite alternate;
-    box-shadow:
-      0 0 16px rgba(165, 60, 221, 0.72),
-      0 0 28px rgba(238, 75, 103, 0.2);
+    border: 1px solid var(--color-primary);
+    border-radius: inherit;
   }
 
   /* Accordion title hover fill */
@@ -351,32 +231,20 @@ body::-webkit-scrollbar,
     z-index: 30;
     height: 1px;
     pointer-events: none;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.18),
-      rgba(255, 255, 255, 0.06),
-      transparent
-    );
+    background: rgba(255, 255, 255, .12);
   }
 
   main[data-home-page]
     > section[data-header-theme="light"]:not(:last-of-type)::after {
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(0, 0, 0, 0.14),
-      rgba(0, 0, 0, 0.05),
-      transparent
-    );
+    background: rgba(0, 0, 0, .09);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .gradient-text-flow,
     .gradient-bg-flow,
     .gradient-action-fill,
+    .gradient-action-paint::before,
     .gradient-action-border,
-    .gradient-action-dot,
     .gradient-icon-flow {
       animation: none;
     }

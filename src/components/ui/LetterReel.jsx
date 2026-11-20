@@ -29,12 +29,6 @@ function LetterReelContent({ words }) {
       const width = letter => letter ? `${Math.max(0, context.measureText(letter).width + tracking) / size}em` : "0em";
       slots.forEach((slot, index) => { slot.style.width = width(words[0][index]); });
       const clock = { time: 0 };
-      const gradient = { progress: 0 };
-      let wordWidth = 0;
-      const paintGradient = () => {
-        root.style.setProperty("--reel-gradient-size", `${wordWidth * 2.6}em 100%`);
-        root.style.setProperty("--reel-gradient-shift", `${-wordWidth * 1.6 * gradient.progress}em`);
-      };
       const ease = gsap.parseEase("power3.inOut");
       let wordIndex = 0;
       let columns = [];
@@ -70,22 +64,17 @@ function LetterReelContent({ words }) {
         // Keep the landed glyphs untouched throughout the reading pause.
         // Rebuild the next reels only when the next shuffle actually starts.
         if (pendingPreparation) {
-          if (clock.time < 4.1) { paintGradient(); return; }
+          if (clock.time < 4.1) return;
           prepare();
           pendingPreparation = false;
         }
-        let offset = 0;
         columns.forEach(column => {
           const progress = ease(gsap.utils.clamp(0, 1, (clock.time - 4.1 - column.delay) / column.duration));
           const y = column.downward ? -column.steps * 100 * (1 - progress) : -column.steps * 100 * progress;
           column.track.style.transform = `translateY(${y}%)`;
           const slotWidth = column.fromWidth + (column.toWidth - column.fromWidth) * progress;
           column.slot.style.width = `${slotWidth}em`;
-          column.slot.style.setProperty("--reel-letter-x", `${offset}em`);
-          offset += slotWidth;
         });
-        wordWidth = offset;
-        paintGradient();
         if (clock.time >= 5.45) root.dataset.currentWord = words[(wordIndex + 1) % words.length];
       };
       prepare();
@@ -95,19 +84,11 @@ function LetterReelContent({ words }) {
         onUpdate: draw,
       });
       loopWhileVisible(loop, root.closest("section"));
-      const gradientLoop = gsap.to(gradient, {
-        progress: 1, duration: 11, ease: "sine.inOut", repeat: -1, yoyo: true, paused: true, onUpdate: paintGradient,
-      });
-      loopWhileVisible(gradientLoop, root.closest("section"));
       return () => {
         loop.kill();
-        gradientLoop.kill();
-        root.style.removeProperty("--reel-gradient-size");
-        root.style.removeProperty("--reel-gradient-shift");
         delete root.dataset.currentWord;
         slots.forEach((slot, index) => {
           slot.style.width = "";
-          slot.style.removeProperty("--reel-letter-x");
           slot.lastElementChild.style.transform = "";
           slot.lastElementChild.replaceChildren(Object.assign(document.createElement("span"), { className: "gradient-text-flow flex h-full items-center justify-center", textContent: words[0][index] || " " }));
         });

@@ -1,6 +1,6 @@
 # Animasyon envanteri ve ortak davranışlar
 
-Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat şu anda render edilmeyen görselleri kapsar. Tasarımın yerleşimi ve animasyonun tetikleyicisi, hareket ailesinden ayrı tutulur.
+Bu envanter mevcut dört route'u ve ortak bileşenleri kapsar. Tasarımın yerleşimi ve animasyonun tetikleyicisi, hareket ailesinden ayrı tutulur.
 
 ## Ortak kaynaklar
 
@@ -9,7 +9,7 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 - `src/lib/motionPresets.js`: ailelerin kuvvet, mesafe, süre, ease, stagger ve scrub değerleri.
 - `src/lib/repeatReveal.js`: sabit kapsayıcıları izleyen tek IntersectionObserver. İlk görünürlükte beklemeden baştan giriş; tamamen ekran dışında en fazla 0,26 sn içinde reverse; hızlı dönüşte dahi yeniden baştan giriş. `rootMargin: 0px`, `threshold: 0`; ekran dışında bekleme, giriş yüzdesi veya kart batch gecikmesi yok. Son kullanıcı ayrılınca gözlemci kaldırılır.
 - `src/lib/pointerMotion.js`: magnet ve üç boyutlu eğim hesapları, ortak pointer easing'i ve temizleme davranışı.
-- `src/lib/useAccordionMotion.js`: Home About ve About Tech Stack için aynı satır ve logo açılış sistemi.
+- `src/lib/useSectionScene.js`: Home About ve GitHub Statistics satırlarının ortak görünürlük hareketleri.
 - `src/lib/useShelfCardReveal.js`: Home ve Projects kartları ortak görünürlük sisteminde; bütün kart içeriği tek yatay maske açılışıyla girer.
 - `src/lib/motionMedia.js`: breakpoint ve reduced-motion abonelikleri.
 - `src/components/ui/MiniTitleText.jsx`: bölüm mini başlıkları için sabit iç maske; dış etiketin padding'i maskeye dahil edilmez. `MOTION.miniTitle` yalnızca 2D `yPercent: -110 → 0`, 0,55 sn power3.out kullanır; scale, opacity veya 3D dönüş yok. Ortak reveal/reverse döngüsüne bağlıdır.
@@ -21,13 +21,13 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 | Aile | Kullanıldığı yerler | Ortak değer / davranış |
 | --- | --- | --- |
 | Maskeli yatay büyük başlık | Bölüm başlıkları, CTA, IdentityBand, hero, footer ve kayan bant kelimeleri | xPercent -115 → 0; 0,75 sn expo.out; yalnızca 2D yatay kayma. Hero ve CTA'da satırlar dönüşümlü -115 / +115 başlangıç kullanır. Identity harfleri yalnızca mevcut hover tepkisi için ayrılır |
-| Maskeli satır açılışı | ResponsiveTextLines, Home About accordion, About Tech accordion, Journey satırları, footer metinleri, menü alt metinleri | yPercent 112; 0,78 sn; power4.out; stagger 0,075 sn |
+| Maskeli satır açılışı | Home About accordion, About Tech accordion, Journey satırları, footer metinleri, menü alt metinleri | yPercent 112; 0,78 sn; power4.out; stagger 0,075 sn |
 | İçerik fade/slide | Bölüm içeriği, kicker, CTA metni/butonu, GitHub satırları, About highlight, Journey ayrıntıları, proje modalı ayrıntıları | y 32 px; 0,8 sn; power3.out; stagger 0,1 sn |
 | Soldan kart gelişi | Home ProjectsHighlights ve ProjectsList | 0,44 sn expo.out yatay maske; bütün içerik birlikte; ayrı metin girişi veya kartlar arasında batch gecikmesi yok |
 | Genişliği kadar maskeli başlık kayması | Hero başlık satırları ve menü linkleri | yüzde 115 başlangıç kayması; 0,9 sn; expo.out. Satırın sağdan gelmesi kompozisyon yönüdür, süre/ease farkı değildir |
-| Logo/icon pop | TechStackAccordion logoları, TechConstellation düğümleri, bölüm satırı ikonları | scale 0,5; rotation -80; 0,8 sn; back.out(1.5); stagger 0,07 sn |
+| Logo/icon pop | Bölüm satırı ikonları | scale 0,5; rotation -80; 0,8 sn; back.out(1.5); stagger 0,07 sn |
 | Magnet | Contact 01–04 ve CTA'nın iki başlık satırı, açıklaması, butonu | Etki yarıçapı 360 px; kuvvet 0,42; yakınlık üssü 1,25; x sınırı 28 px; y sınırı 22 px; 0,7 sn power3.out. Artık bileşen bazında çarpan yok |
-| Pointer tilt | Tüm hero başlıkları, InterfaceSculpture; kaynakta kalan OrbitalSculpture ve ContactEnvelope | Normalize edilmiş konum; rotationY ±12°, rotationX ±10°; 0,7 sn power3.out; touch/reduced-motion'da kapalı |
+| Pointer tilt | Tüm hero başlıkları | Normalize edilmiş konum; rotationY ±12°, rotationX ±10°; 0,7 sn power3.out; touch/reduced-motion'da kapalı |
 | Proje kartı tilt | Home ve Projects kartları | Aynı x/y çarpanları: 0,108 / 0,122; aynı CSS hover kaldırması |
 | Scroll parallax / scrub | Hero çıkışı, CTA satırları, outline marquee, arka plan halkaları, dekoratif objeler, yatay galeri | Ortak scrub 1 sn; sürekli scroll'a bağlı hareketler geri kaydırıldığında doğal olarak tersine gider. Mesafe ve eksen tasarımın parçasıdır |
 | İlerleme göstergeleri | Sayfa üst barı, BackToTop çevre çizgisi, hero oku, galeri barı, Journey barı | Ortak 0,3 sn takip süresi. Ölçülen ilerleme alanı her göstergenin işlevine göre kalır |
@@ -35,8 +35,7 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 | Doğrudan cursor takibi | Home galerisindeki Drag rozeti | Ortak pointer süresi/ease'i: 0,7 sn power3.out. Konumu doğrudan pointer merkezine bağlanır; magnetin yakınlık kuvveti uygulanmaz |
 | Footer / menü halkaları | Footer'ın scroll hareketi ve menünün açılış timeline'ı | Aynı dokuz yol; aynı travel/sideways ölçekleri ve limitleri; scale 1,08 → 1; power3.inOut. Menü timeline süresi 0,78 sn; footer kullanıcı scroll'u ile ilerler |
 | Sürekli kayan bant | Tüm MarqueeText örnekleri | Ortak 44 sn temel tur; aynı scroll hızı artışı ve aynı yumuşatma; ekran dışında ve gizli sekmede pause |
-| Dekoratif sürekli dönüş | Marquee sembolleri, TechConstellation; kaynakta kalan orbital halkalar | Ortak 80 sn tur. Logo karşı dönüşü okunurluğu korumak için aynı sürede ters yöndedir |
-| Boşta salınım | InterfaceSculpture kıvılcımları; kaynakta kalan gönderim zarfı | Ortak 3 sn sine.inOut; görünürlükle play/pause |
+| Dekoratif sürekli dönüş | Marquee sembolleri | Ortak 80 sn tur. |
 | Sayaç | Tüm RevealCounter kullanımları | Varsayılan 1,9 sn; aynı makara hesabı. Bölüm sayaçları kendi görünürlüklerine göre play/reverse; hero sayacı intro sıralamasından başlar |
 | Renkli gradient akışı | Ortak CSS gradientleri, form odak başlıkları, accordion SVG gradientleri | Tek kaynaktan 22 sn. Ekran dışı/gizli sekme durdurma sistemi korunur |
 | Hover gradient doldurma | GradientActionButton, sosyal butonlar, menü/footer/accordion başlıkları | Mevcut ortak CSS aileleri korunur; buton yazısı geçişi ortak pointer süresi/ease'i kullanır |
@@ -48,8 +47,6 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 - CTA: `once` kaldırıldı; magnet ile reveal farklı kapsayıcı/property üzerinde çalışıyor.
 - IdentityBand: tek seferlik harf reveal'ı ortak sisteme taşındı.
 - MarqueeText: kelime girişi tekrar ediyor; bandın sürekli akışı görünürlük dışında duruyor, scroll hızına tepkisi korunuyor.
-- InterfaceSculpture: katman girişi tekrar ediyor; boşta salınımın görünürlük yönetimi ortak.
-- TechConstellation: halka ve ikon girişi tekrar ediyor; dönüşler ekran dışında ve gizli sekmede duruyor.
 - Genel bölüm satırları, çizgileri ve ikonları: `once` kaldırıldı.
 - About metin highlight'ları: yalnızca yukarı çıkışta sıfırlamak yerine her iki yönde aynı timeline reverse ediyor.
 - Footer: metin ve bağlantılar kendi sabit maskelerinden izlenir; tüm footer'ın görünürlüğünü veya uzun bir sıralamayı beklemez.
@@ -58,7 +55,6 @@ Bu envanter mevcut dört route'u, ortak bileşenleri ve kaynakta bulunan fakat �
 - Accordion içerikleri: yalnızca açık panel değişince çalışmak yerine scroll dönüşlerinde de aynı hook ile yeniden oynuyor.
 - Journey: aktif bölüm değişimi ve ilerleme mantığı korunurken dış başlık/içerik/kontrol girişi ortak görünürlük sistemiyle tekrar ediyor.
 - Sayaçlar: bölüm tamamlanmasına bağımlı tekrar tetikleme yerine kendi ortak görünürlük aboneliğini kullanıyor.
-- Kaynakta bulunan ContactEnvelope: kullanılmaya başlanırsa girişi de ortak play/reverse ve tilt sistemini kullanacak.
 
 ## Ayrı davranış olması amaçlanan yerler
 

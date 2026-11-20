@@ -23,5 +23,5 @@ export default function ScrollMarqueeText({ text }) {
     });
     return () => media.revert();
   }, { scope: ref });
-  return localize(<section ref={ref} className="ui-marquee outline-band" data-header-theme="light" aria-label={text}><div className="outline-track" aria-hidden="true">{[0, 1, 2, 3].map((i) => <div key={i}><span className="outline-word">{text}</span><span className="outline-star"><span><GraphicMark variant="arrow" /></span></span></div>)}</div></section>);
+  return localize(<section ref={ref} className="ui-marquee outline-band" data-header-theme="light" aria-label={text}><div className="outline-track" aria-hidden="true">{[0, 1, 2, 3].map((i) => <div key={i}><span className="outline-word">{text}<span className="outline-word-fill">{text}</span></span><span className="outline-star"><span><GraphicMark variant="arrow" /></span></span></div>)}</div></section>);
 }

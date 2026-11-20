@@ -2,12 +2,12 @@
 import { useRef } from "react";
 import { flushSync } from "react-dom";
 import gsap from "gsap";
-import { useLanguage } from "@/hooks/useLanguage";
+import { rememberLanguage, useLanguage } from "@/hooks/useLanguage";
 import { usePathname } from "next/navigation";
 import { localizedPath } from "@/lib/localizedRoutes";
 
 export default function LanguageToggle() {
-  const { locale, nextLocale, toggleLanguage, t } = useLanguage();
+  const { locale, nextLocale, t } = useLanguage();
   const pathname = usePathname();
   const switching = useRef(false);
   async function change() {
@@ -27,7 +27,7 @@ export default function LanguageToggle() {
         window.__pageIntroDoneForPath = nextPath;
         window.__pageIntroActivePath = null;
         window.history.pushState(null, "", `${nextPath}${window.location.search}${window.location.hash}`);
-        toggleLanguage();
+        rememberLanguage(nextLocale);
       });
       window.dispatchEvent(new CustomEvent("page-intro:complete", { detail: { pathname: localizedPath(pathname, nextLocale) } }));
       window.dispatchEvent(new Event("language:reveal"));

@@ -1,3 +1,4 @@
+import { PRIMARY_COLOR } from "@/data/brand";
 import { Geist, Geist_Mono } from "next/font/google";
 import { siteConfig, createPageMetadata } from "@/lib/seo";
 import "./globals.css";
@@ -13,6 +14,7 @@ import BackToTop from "@/components/ui/BackToTop/BackToTop";
 import SeoStructuredData from "@/components/layout/SeoStructuredData/SeoStructuredData";
 import GoogleAnalytics from "@/components/layout/GoogleAnalytics/GoogleAnalytics";
 import MotionExperience from "@/components/layout/MotionExperience";
+import { LanguageEffects } from "@/hooks/useLanguage";
 import RouteSeoSync from "@/components/layout/RouteSeoSync";
 
 const geistSans = Geist({
@@ -52,7 +54,7 @@ export const metadata = {
   manifest: "/manifest.webmanifest",
   other: {
     "mobile-web-app-capable": "yes",
-    "msapplication-TileColor": "#000000",
+    "msapplication-TileColor": PRIMARY_COLOR,
     "msapplication-TileImage": "/icon-512.png",
     "profile:first_name": "Furkan",
     "profile:last_name": "Coşar",
@@ -73,10 +75,7 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5,
   colorScheme: "light dark",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#050505" },
-  ],
+  themeColor: PRIMARY_COLOR,
 };
 
 export default function RootLayout({ children }) {
@@ -90,6 +89,7 @@ export default function RootLayout({ children }) {
         className="min-h-full flex flex-col"
         suppressHydrationWarning
       >
+        <LanguageEffects />
         <SeoStructuredData />
         <RouteSeoSync />
         <GoogleAnalytics />
