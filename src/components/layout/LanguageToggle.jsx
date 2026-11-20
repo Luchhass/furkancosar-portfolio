@@ -41,14 +41,10 @@ export default function LanguageToggle() {
     }
   }
   return (
-    <a href={nextPath} hrefLang={nextLocale} onClick={change} data-language-link data-menu-nav-item data-active-language={locale}
-      className="relative grid h-11 grid-cols-[2.75rem_.75rem_2.75rem] items-center justify-items-center text-sm leading-none font-black tracking-wide text-current no-underline focus-visible:outline-2 focus-visible:-outline-offset-2"
+    <a href={nextPath} hrefLang={nextLocale} onClick={change} data-language-link data-active-language={locale}
+      className="pointer-events-auto inline-flex h-11 min-w-11 items-start justify-start text-[32px] leading-none font-bold tracking-normal text-current no-underline transition-colors duration-200 hover:text-[var(--color-primary)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-primary)]"
       aria-label={t("toggles.languageTo", { language: nextLocale === "tr" ? "Türkçe" : "English" })}>
-      <span aria-hidden="true" data-language-indicator
-        className={`pointer-events-none absolute inset-y-0 left-0 w-11 rounded-full border border-[var(--color-primary)] transition-transform duration-350 ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none ${locale === "tr" ? "translate-x-[3.5rem]" : "translate-x-0"}`} />
-      <span aria-hidden="true">EN</span>
-      <span aria-hidden="true" className="text-current/50">/</span>
-      <span aria-hidden="true">TR</span>
+      <span aria-hidden="true" data-language-label className="ui-header-language-label">{nextLocale.toUpperCase()}</span>
     </a>
   );
 }

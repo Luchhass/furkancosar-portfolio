@@ -1,5 +1,4 @@
 import { useLocalizedContent } from "@/lib/localizeContent";
-import LanguageToggle from "../LanguageToggle";
 import { ChromeContact, ChromeNavigation, ChromeRings, ChromeSocials } from "../SiteChrome";
 
 export default function SiteMenu({ menuRef, pathname, onNavigate }) {
@@ -19,10 +18,6 @@ export default function SiteMenu({ menuRef, pathname, onNavigate }) {
 
       <div className="site-menu-links">
         <ChromeNavigation pathname={pathname} variant="menu" onNavigate={onNavigate} />
-      </div>
-
-      <div className="site-menu-language overflow-hidden">
-        <LanguageToggle />
       </div>
 
       <div className="site-menu-meta flex flex-col gap-4 md:flex-row md:items-end md:justify-between">

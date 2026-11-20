@@ -7,6 +7,7 @@ import { useLocalizedContent } from "@/lib/localizeContent";
 import { basePath } from "@/lib/localizedRoutes";
 import HeroFullscreenButton from "./HeroFullscreenButton";
 import SiteMenu from "./SiteMenu";
+import LanguageToggle from "../LanguageToggle";
 import useHeaderTheme from "./useHeaderTheme";
 import useHeroFullscreen from "./useHeroFullscreen";
 import useSiteMenu from "./useSiteMenu";
@@ -26,21 +27,25 @@ export default function Header() {
         aria-label="Primary navigation"
       >
         <div className="ui-header-slot ui-header-left">
-          <HeroFullscreenButton {...fullscreen} />
-          <div className="hidden md:flex">
-            {basePath(pathname) !== "/projects" && (
-              <Link
-                href="/projects"
-                onClick={closeMenuImmediately}
-                data-hero-intro="projects-link"
-                className="ui-header-projects group pointer-events-auto inline-flex items-center text-xs leading-none font-black whitespace-nowrap text-current no-underline"
-              >
+          {!isMenuOpen && <HeroFullscreenButton {...fullscreen} />}
+          {isMenuOpen ? (
+            <LanguageToggle />
+          ) : (
+            <div className="hidden md:flex">
+              {basePath(pathname) !== "/projects" && (
+                <Link
+                  href="/projects"
+                  onClick={closeMenuImmediately}
+                  data-hero-intro="projects-link"
+                  className="ui-header-projects group pointer-events-auto inline-flex items-center text-xs leading-none font-black whitespace-nowrap text-current no-underline"
+                >
                   <span data-header-intro-content className="ui-header-projects-text relative after:absolute after:bottom-[-0.45rem] after:left-0 after:h-0.5 after:w-full after:bg-current after:[clip-path:inset(0_100%_0_0)] after:opacity-90 after:transition-[clip-path] after:duration-500 after:ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:after:[clip-path:inset(0_0_0_0)] group-focus-visible:after:[clip-path:inset(0_0_0_0)]">
-                  SEE MY PROJECTS
-                </span>
-              </Link>
-            )}
-          </div>
+                    SEE MY PROJECTS
+                  </span>
+                </Link>
+              )}
+            </div>
+          )}
         </div>
 
         <Link
