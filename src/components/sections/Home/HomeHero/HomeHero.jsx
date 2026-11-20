@@ -18,8 +18,9 @@ export default function HomeHero() {
         ariaLabel: `${projectCount} completed projects with modern interfaces`,
       }}
       copyLines={[
-        "Responsive, animated interfaces built with care.",
-        "Clear design, smooth motion and a frontend that works on every screen.",
+        "I build web interfaces that feel clear and fast.",
+        "I use motion to guide people through each screen.",
+        "Every detail helps the site work on any device.",
       ]}
       action={{
         href: "/contact",

@@ -20,7 +20,7 @@ export default function HeroFullscreenButton({ isHeroFullscreen, showHeroFullscr
       }`}
     >
       <span
-        data-hero-intro="fullscreen-button"
+        data-header-intro-content
         className="absolute inset-0"
       >
         <FullscreenIcon

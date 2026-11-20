@@ -32,17 +32,5 @@
 }
 
 .word, .letters { display: inline-flex; align-items: flex-start; }
-.brand { font-weight: 700; letter-spacing: 0; }
 .letterMask { display: inline-block; overflow: hidden; height: 1em; vertical-align: top; }
 .letter { display: block; height: 1em; line-height: 1; }
-
-.registered {
-  position: relative;
-  top: .25em;
-  align-self: flex-start;
-  margin-left: .05em;
-  font-size: .31em;
-  font-weight: 700;
-  letter-spacing: normal;
-  line-height: 1;
-}

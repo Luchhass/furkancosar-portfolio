@@ -17,13 +17,26 @@ export default function ReadingText(props) {
   return <ReadingTextContent key={locale} {...props} />;
 }
 
-function ReadingTextContent({ as: Tag = "p", children, active = true, waitForIntro = false, ...attributes }) {
+function ReadingTextContent({ as: Tag = "p", children, active = true, waitForIntro = false, spreadLines = false, ...attributes }) {
   const localize = useLocalizedContent();
   const ref = useRef(null);
   useGSAP(() => {
     if (!active) return;
     const root = ref.current;
     const media = createMotionMedia();
+    const markSpreadLines = split => {
+      if (spreadLines) root.toggleAttribute("data-spread-lines", split.lines.length > 1);
+    };
+    const clearSpreadLines = () => root.removeAttribute("data-spread-lines");
+    if (spreadLines) {
+      media.add("(prefers-reduced-motion: reduce) and (min-width: 1280px)", () => {
+        const split = SplitText.create(root, {
+          type: "lines", linesClass: "reading-line", autoSplit: true,
+          onSplit: markSpreadLines, onRevert: clearSpreadLines,
+        });
+        return () => split.revert();
+      });
+    }
     media.add("(prefers-reduced-motion: no-preference)", () => {
       let release;
       let animation;
@@ -46,7 +59,9 @@ function ReadingTextContent({ as: Tag = "p", children, active = true, waitForInt
       }
       const split = SplitText.create(root, {
         type: "lines,words", mask: "words", linesClass: "reading-line", wordsClass: "reading-word", autoSplit: true, deepSlice: false, aria: "auto",
+        onRevert: spreadLines ? clearSpreadLines : undefined,
         onSplit(self) {
+          markSpreadLines(self);
           root.setAttribute("aria-label", accessibleLabel);
           release?.();
           sequence?.dispose();
@@ -80,6 +95,6 @@ function ReadingTextContent({ as: Tag = "p", children, active = true, waitForInt
       };
     });
     return () => media.revert();
-  }, { scope: ref, dependencies: [active, waitForIntro, children], revertOnUpdate: true });
+  }, { scope: ref, dependencies: [active, waitForIntro, spreadLines, children], revertOnUpdate: true });
   return localize(<Tag ref={ref} data-reading-reveal {...attributes}>{children}</Tag>);
 }

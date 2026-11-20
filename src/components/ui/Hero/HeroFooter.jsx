@@ -8,23 +8,23 @@ export default function HeroFooter({ stat, action, copyLines, copyClassName }) {
   return localize(
     <div
       data-hero-fullscreen-hide
-      className="relative z-10 row-start-3 grid w-full grid-cols-2 items-end gap-4 self-end xl:grid-cols-[minmax(0,1fr)_minmax(0,auto)_minmax(0,1fr)] xl:gap-x-6"
+      className="relative z-10 row-start-3 grid w-full grid-cols-[minmax(0,1fr)_auto] items-end gap-4 self-end xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:gap-x-6"
     >
       {stat && (
         <div
           data-hero-exit="stat"
-          className="pointer-events-auto col-start-1 row-start-2 min-w-0 overflow-hidden pr-3 xl:row-start-1 xl:pr-0"
+          className="pointer-events-auto col-start-1 row-start-2 min-w-0 overflow-hidden xl:row-start-1"
           aria-label={stat.ariaLabel}
         >
-          <div data-hero-stat className="flex items-end gap-1 md:gap-2 xl:gap-3">
-            <span className="ui-hero-counter text-[56px] leading-[0.82] font-black">
+          <div data-hero-stat className="flex items-end gap-1.5 md:gap-3 xl:gap-4">
+            <span className="ui-hero-counter shrink-0 font-black">
               <RevealCounter
                 value={stat.value}
                 textClassName="gradient-text-flow"
               />
             </span>
 
-            <p className="ui-hero-stat-label m-0 min-w-0 text-[16px] leading-tight font-medium text-white/90 md:text-[18px] xl:text-[20px]">
+            <p className="ui-hero-stat-label m-0 min-w-0 font-medium text-white/90">
               {stat.labelLines.map((line, index) => (
                 <span key={line} className={index > 0 ? "hidden md:block" : "block"}>
                   {line}
@@ -37,11 +37,10 @@ export default function HeroFooter({ stat, action, copyLines, copyClassName }) {
 
       <p
         data-hero-exit="copy"
-        className={`ui-hero-copy col-span-2 row-start-1 m-0 w-full max-w-[46ch] justify-self-center text-center font-medium text-white/90 xl:col-span-1 xl:col-start-2 xl:max-w-md ${copyClassName}`}
+        className={`ui-hero-copy col-span-2 row-start-1 m-0 w-full justify-self-center text-center font-medium text-white/90 xl:col-span-1 xl:col-start-2 ${copyClassName}`}
       >
-        <ReadingText as="span" waitForIntro className="block text-wrap md:hidden">{copyLines.join(" ")}</ReadingText>
-        <ReadingText as="span" waitForIntro className="hidden md:block">
-          {copyLines.map(line => <span key={line} className="block text-wrap">{line}</span>)}
+        <ReadingText as="span" waitForIntro spreadLines={Boolean(action)} className="ui-hero-copy-lines block">
+          {copyLines.map(line => <span key={line} className="ui-hero-copy-line block">{line}{" "}</span>)}
         </ReadingText>
       </p>
 

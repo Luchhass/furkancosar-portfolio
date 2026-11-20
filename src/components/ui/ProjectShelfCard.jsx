@@ -25,12 +25,12 @@ export default function ProjectShelfCard({ project, number, onOpen }) {
               <span className="shelf-card-number project-card-number project-card-lift gradient-text-flow">{number}</span>
             </div>
             <div className="shelf-card-copy">
-              <h3 className="project-card-lift"><span className="shelf-card-reveal">{project.name}</span></h3>
-              <p className="shelf-card-description project-card-lift"><span className="shelf-card-reveal">{project.description || project.tagline}</span></p>
+              <h3 className="project-card-lift">{project.name}</h3>
+              <p className="shelf-card-description project-card-lift">{project.description || project.tagline}</p>
               {project.liveUrl && (
                 <a className="shelf-card-action project-card-lift" href={project.liveUrl} target="_blank"
                   rel="noopener noreferrer" draggable={false} aria-label={`Visit ${project.name} live site`}>
-                  <span className="shelf-card-reveal inline-flex items-center gap-2">View project <ArrowUpRight size={14} aria-hidden="true" /></span>
+                  View project <ArrowUpRight size={14} aria-hidden="true" />
                 </a>
               )}
             </div>

@@ -143,22 +143,19 @@ export default function RevealCounter({
     );
     const target = Math.round(parsedValue.target);
 
-    function getLineHeight(track) {
-      const firstFrame = track?.firstElementChild;
-
-      return firstFrame?.getBoundingClientRect().height || root.clientHeight;
-    }
+    // Each step is one frame of its reel, even when its type size changes.
+    const frameOffsets = tracks.map(track => -100 / track.childElementCount);
 
     function setZero() {
       gsap.killTweensOf(tracks);
-      gsap.set(tracks, { y: 0 });
+      gsap.set(tracks, { yPercent: 0 });
     }
 
     function setFinal() {
       tracks.forEach((track, trackIndex) => {
         const column = digitColumns[trackIndex];
 
-        gsap.set(track, { y: -((column?.steps || 0) % 10) * getLineHeight(track), clearProps: "willChange" });
+        gsap.set(track, { yPercent: ((column?.steps || 0) % 10) * frameOffsets[trackIndex], clearProps: "willChange" });
       });
     }
 
@@ -175,8 +172,7 @@ export default function RevealCounter({
       gsap.set(tracks, { willChange: "transform" });
 
       const totalDuration = duration ?? getDefaultDuration(target);
-      const lineHeights = tracks.map(getLineHeight);
-      const setters = tracks.map((track) => gsap.quickSetter(track, "y", "px"));
+      const setters = tracks.map(track => gsap.quickSetter(track, "yPercent"));
       const state = { value: 0 };
 
       function renderValue() {
@@ -184,10 +180,9 @@ export default function RevealCounter({
 
         tracks.forEach((_track, trackIndex) => {
           const column = digitColumns[trackIndex];
-          const lineHeight = lineHeights[trackIndex];
           const columnStep = getColumnStep(progress, column, target);
 
-          setters[trackIndex](-(columnStep % 10) * lineHeight);
+          setters[trackIndex]((columnStep % 10) * frameOffsets[trackIndex]);
         });
       }
 

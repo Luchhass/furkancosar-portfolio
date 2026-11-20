@@ -18,8 +18,9 @@ export default function AboutHero() {
         ariaLabel: `${projectCount} completed projects with modern interfaces`,
       }}
       copyLines={[
-        "I'm a frontend developer focused on clear interfaces and thoughtful interaction.",
-        "I combine design, code and motion to make digital experiences feel natural.",
+        "I turn ideas into clear and responsive interfaces.",
+        "I bring design, code and motion together as I build.",
+        "I refine each detail until the site feels natural.",
       ]}
       action={{
         href: "/cv/furkan-cosar-cv.pdf",

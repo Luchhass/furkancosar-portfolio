@@ -35,7 +35,7 @@ export default function Header() {
                 data-hero-intro="projects-link"
                 className="ui-header-projects group pointer-events-auto inline-flex items-center text-xs leading-none font-black whitespace-nowrap text-current no-underline"
               >
-                  <span className="ui-header-projects-text relative after:absolute after:bottom-[-0.45rem] after:left-0 after:h-0.5 after:w-full after:bg-current after:[clip-path:inset(0_100%_0_0)] after:opacity-90 after:transition-[clip-path] after:duration-500 after:ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:after:[clip-path:inset(0_0_0_0)] group-focus-visible:after:[clip-path:inset(0_0_0_0)]">
+                  <span data-header-intro-content className="ui-header-projects-text relative after:absolute after:bottom-[-0.45rem] after:left-0 after:h-0.5 after:w-full after:bg-current after:[clip-path:inset(0_100%_0_0)] after:opacity-90 after:transition-[clip-path] after:duration-500 after:ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:after:[clip-path:inset(0_0_0_0)] group-focus-visible:after:[clip-path:inset(0_0_0_0)]">
                   SEE MY PROJECTS
                 </span>
               </Link>
@@ -51,9 +51,11 @@ export default function Header() {
           className="ui-header-brand pointer-events-auto inline-flex items-center leading-none font-bold text-current no-underline"
         >
           <span className="ui-header-brand-dock">
-            <span className="ui-header-brand-text">{siteConfig.brand}</span>
+            <span className="ui-header-brand-text">{Array.from(siteConfig.brand, (letter, index) => (
+              <span key={index} className="ui-header-brand-letter-mask"><span data-intro-brand-letter>{letter}</span></span>
+            ))}</span>
           </span>
-          <span className="ui-header-brand-reg" aria-hidden="true">&reg;</span>
+          <span className="ui-header-brand-reg" data-intro-brand-reg aria-hidden="true">&reg;</span>
         </Link>
 
         <button
@@ -65,7 +67,9 @@ export default function Header() {
           aria-controls="site-menu"
           onClick={toggleMenu}
         >
-          <span className={`menu-center-line ${isMenuOpen ? "scale-x-0 opacity-0" : ""}`} aria-hidden="true" />
+          <span data-header-intro-content className="ui-header-menu-icon absolute inset-0" aria-hidden="true">
+            <span className={`menu-center-line ${isMenuOpen ? "scale-x-0 opacity-0" : ""}`} />
+          </span>
         </button>
       </header>
 

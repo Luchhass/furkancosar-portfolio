@@ -19,8 +19,9 @@ export default function ProjectsHero() {
         ariaLabel: `${projectCount} completed projects with modern interfaces`,
       }}
       copyLines={[
-        "A collection of interfaces shaped with clear structure and thoughtful interaction.",
-        "Explore the ideas, details and decisions behind each project.",
+        "Browse a collection of interfaces built for real use.",
+        "Each project explores a different layout or flow.",
+        "See the ideas and choices that shaped the result.",
       ]}
       action={{
         href: "/contact",
