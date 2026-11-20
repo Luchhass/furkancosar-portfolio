@@ -16,7 +16,7 @@ export default function TechStackAccordion() {
   const { locale } = useLanguage();
   useToolkitMotion(root, locale);
 
-  return localize(<section ref={root} className={styles.section} data-header-theme="light" aria-labelledby="toolkit-heading">
+  return localize(<section ref={root} className={styles.section} data-header-theme="light" data-skip-section-snap aria-labelledby="toolkit-heading">
     <div data-toolkit-frame className={styles.frame}>
       <div data-toolkit-intro className={`ui-section ${styles.intro}`}>
         <div className={styles.center}>

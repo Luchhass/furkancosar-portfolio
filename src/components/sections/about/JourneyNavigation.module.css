@@ -2,11 +2,11 @@
 .controls :global(.journey-rail-fill) { background-color: var(--color-primary); }
 .controls :global(.journey-chapter-links) { gap: 12px; margin-top: 14px; }
 .controls :global(.journey-chapter-links button) { display: block; min-width: 0; padding: 0; border: 0; background: none; color: #ffffff55; overflow: hidden; transition: color .3s; }
-.track { position: absolute; inset: 0 auto 0 0; display: flex; width: 200%; column-gap: 6px; transform: translateX(-50%); }
+.track { position: absolute; inset: 0 auto 0 0; display: flex; width: 200%; transform: translateX(-50%); }
 .entry { position: relative; display: block; width: max-content; max-width: 100%; overflow: hidden; }
 .body { display: flex; flex: 0 0 50%; min-width: 0; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 0; }
 .number { font-size: 28px; line-height: .82; font-weight: 900; letter-spacing: normal; font-variant-numeric: tabular-nums; }
-.label { font-size: 10px; line-height: 1; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.label { font-size: 10px; line-height: 1.15; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
 .controls :global(.journey-chapter-links button[aria-current="step"]) { color: #fff; }
 @media (min-width: 768px) { .number { font-size: 30px; } }
 @media (min-width: 1024px) { .number { font-size: 32px; } }
@@ -15,7 +15,8 @@
 }
 @media (max-width: 767px) {
   .controls :global(.journey-chapter-links) { gap: 5px; margin-top: 12px; }
-  .track { column-gap: 4px; }
+  .controls :global(.journey-chapter-links button) { container-type: inline-size; }
+  .label { font-size: clamp(7.5px, 19.5cqi, 10px); letter-spacing: .08em; }
   .body { flex-direction: column; align-items: flex-start; padding: 10px 0; gap: 7px; }
 }
 @media (prefers-reduced-motion: reduce) {

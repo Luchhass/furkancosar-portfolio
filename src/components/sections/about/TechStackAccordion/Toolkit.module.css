@@ -1,5 +1,9 @@
 .section { position: relative; background: #fff; color: #141414; }
 .frame { position: relative; isolation: isolate; width: 100%; height: 100dvh; overflow: clip; background: #fff; }
+@media (prefers-reduced-motion: no-preference) {
+  .section { height: calc(100dvh + var(--toolkit-scroll-distance, 0px)); }
+  .frame { position: sticky; top: 0; }
+}
 .intro { position: absolute; inset: 0; z-index: 2; display: grid; align-items: center; }
 .center { display: grid; justify-items: center; gap: var(--ui-stack); text-align: center; min-width: 0; }
 .center h2 { display: grid; gap: .08em; margin: 0; }

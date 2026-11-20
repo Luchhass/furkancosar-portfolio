@@ -93,10 +93,14 @@ export function createSectionScroll() {
     const y = window.scrollY;
     const triggers = ScrollTrigger.getAll().filter(trigger => trigger.pin);
     ranges = triggers.map(trigger => [trigger.start, trigger.end]);
-    const nodes = document.querySelectorAll("main .ui-screen, main .journey-story");
+    const nodes = document.querySelectorAll("main :is(.ui-screen, .journey-story, [data-skip-section-snap])");
     targets = [...nodes].flatMap(node => {
       const pin = triggers.find(trigger => trigger.pin === node);
       const top = pin ? pin.start : y + node.getBoundingClientRect().top;
+      if (node.hasAttribute("data-skip-section-snap")) {
+        ranges.push([top, top + Math.max(0, node.offsetHeight - window.innerHeight)]);
+        return [];
+      }
       if (node.matches(".journey-deck") || (!pin && node.offsetHeight > window.innerHeight + 4)) {
         const end = top + node.offsetHeight - window.innerHeight;
         ranges.push([top, end]);

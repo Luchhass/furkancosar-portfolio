@@ -33,7 +33,12 @@ export default function useToolkitMotion(root, locale) {
       const measure = () => {
         viewportWidth = frame.clientWidth;
         widths = tracks.map(track => track.scrollWidth);
-        travelDistance = Math.max(...widths) + viewportWidth;
+        // The longest row determines the scroll distance for all four bands.
+        const distance = (Math.max(...widths) + viewportWidth) / (.38 * 3.5);
+        if (distance === travelDistance) return false;
+        travelDistance = distance;
+        section.style.setProperty("--toolkit-scroll-distance", `${distance}px`);
+        return true;
       };
       // All stages are pure functions of one scrubbed scroll position.
       // There is no timed playback or independent sequence to get out of sync.
@@ -60,14 +65,14 @@ export default function useToolkitMotion(root, locale) {
         progress: 1, ease: "none", onUpdate: draw,
         scrollTrigger: {
           id: "toolkit-strips", trigger: section, start: "top top",
-          // Keep the same stages with a shorter, more responsive scroll journey.
-          // The longest row sets scroll length; every row shares its start/end.
-          end: () => { measure(); return `+=${travelDistance / (.38 * 3.5)}`; },
-          pin: frame, scrub: .3, invalidateOnRefresh: true,
-          onRefresh: () => { measure(); draw(); },
+          end: "bottom bottom", scrub: .3,
+          onRefreshInit: measure, onRefresh: draw,
         },
       });
-      const resize = new ResizeObserver(() => { measure(); draw(); });
+      const resize = new ResizeObserver(() => {
+        if (measure()) ScrollTrigger.refresh(true);
+        draw();
+      });
       resize.observe(frame);
       tracks.forEach(track => resize.observe(track));
       return () => {
@@ -75,6 +80,7 @@ export default function useToolkitMotion(root, locale) {
         animation.scrollTrigger?.kill();
         animation.kill();
         introExit.revert();
+        section.style.removeProperty("--toolkit-scroll-distance");
       };
     });
     return () => media.revert();
