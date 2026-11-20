@@ -50,12 +50,14 @@ export default function Header() {
           data-hero-intro="brand"
           className="ui-header-brand pointer-events-auto inline-flex items-center leading-none font-bold text-current no-underline"
         >
-          <span className="ui-header-brand-dock">
-            <span className="ui-header-brand-text">{Array.from(siteConfig.brand, (letter, index) => (
-              <span key={index} className="ui-header-brand-letter-mask"><span data-intro-brand-letter>{letter}</span></span>
-            ))}</span>
+          <span data-header-intro-content="brand" className="relative inline-flex h-full items-center">
+            <span className="ui-header-brand-dock">
+              <span className="ui-header-brand-text">{Array.from(siteConfig.brand, (letter, index) => (
+                <span key={index} className="ui-header-brand-letter-mask"><span data-intro-brand-letter>{letter}</span></span>
+              ))}</span>
+            </span>
+            <span className="ui-header-brand-reg" data-intro-brand-reg aria-hidden="true">&reg;</span>
           </span>
-          <span className="ui-header-brand-reg" data-intro-brand-reg aria-hidden="true">&reg;</span>
         </Link>
 
         <button

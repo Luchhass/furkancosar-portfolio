@@ -6,7 +6,7 @@ import { localizedPath } from "./localizedRoutes";
 
 // Translate React content before rendering: never mutate GSAP's split DOM.
 const textProps = new Set(["aria-label", "title", "placeholder", "alt", "label", "text", "ariaLabel"]);
-const contentProps = new Set(["titleLines", "copyLines", "labelLines", "words", "stat", "action"]);
+const contentProps = new Set(["titleLines", "copyLines", "words", "stat", "action"]);
 function values(value, locale) {
   if (typeof value === "string") return translate(locale, value);
   if (Array.isArray(value)) return value.map(item => values(item, locale));

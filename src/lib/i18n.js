@@ -13,7 +13,7 @@ const dynamicMessages = [
   [/^Visit (.+) live site$/, "$1 sitesini ziyaret et"],
   [/^Go to chapter (\d+): (.+)$/, "$1. adıma git: $2"],
   [/^(.+) preview$/, "$1 önizlemesi"],
-  [/^(\d+) completed projects with modern interfaces$/, "Modern arayüzlerle tamamlanmış $1 proje"],
+  [/^(\d+) completed projects$/, "$1 tamamlanan proje"],
 ];
 
 export function translate(locale, key, values = {}) {

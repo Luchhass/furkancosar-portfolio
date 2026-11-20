@@ -15,8 +15,8 @@ export default function ProjectsHero() {
       ]}
       stat={{
         value: String(projectCount),
-        labelLines: ["completed projects", "with modern interfaces"],
-        ariaLabel: `${projectCount} completed projects with modern interfaces`,
+        label: "completed projects",
+        ariaLabel: `${projectCount} completed projects`,
       }}
       copyLines={[
         "Browse a collection of interfaces built for real use.",

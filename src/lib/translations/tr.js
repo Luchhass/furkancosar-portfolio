@@ -19,7 +19,7 @@ export const TURKISH_MESSAGES = {
   "THE MIND": "ARAYÜZÜN", "BEHIND": "ARKASINDAKİ", "THE INTERFACE": "BAKIŞ AÇISI",
   "What I've": "NELER", "Been": "GELİŞTİRDİM", "Building": "KEŞFET",
   "Let's": "GEL", "Shape Your": "YENİ FİKRİNİ", "Next Build": "ŞEKİLLENDİRELİM",
-  "completed projects": "tamamlanan proje", "with modern interfaces": "modern arayüzlerle",
+  "completed projects": "tamamlanan proje",
   "SCROLL TO EXPLORE": "KEŞFETMEK İÇİN KAYDIR", "Back to top": "Başa dön", "BACK TO TOP": "BAŞA DÖN",
   "I build web interfaces that feel clear and fast.": "Sade ve hızlı web arayüzleri geliştiriyorum.",
   "I use motion to guide people through each screen.": "Her ekranda akıcı geçişlerle yol gösteriyorum.",

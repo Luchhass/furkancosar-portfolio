@@ -29,7 +29,7 @@ function ReadingTextContent({ as: Tag = "p", children, active = true, waitForInt
     };
     const clearSpreadLines = () => root.removeAttribute("data-spread-lines");
     if (spreadLines) {
-      media.add("(prefers-reduced-motion: reduce) and (min-width: 1280px)", () => {
+      media.add("(prefers-reduced-motion: reduce)", () => {
         const split = SplitText.create(root, {
           type: "lines", linesClass: "reading-line", autoSplit: true,
           onSplit: markSpreadLines, onRevert: clearSpreadLines,

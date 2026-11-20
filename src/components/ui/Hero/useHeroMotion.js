@@ -39,11 +39,10 @@ function useHeroEntrance(heroRef, pathname) {
         return rect.width > 0 && rect.height > 0;
       };
 
-      const headerControls = [...document.querySelectorAll("[data-header-intro-content]")].filter(isVisibleElement);
-      const headerMasks = headerControls.map(control => control.parentElement);
-      const headerBrand = document.querySelector("[data-hero-intro='brand']");
-      const animateBrand = basePath(pathname) !== "/" && isVisibleElement(headerBrand);
-      const headerItems = animateBrand ? [...headerControls, headerBrand] : headerControls;
+      const isHome = basePath(pathname) === "/";
+      const headerItems = [...document.querySelectorAll("[data-header-intro-content]")].filter(item =>
+        isVisibleElement(item) && !(isHome && item.dataset.headerIntroContent === "brand"));
+      const headerMasks = headerItems.map(item => item.parentElement);
 
       const titleItems = [...q("[data-hero-title]")].filter(isVisibleElement);
       const statItems = [...q("[data-hero-stat]")].filter(isVisibleElement);
@@ -66,16 +65,15 @@ function useHeroEntrance(heroRef, pathname) {
 
       const buttonReleaseStart = lastTitleStart + 0.9;
 
-      // The link and buttons stay in place while their contents enter the mask.
-      gsap.set(headerMasks, { clipPath: "inset(0 -6px -6px)" });
-      gsap.set(headerControls, {
+      // The links and buttons stay in place while their contents enter the mask.
+      gsap.set(headerMasks, {
+        clipPath: (_, mask) => mask.classList.contains("ui-header-brand") ? "inset(0 -16px -6px -6px)" : "inset(0 -6px -6px)",
+      });
+      gsap.set(headerItems, {
         y: (_, control) => -control.parentElement.offsetHeight - 6,
         force3D: false,
         willChange: "transform",
       });
-      if (animateBrand) {
-        gsap.set(headerBrand, { autoAlpha: 1, y: -34, force3D: false, willChange: "transform" });
-      }
 
       if (auxiliaryItems.length) {
         gsap.set(auxiliaryItems, {
@@ -127,7 +125,7 @@ function useHeroEntrance(heroRef, pathname) {
           },
           0,
         );
-        if (headerMasks.length) timeline.set(headerMasks, { clearProps: "clipPath" });
+        timeline.set(headerMasks, { clearProps: "clipPath" });
       }
 
       if (statItems.length) {

@@ -14,8 +14,8 @@ export default function HomeHero() {
       ]}
       stat={{
         value: String(projectCount),
-        labelLines: ["completed projects", "with modern interfaces"],
-        ariaLabel: `${projectCount} completed projects with modern interfaces`,
+        label: "completed projects",
+        ariaLabel: `${projectCount} completed projects`,
       }}
       copyLines={[
         "I build web interfaces that feel clear and fast.",
